@@ -1,0 +1,12 @@
+---
+name: Push to dev or main
+
+on:
+  push:
+    branches:
+      - main
+      - dev
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml

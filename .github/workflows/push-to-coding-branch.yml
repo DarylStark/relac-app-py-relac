@@ -1,0 +1,12 @@
+---
+name: Push to coding branch
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - dev
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml

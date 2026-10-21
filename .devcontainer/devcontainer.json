@@ -1,0 +1,11 @@
+{
+    "name": "relac",
+    "image": "dast1986/slough-dev-dc-python:1.0.2",
+    "remoteEnv": {
+        "PROMPTNAME": "RELAC",
+        "LC_ALL": "C.UTF-8"
+    },
+    "mounts": [
+        "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+    ]
+}
