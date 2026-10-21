@@ -31,7 +31,6 @@ class Author(ResourceBase):
     state: AuthorState = AuthorState.UNSPECIFIED
     birthdate: date | None = None
     deceased_date: date | None = None
-    works: list[Work] | None = None
 
     @override
     def is_valid(self) -> bool:
@@ -69,7 +68,8 @@ class Work(ResourceBase):
     authors: list[Author] = Field(default_factory=list)
     work_type: WorkType | None = None
     work_structure: WorkStructure | None = None
-    edition: list[WorkEdition] = Field(default_factory=list)
+    editions_objs: list[WorkEdition] = Field(default_factory=list)
+    editions: list[str] = Field(default_factory=list)
 
     @override
     def is_valid(self) -> bool:
@@ -144,6 +144,9 @@ class BookBinding(Enum):
     POCKET = 'pocket'
     LUXE_EDITION = 'luxe_edition'
     GRAPHICAL_NOVEL_ADAPTION = 'graphical_novel_adaption'
+    EPUB = 'epub'
+    EPUB_WATERMARK = 'epub_watermark'
+    EPUB_DRM = 'epub_drm'
 
 
 class Book(ResourceBase):
@@ -153,8 +156,7 @@ class Book(ResourceBase):
     title: str
     publisher: BookPublisher | None = None
     medium: BookMedium = BookMedium.UNSPECIFIED
-    biding: BookBinding = BookBinding.UNSPECIFIED
-    collection: BookCollection | None = None
+    binding: BookBinding = BookBinding.UNSPECIFIED
 
     @override
     def is_valid(self) -> bool:
@@ -168,8 +170,6 @@ class ReadingSession(ResourceBase):
 
     startdate: date | None = None
     enddate: date | None = None
-    work: Work | None = None
-    book: Book | None = None
     finished: bool = False
 
     @override

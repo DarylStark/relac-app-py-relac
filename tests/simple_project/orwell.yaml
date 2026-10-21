@@ -1,0 +1,33 @@
+---
+#-------------------------------------------------------------------------------
+# Author
+#-------------------------------------------------------------------------------
+author.george_orwell:
+  name: George Orwell
+  state: deceased
+  birthdate: 1903-06-25
+  deceased_date: 1950-01-21
+#-------------------------------------------------------------------------------
+# Works and work editions
+#-------------------------------------------------------------------------------
+work.george_orwell__nineteen_eighty_four:
+  title: Nineteen Eighty-Four
+  <<: *template_work
+  editions:
+    - work_edition.george_orwell__nineteen_eighty_four__original
+
+work_edition.george_orwell__nineteen_eighty_four__original:
+  title: Nineteen Eighty-Four
+  <<: *template_work_edition
+#-------------------------------------------------------------------------------
+# Books
+#-------------------------------------------------------------------------------
+book.george_orwell__nineteen_eighty_four__clothbound_classic:
+  isbn13: 9780241453513
+  title: Nineteen Eighty-Four
+  medium: hardcover
+  binding: luxe_edition
+  collection: collection.penguin_clothbound_classics
+  work_editions:
+    - work_edition.george_orwell__nineteen_eighty_four__original
+#-------------------------------------------------------------------------------

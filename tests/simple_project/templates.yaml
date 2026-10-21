@@ -1,0 +1,13 @@
+---
+#-------------------------------------------------------------------------------
+# Templates
+#-------------------------------------------------------------------------------
+_template_work: &template_work
+  author: author.stephen_king
+  work_type: genre-fiction
+  work_structure: short-story
+
+_template_work_edition: &template_work_edition
+  title: Mr. Harrigan's Phone
+  edition_type: original
+  language: en
