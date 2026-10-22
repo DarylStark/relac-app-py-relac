@@ -1,0 +1,11 @@
+---
+#-------------------------------------------------------------------------------
+# Publisher Penguin
+#-------------------------------------------------------------------------------
+publisher.penguin_random_house:
+  name: Penguin Random House
+
+publisher.penguin_random_house__classics:
+  name: Penguin Random House
+  imprint: Penguin Classics
+#-------------------------------------------------------------------------------
