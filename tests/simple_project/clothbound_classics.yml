@@ -4,4 +4,6 @@
 #-------------------------------------------------------------------------------
 collection.penguin_clothbound_classics:
   name: Penguin Clothbound Classics
+  books:
+    - book.george_orwell__nineteen_eighty_four__clothbound_classic
 #-------------------------------------------------------------------------------

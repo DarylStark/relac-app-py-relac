@@ -85,7 +85,7 @@ class ProjectParser:
         obj: dict[str, str],
     ) -> ResourceModel:
         """Generic method to parse data."""
-        return model.model_validate(obj)
+        return model.model_validate(obj, extra='forbid')
 
     def _parse_author_object(self, obj_id: str, data: dict[str, str]) -> None:
         """Parse an raw author object into a Author object."""

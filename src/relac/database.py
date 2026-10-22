@@ -41,6 +41,47 @@ class Database:
             raise ValueError(f'Object with it "{id}" already exists.')
         collection[id] = obj
 
+    def _converge_works_editions(self) -> None:
+        """Converge all works."""
+        for obj in self._work_editions.values():
+            work_obj = self._works.get(obj.work)
+            if not work_obj:
+                # TODO: Custom error
+                raise ValueError(f'Work with id "{obj.work}" doesn\'t exist')
+            obj.work_obj = work_obj
+            work_obj.edition_objs.append(obj)
+
+    def _converge_books(self) -> None:
+        """Converge all books."""
+        for obj in self._books.values():
+            if not obj.publisher:
+                continue
+
+            publisher_obj = self._book_publishers.get(obj.publisher)
+            if not publisher_obj:
+                # TODO: Custom error
+                raise ValueError(
+                    f'Publisher with id "{obj.publisher}" doesn\'t exist'
+                )
+            obj.publisher_obj = publisher_obj
+            publisher_obj.book_objs.append(obj)
+
+    def _converge_book_collections(self) -> None:
+        """Converge all book collections."""
+        for obj in self._book_collections.values():
+            for book in obj.books:
+                book_obj = self._books.get(book)
+                if book_obj is None:
+                    raise ValueError(f'Book with id "{book}" doesn\'t exist')
+                obj.book_objs.append(book_obj)
+                book_obj.collection_objs.append(obj)
+
+    def converge(self) -> None:
+        """Converge all objects."""
+        self._converge_works_editions()
+        self._converge_books()
+        self._converge_book_collections()
+
     def add_author(self, id: str, obj: Author) -> None:
         """Add a author to the database."""
         self._add_object(id, obj, self._authors)

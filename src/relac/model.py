@@ -10,7 +10,6 @@ class ResourceBase(BaseModel):
     """Base model for resources."""
 
     _id: str | None = PrivateAttr(default=None)
-    _is_converged: bool = PrivateAttr(default=False)
 
 
 class AuthorState(Enum):
@@ -28,6 +27,9 @@ class Author(ResourceBase):
     state: AuthorState = AuthorState.UNSPECIFIED
     birthdate: date | None = None
     deceased_date: date | None = None
+
+    # Relation (real objects)
+    work_objs: list[Work] = Field(default_factory=list)
 
 
 class WorkType(Enum):
@@ -63,7 +65,7 @@ class Work(ResourceBase):
 
     # Relation (real objects)
     authors_objs: list[Author] = Field(default_factory=list)
-    editions_objs: list[WorkEdition] = Field(default_factory=list)
+    edition_objs: list[WorkEdition] = Field(default_factory=list)
 
 
 class WorkEditionType(Enum):
@@ -95,6 +97,10 @@ class BookCollection(ResourceBase):
     """A collection of books."""
 
     name: str
+    books: list[str] = Field(default_factory=list)
+
+    # Relations (real objects)
+    book_objs: list[Book] = Field(default_factory=list)
 
 
 class BookPublisher(ResourceBase):
@@ -135,11 +141,13 @@ class Book(ResourceBase):
     isbn13: int
     title: str
     publisher: str | None = None
+    work_editions: list[str] = Field(default_factory=list)
     medium: BookMedium = BookMedium.UNSPECIFIED
     binding: BookBinding = BookBinding.UNSPECIFIED
 
     # Relationships (real objects)
-    publisher_obj: BookPublisher | None = None
+    publisher_obj: BookPublisher = Field(default_factory=list)
+    collection_objs: list[BookCollection] = Field(default_factory=list)
 
 
 class ReadingSession(ResourceBase):

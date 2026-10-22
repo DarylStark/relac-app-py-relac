@@ -12,7 +12,6 @@ author.george_orwell:
 #-------------------------------------------------------------------------------
 work.george_orwell__nineteen_eighty_four:
   title: Nineteen Eighty-Four
-  _is_converged: True
   <<: *template_work
 
 work_edition.george_orwell__nineteen_eighty_four__original:
@@ -28,7 +27,4 @@ book.george_orwell__nineteen_eighty_four__clothbound_classic:
   publisher: publisher.penguin_random_house__classics
   medium: hardcover
   binding: luxe_edition
-  collection: collection.penguin_clothbound_classics
-  work_editions:
-    - work_edition.george_orwell__nineteen_eighty_four__original
 #-------------------------------------------------------------------------------

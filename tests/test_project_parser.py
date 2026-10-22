@@ -11,6 +11,7 @@ def test_parsing_directory() -> None:
     database = Database()
     parser = ProjectParser(Path('tests/simple_project/'), database)
     parser.parse()
+    database.converge()
 
     assert len(database.get_authors()) == 2
     assert len(database.get_works()) == 5
@@ -20,3 +21,5 @@ def test_parsing_directory() -> None:
     assert len(database.get_book_collections()) == 1
     assert len(database.get_labels()) == 0
     assert len(database.get_resource_lists()) == 0
+
+    pass

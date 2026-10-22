@@ -27,9 +27,6 @@ work_edition.stephen_king__mr_harrigans_phone__nl:
 work.stephen_king__the_life_of_chuck:
   title: The Life of Chuck
   <<: *template_work
-  editions:
-    - work_edition.stephen_king__the_life_of_chuck__original
-    - work_edition.stephen_king__the_life_of_chuck__nl
 
 work_edition.stephen_king__the_life_of_chuck__original:
   title: The Life of Chuck
@@ -45,9 +42,6 @@ work_edition.stephen_king__the_life_of_chuck__nl:
 work.stephen_king__if_it_bleeds:
   title: If It Bleeds
   <<: *template_work
-  editions:
-    - work_edition.stephen_king__if_it_bleed__original
-    - work_edition.stephen_king__if_it_bleed__nl
 
 work_edition.stephen_king__if_it_bleed__original:
   title: If It Bleeds
@@ -63,9 +57,6 @@ work_edition.stephen_king__if_it_bleed__nl:
 work.stephen_king__rat:
   title: Rat
   <<: *template_work
-  editions:
-    - work_edition.stephen_king__rat__original
-    - work_edition.stephen_king__rat__nl
 
 work_edition.stephen_king__rat__original:
   title: Rat
