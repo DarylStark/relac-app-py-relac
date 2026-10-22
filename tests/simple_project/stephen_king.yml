@@ -1,0 +1,95 @@
+---
+#-------------------------------------------------------------------------------
+# Author
+#-------------------------------------------------------------------------------
+author.stephen_king:
+  name: Stephen King
+  state: alive
+  birthdate: 1947-09-21
+#-------------------------------------------------------------------------------
+# Works and work editions
+#-------------------------------------------------------------------------------
+work.stephen_king__mr_harrigans_phone:
+  title: Mr. Harrigan's Phone
+  <<: *template_work
+
+work_edition.stephen_king__mr_harrigans_phone__original:
+  title: Mr. Harrigan's Phone
+  work: work.stephen_king__mr_harrigans_phone
+  <<: *template_work_edition
+
+work_edition.stephen_king__mr_harrigans_phone__nl:
+  title: De telefoon van meneer Harrigan
+  work: work.stephen_king__mr_harrigans_phone
+  <<: *template_work_edition
+  language: nl
+
+work.stephen_king__the_life_of_chuck:
+  title: The Life of Chuck
+  <<: *template_work
+
+work_edition.stephen_king__the_life_of_chuck__original:
+  title: The Life of Chuck
+  work: work.stephen_king__the_life_of_chuck
+  <<: *template_work_edition
+
+work_edition.stephen_king__the_life_of_chuck__nl:
+  title: Het leven van Chuck
+  work: work.stephen_king__the_life_of_chuck
+  <<: *template_work_edition
+  language: nl
+
+work.stephen_king__if_it_bleeds:
+  title: If It Bleeds
+  <<: *template_work
+
+work_edition.stephen_king__if_it_bleed__original:
+  title: If It Bleeds
+  work: work.stephen_king__if_it_bleeds
+  <<: *template_work_edition
+
+work_edition.stephen_king__if_it_bleed__nl:
+  title: Als het bloedt
+  work: work.stephen_king__if_it_bleeds
+  <<: *template_work_edition
+  language: nl
+
+work.stephen_king__rat:
+  title: Rat
+  <<: *template_work
+
+work_edition.stephen_king__rat__original:
+  title: Rat
+  work: work.stephen_king__rat
+  <<: *template_work_edition
+
+work_edition.stephen_king__rat__nl:
+  title: Rat
+  work: work.stephen_king__rat
+  <<: *template_work_edition
+  language: nl
+#-------------------------------------------------------------------------------
+# Books
+#-------------------------------------------------------------------------------
+book.stephen_king__als_het_bloedt:
+  isbn13: 9789402315103
+  title: Als het bloedt
+  medium: ebook
+  binding: epub_watermark
+  work_editions:
+    - work_edition.stephen_king__if_it_bleed__nl
+    - work_edition.stephen_king__mr_harrigans_phone__nl
+    - work_edition.stephen_king__rat__nl
+    - work_edition.stephen_king__the_life_of_chuck__nl
+
+book.stephen_king__if_it_bleeds:
+  isbn13: 9781982137984
+  title: If It Bleeds
+  medium: paperback
+  binding: unspecified
+  work_editions:
+    - work_edition.stephen_king__if_it_bleed__original
+    - work_edition.stephen_king__mr_harrigans_phone__original
+    - work_edition.stephen_king__rat__original
+    - work_edition.stephen_king__the_life_of_chuck__original
+#-------------------------------------------------------------------------------

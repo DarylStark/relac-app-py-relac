@@ -1,19 +1,15 @@
 """Module with the models for the application."""
 
-from abc import ABC, abstractmethod
 from datetime import date
 from enum import Enum
-from typing import override
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 
-class ResourceBase(ABC, BaseModel):
+class ResourceBase(BaseModel):
     """Base model for resources."""
 
-    @abstractmethod
-    def is_valid(self) -> bool:
-        """Abstract method to determine if a resource is valid."""
+    _id: str | None = PrivateAttr(default=None)
 
 
 class AuthorState(Enum):
@@ -31,12 +27,9 @@ class Author(ResourceBase):
     state: AuthorState = AuthorState.UNSPECIFIED
     birthdate: date | None = None
     deceased_date: date | None = None
-    works: list[Work] | None = None
 
-    @override
-    def is_valid(self) -> bool:
-        """Check if this model is valid."""
-        return self.name.strip() != ''
+    # Relation (real objects)
+    work_objs: list[Work] = Field(default_factory=list)
 
 
 class WorkType(Enum):
@@ -66,15 +59,13 @@ class Work(ResourceBase):
     """Model for a work."""
 
     title: str
-    authors: list[Author] = Field(default_factory=list)
+    author: str
     work_type: WorkType | None = None
     work_structure: WorkStructure | None = None
-    edition: list[WorkEdition] = Field(default_factory=list)
 
-    @override
-    def is_valid(self) -> bool:
-        """Check if this model is valid."""
-        return self.title.strip() != ''
+    # Relation (real objects)
+    authors_objs: list[Author] = Field(default_factory=list)
+    edition_objs: list[WorkEdition] = Field(default_factory=list)
 
 
 class WorkEditionType(Enum):
@@ -93,26 +84,23 @@ class WorkEdition(ResourceBase):
     """A edition for a work."""
 
     title: str
-    work: Work | None = None
+    work: str
     release_date: date | None = None
     edition_type: WorkEditionType = WorkEditionType.UNSPECIFIED
     language: str | None = None
 
-    @override
-    def is_valid(self) -> bool:
-        """Check if this model is valid."""
-        return self.title.strip() != ''
+    # Relations (real objects)
+    work_obj: Work | None = None
 
 
 class BookCollection(ResourceBase):
     """A collection of books."""
 
     name: str
+    books: list[str] = Field(default_factory=list)
 
-    @override
-    def is_valid(self) -> bool:
-        """Check if this model is valid."""
-        return self.name.strip() != ''
+    # Relations (real objects)
+    book_objs: list[Book] = Field(default_factory=list)
 
 
 class BookPublisher(ResourceBase):
@@ -121,10 +109,8 @@ class BookPublisher(ResourceBase):
     name: str
     imprint: str | None = None
 
-    @override
-    def is_valid(self) -> bool:
-        """Check if this model is valid."""
-        return self.name.strip() != ''
+    # Relations (real objects)
+    book_objs: list[Book] = Field(default_factory=list)
 
 
 class BookMedium(Enum):
@@ -144,6 +130,9 @@ class BookBinding(Enum):
     POCKET = 'pocket'
     LUXE_EDITION = 'luxe_edition'
     GRAPHICAL_NOVEL_ADAPTION = 'graphical_novel_adaption'
+    EPUB = 'epub'
+    EPUB_WATERMARK = 'epub_watermark'
+    EPUB_DRM = 'epub_drm'
 
 
 class Book(ResourceBase):
@@ -151,16 +140,14 @@ class Book(ResourceBase):
 
     isbn13: int
     title: str
-    publisher: BookPublisher | None = None
+    publisher: str | None = None
+    work_editions: list[str] = Field(default_factory=list)
     medium: BookMedium = BookMedium.UNSPECIFIED
-    biding: BookBinding = BookBinding.UNSPECIFIED
-    collection: BookCollection | None = None
+    binding: BookBinding = BookBinding.UNSPECIFIED
 
-    @override
-    def is_valid(self) -> bool:
-        """Check if this model is valid."""
-        # TODO: Validate the isbn13
-        return self.title.strip() != ''
+    # Relationships (real objects)
+    publisher_obj: BookPublisher = Field(default_factory=list)
+    collection_objs: list[BookCollection] = Field(default_factory=list)
 
 
 class ReadingSession(ResourceBase):
@@ -168,14 +155,13 @@ class ReadingSession(ResourceBase):
 
     startdate: date | None = None
     enddate: date | None = None
-    work: Work | None = None
-    book: Book | None = None
     finished: bool = False
+    work_edition: str | None = None
+    book: str | None = None
 
-    @override
-    def is_valid(self) -> bool:
-        """Check if this model is valid."""
-        return True
+    # Relationships (real objects)
+    work_edition_obj: WorkEdition | None = None
+    book_obj: Book | None = None
 
 
 class Label(ResourceBase):
@@ -183,18 +169,8 @@ class Label(ResourceBase):
 
     name: str
 
-    @override
-    def is_valid(self) -> bool:
-        """Check if this model is valid."""
-        return self.name.strip() != ''
-
 
 class ResourceList(ResourceBase):
     """A list of resources."""
 
     name: str
-
-    @override
-    def is_valid(self) -> bool:
-        """Check if this model is valid."""
-        return self.name.strip() != ''
