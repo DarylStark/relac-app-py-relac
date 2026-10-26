@@ -128,6 +128,7 @@ class BookBinding(Enum):
 
     UNSPECIFIED = 'unspecified'
     POCKET = 'pocket'
+    NOVELLA = 'novella'
     LUXE_EDITION = 'luxe_edition'
     GRAPHICAL_NOVEL_ADAPTION = 'graphical_novel_adaption'
     EPUB = 'epub'
@@ -146,6 +147,7 @@ class Book(ResourceBase):
     binding: BookBinding = BookBinding.UNSPECIFIED
 
     # Relationships (real objects)
+    work_edition_objs: list[WorkEdition] = Field(default_factory=list)
     publisher_obj: BookPublisher = Field(default_factory=list)
     collection_objs: list[BookCollection] = Field(default_factory=list)
 

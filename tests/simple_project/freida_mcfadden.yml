@@ -1,0 +1,42 @@
+---
+#-------------------------------------------------------------------------------
+# Author
+#-------------------------------------------------------------------------------
+author.freida_mcfadden:
+  name: Freidda McFadden
+  state: alive
+  birthdate: 1980-05-01
+#-------------------------------------------------------------------------------
+# Works and work editions
+#-------------------------------------------------------------------------------
+work.freida_mcfadden__the_housemaids_wedding:
+  title: The Housemaid's Wedding
+  <<: *template_work
+  author: author.freida_mcfadden
+
+work_edition.freida_mcfadden__the_housemaids_wedding__original:
+  title: The Housemaid's Wedding
+  work: work.freida_mcfadden__the_housemaids_wedding
+  <<: *template_work_edition
+
+work.freida_mcfadden__the_witch:
+  title: The Witch
+  <<: *template_work
+  author: author.freida_mcfadden
+
+work_edition.freida_mcfadden__the_witch__abriged:
+  title: The Witch
+  work: work.freida_mcfadden__the_witch
+  <<: *template_work_edition
+#-------------------------------------------------------------------------------
+# Books
+#-------------------------------------------------------------------------------
+book.freida_mcfadden__the_housemaids_wedding:
+  isbn13: 9781628861891
+  title: The Housemaid's Wedding
+  medium: paperback
+  binding: novella
+  work_editions:
+    - work_edition.freida_mcfadden__the_housemaids_wedding__original
+    - work_edition.freida_mcfadden__the_witch__abriged
+#-------------------------------------------------------------------------------

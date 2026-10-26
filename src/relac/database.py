@@ -54,17 +54,23 @@ class Database:
     def _converge_books(self) -> None:
         """Converge all books."""
         for obj in self._books.values():
-            if not obj.publisher:
-                continue
+            if obj.publisher is not None:
+                publisher_obj = self._book_publishers.get(obj.publisher)
+                if not publisher_obj:
+                    # TODO: Custom error
+                    raise ValueError(
+                        f'Publisher with id "{obj.publisher}" doesn\'t exist'
+                    )
+                obj.publisher_obj = publisher_obj
+                publisher_obj.book_objs.append(obj)
 
-            publisher_obj = self._book_publishers.get(obj.publisher)
-            if not publisher_obj:
-                # TODO: Custom error
-                raise ValueError(
-                    f'Publisher with id "{obj.publisher}" doesn\'t exist'
-                )
-            obj.publisher_obj = publisher_obj
-            publisher_obj.book_objs.append(obj)
+            for work_edition in obj.work_editions:
+                work_edition_obj = self._work_editions.get(work_edition)
+                if work_edition_obj is None:
+                    raise ValueError(
+                        f'WorkEdition with id "{work_edition}" doesn\'t exist'
+                    )
+                obj.work_edition_objs.append(work_edition_obj)
 
     def _converge_book_collections(self) -> None:
         """Converge all book collections."""

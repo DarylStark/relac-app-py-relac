@@ -13,10 +13,10 @@ def test_parsing_directory() -> None:
     parser.parse()
     database.converge()
 
-    assert len(database.get_authors()) == 2
-    assert len(database.get_works()) == 5
-    assert len(database.get_work_editions()) == 9
-    assert len(database.get_books()) == 3
+    assert len(database.get_authors()) == 3
+    assert len(database.get_works()) == 7
+    assert len(database.get_work_editions()) == 11
+    assert len(database.get_books()) == 4
     assert len(database.get_book_publishers()) == 2
     assert len(database.get_book_collections()) == 1
     assert len(database.get_labels()) == 0

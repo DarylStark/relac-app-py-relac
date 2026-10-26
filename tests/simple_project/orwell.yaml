@@ -27,4 +27,6 @@ book.george_orwell__nineteen_eighty_four__clothbound_classic:
   publisher: publisher.penguin_random_house__classics
   medium: hardcover
   binding: luxe_edition
+  work_editions:
+    - work_edition.george_orwell__nineteen_eighty_four__original
 #-------------------------------------------------------------------------------
