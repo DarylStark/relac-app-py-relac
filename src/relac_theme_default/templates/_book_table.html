@@ -1,0 +1,43 @@
+{% macro book_table(books) %}
+<div class="table-scroll">
+    <table class="resources" data-sortable>
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Publisher</th>
+                <th scope="col" class="center">Works</th>
+                <th scope="col" class="right">ISBN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book_id, book in books %}
+                {{ book_row(book_id, book) }}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{% macro book_row(book_id, book) %}
+<tr data-href="{{ book_id }}.html">
+    <td>{{ book.title }}</td>
+    <td>
+        {% if book.publisher_obj %}
+            {{ book.publisher_obj.name }}
+            {% if book.publisher_obj.imprint %}
+                / {{ book.publisher_obj.imprint }}
+            {% endif %}
+        {% endif %}
+    </td>
+    <td class="center">
+        <div class="isbn">
+            {{ book.work_edition_objs | length }}
+        </div>
+    </td>
+    <td class="right">
+        <div class="isbn">
+            {{ book.isbn13 | isbn }}
+        </div>
+    </td>
+</tr>
+{% endmacro %}

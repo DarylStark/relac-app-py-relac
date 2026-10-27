@@ -248,12 +248,10 @@ table.resources thead th {
 }
 
 table[data-sortable] th .sortable-table-button {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    position: relative;
+    display: block;
     width: 100%;
-    gap: 8px;
-    padding: 0;
+    padding: 0 1.25em 0 0;
     border: 0;
     color: inherit;
     background: transparent;
@@ -264,13 +262,23 @@ table[data-sortable] th .sortable-table-button {
 }
 
 table[data-sortable] th.right .sortable-table-button {
-    justify-content: flex-end;
     text-align: right;
 }
 
+table[data-sortable] th.center .sortable-table-button {
+    padding-right: 1.25em;
+    padding-left: 1.25em;
+    text-align: center;
+}
+
 table[data-sortable] th .sortable-table-button::after {
+    position: absolute;
+    top: 50%;
+    right: 0;
     content: "↕";
     opacity: 0.55;
+    line-height: 1;
+    transform: translateY(-50%);
 }
 
 table[data-sortable] th[aria-sort="ascending"] .sortable-table-button::after {
@@ -297,6 +305,11 @@ table.resources td {
 table.resources thead th.right,
 table.resources td.right {
     text-align: right;
+}
+
+table.resources thead th.center,
+table.resources td.center {
+    text-align: center;
 }
 
 table.resources tbody tr:hover {
