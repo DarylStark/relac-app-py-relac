@@ -1,0 +1,29 @@
+<html>
+
+<head>
+    <title>Relac library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel='stylesheet' href="static/style.css" />
+</head>
+
+<body>
+
+    <main class="page-shell">
+        <h1>Relac library</h1>
+
+        <nav class="tab-nav">
+            <a href="index.html" {% if active_page == "overview" %}class="active"{% endif %}>Overview</a>
+            <a href="authors.html" {% if active_page == "authors" %}class="active"{% endif %}>Authors</a>
+            <a href="works.html" {% if active_page == "works" %}class="active"{% endif %}>Works</a>
+            <a href="books.html" {% if active_page == "books" %}class="active"{% endif %}>Books</a>
+            <a href="collections.html" {% if active_page == "collections" %}class="active"{% endif %}>Collections</a>
+            <a href="lists.html" {% if active_page == "lists" %}class="active"{% endif %}>Lists</a>
+        </nav>
+        
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    <script src="static/sortable-tables.js" defer></script>
+</body>
+</html>

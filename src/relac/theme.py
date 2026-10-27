@@ -1,7 +1,8 @@
 """Module with a Theme class."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Literal
 
 
 @dataclass
@@ -11,3 +12,10 @@ class RelacTheme:
     name: str
     source_dir: Path
     index_template: str
+    static_folder: Path | None = None
+    index_pages: dict[Literal['books', 'works'], str] = field(
+        default_factory=dict
+    )
+    resource_pages: dict[Literal['book', 'work'], str] = field(
+        default_factory=dict
+    )

@@ -11,7 +11,9 @@
             "module": "relac",
             "args": [
                 "static_html",
-                "create"
+                "create",
+                "--output",
+                "${workspaceFolder}/out"
             ],
             "cwd": "${workspaceFolder}/tests/simple_project",
             "python": "${workspaceFolder}/.venv/bin/python",

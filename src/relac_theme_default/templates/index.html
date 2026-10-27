@@ -1,271 +1,59 @@
-<html>
+{% extends "base.html" %}
+{% set active_page = "overview" %}
 
-<head>
-    <title>Relac library</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        :root
-        {
-            color-scheme: dark;
-            --page: rgb(16, 20, 19);
-            --surface: rgb(24, 30, 29);
-            --line: rgb(49, 59, 57);
-            --text: rgb(231, 237, 234);
-            --muted: rgb(151, 165, 160);
-            --accent: rgb(125, 218, 194);
-        }
-
-        *
-        {
-            box-sizing: border-box;
-        }
-
-        body
-        {
-            margin: 0;
-            min-height: 100vh;
-            font-family: "Trebuchet MS", "Gill Sans", sans-serif;
-            color: var(--text);
-            background: linear-gradient(145deg, rgb(22, 29, 27), var(--page) 48%);
-        }
-
-        main.page-shell
-        {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 44px 32px 64px;
-        }
-
-        h1
-        {
-            margin: 0 0 28px;
-            text-align: center;
-            font-family: Georgia, "Times New Roman", serif;
-            font-size: 32px;
-            font-weight: 500;
-            line-height: 1.2;
-            letter-spacing: 0;
-        }
-
-        nav.tab-nav
-        {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            padding: 4px;
-            gap: 4px;
-        }
-
-        nav.tab-nav button
-        {
-            cursor: pointer;
-            min-height: 40px;
-            color: var(--muted);
-            border-radius: 999px;
-            border: none;
-            padding: 8px 16px;
-            font: inherit;
-            font-size: 13px;
-            white-space: nowrap;
-            background: transparent;
-        }
-
-        nav.tab-nav button:hover
-        {
-            color: var(--text);
-            background: rgb(37, 46, 43);
-        }
-
-        nav.tab-nav button.active
-        {
-            color: rgb(14, 31, 27);
-            background: var(--accent);
-        }
-
-        div.statistics
-        {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 14px;
-            margin-top: 28px;
-        }
-
-        div.card
-        {
-            /* min-height: 116px; */
-            padding: 18px;
-            text-align: center;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            background: linear-gradient(150deg, rgb(27, 35, 33), var(--surface));
-        }
-
-        div.card p:first-child
-        {
-            margin: 0 0 10px;
-            color: var(--accent);
-            font-size: 28px;
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
-            line-height: 1;
-        }
-
-        div.card p:last-child
-        {
-            margin: 0;
-            color: var(--muted);
-            font-size: 13px;
-            line-height: 1.4;
-        }
-
-        div.content
-        {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 14px;
-            margin-top: 14px;
-        }
-
-        div.content .card:not(.small)
-        {
-            grid-column: 1 / -1;
-        }
-
-        @media (max-width: 760px)
-        {
-            main.page-shell
-            {
-                padding: 32px 24px 48px;
-            }
-
-            div.statistics
-            {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (max-width: 480px)
-        {
-            main.page-shell
-            {
-                padding: 24px 16px 36px;
-            }
-
-            h1
-            {
-                margin-bottom: 22px;
-                font-size: 28px;
-            }
-
-            nav.tab-nav
-            {
-                display: grid;
-                grid-template-columns: repeat(3, minmax(0, 1fr));
-                width: 100%;
-                justify-items: center;
-            }
-
-            nav.tab-nav button
-            {
-                min-width: 0;
-                padding: 8px 4px;
-                font-size: 12px;
-            }
-
-            div.statistics
-            {
-                gap: 10px;
-                margin-top: 20px;
-            }
-
-            div.content
-            {
-                grid-template-columns: minmax(0, 1fr);
-                gap: 10px;
-                margin-top: 10px;
-            }
-
-            div.card
-            {
-                /* min-height: 104px; */
-                padding: 14px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <main class="page-shell">
-        <h1>Relac library</h1>
-
-        <nav class="tab-nav">
-            <button class="active">Overview</button>
-            <button>Authors</button>
-            <button>Works</button>
-            <button>Books</button>
-            <button>Collection</button>
-            <button>Lists</button>
-        </nav>
-
-        <div class="statistics">
-            <div class="card">
-                <p>
-                    142
-                </p>
-                <p>
-                    Works
-                </p>
-            </div>
-
-            <div class="card">
-                <p>
-                    89
-                </p>
-                <p>
-                    books owned
-                </p>
-            </div>
-
-            <div class="card">
-                <p>
-                    2
-                </p>
-                <p>
-                    reading right now
-                </p>
-            </div>
-
-            <div class="card">
-                <p>
-                    72
-                </p>
-                <p>
-                    on reading list
-                </p>
-            </div>
+{% block content %}
+    <div class="statistics">
+        <div class="card">
+            <p>
+                142
+            </p>
+            <p>
+                Works
+            </p>
         </div>
 
-        <div class="content">
-            <div class="card small">
-                <h2>Reading challenges</h2>
-                <p>No challenges yet.</p>
-            </div>
-
-            <div class="card small">
-                <h2>Recent reading sessions</h2>
-                <p>Here come all the recent reading sessions</p>
-            </div>
-
-            <div class="card">
-                <h2>Works to read</h2>
-                <p>Here comes your reading list.</p>
-            </div>
+        <div class="card">
+            <p>
+                89
+            </p>
+            <p>
+                books owned
+            </p>
         </div>
-    </main>
 
-</body>
-</html>
+        <div class="card">
+            <p>
+                2
+            </p>
+            <p>
+                reading right now
+            </p>
+        </div>
+
+        <div class="card">
+            <p>
+                72
+            </p>
+            <p>
+                on reading list
+            </p>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="card small">
+            <h2>Reading challenges</h2>
+            <p>No challenges yet.</p>
+        </div>
+
+        <div class="card small">
+            <h2>Recent reading sessions</h2>
+            <p>Here come all the recent reading sessions</p>
+        </div>
+
+        <div class="card">
+            <h2>Works to read</h2>
+            <p>Here comes your reading list.</p>
+        </div>
+    </div>
+{% endblock %}

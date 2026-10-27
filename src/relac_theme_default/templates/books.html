@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% set active_page = "books" %}
+
+{% block content %}
+    <div class="content">
+        <div class="card">
+            <div class="table-scroll">
+                <table class="resources" data-sortable>
+                    <thead>
+                        <tr>
+                            <th scope="col">Title</th>
+                            <th scope="col">Publisher</th>
+                            <th scope="col" class="right">ISBN</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for bookid, book in books %}
+                        <tr data-href="{{ bookid }}.html">
+                            <td>{{ book.title }}</td>
+                            <td>
+                                {% if book.publisher_obj %}
+                                    {{ book.publisher_obj.name }}
+                                    {% if book.publisher_obj.imprint %}
+                                        / {{ book.publisher_obj.imprint }}
+                                    {% endif %}
+                                {% endif %}
+                            </td>
+                            <td class="right"><div class="isbn">{{ book.isbn13 | isbn }}</div></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
