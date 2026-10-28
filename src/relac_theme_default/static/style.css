@@ -35,10 +35,20 @@ main.page-shell
     padding: 44px 32px 64px;
 }
 
+.page-header
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 28px;
+}
+
 h1
 {
-    margin: 0 0 28px;
-    text-align: center;
+    flex: none;
+    margin: 0;
+    text-align: left;
     font-family: Georgia, "Times New Roman", serif;
     font-size: 32px;
     font-weight: 500;
@@ -260,16 +270,27 @@ a:hover
 nav.tab-nav
 {
     display: flex;
-    flex-wrap: wrap;
+    flex: 1;
+    flex-wrap: nowrap;
     align-items: center;
-    justify-content: center;
-    width: 100%;
+    justify-content: flex-end;
+    min-width: 0;
     padding: 4px;
     gap: 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+nav.tab-nav::-webkit-scrollbar
+{
+    display: none;
 }
 
 nav.tab-nav a
 {
+    flex: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
@@ -355,6 +376,22 @@ div.content .card:not(.small)
         padding: 32px 24px 48px;
     }
 
+    .page-header
+    {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+
+    nav.tab-nav
+    {
+        justify-content: flex-start;
+        width: 100%;
+        padding: 4px 0;
+        overscroll-behavior-x: contain;
+    }
+
     div.statistics
     {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -370,22 +407,12 @@ div.content .card:not(.small)
 
     h1
     {
-        margin-bottom: 22px;
         font-size: 28px;
-    }
-
-    nav.tab-nav
-    {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        width: 100%;
-        justify-items: center;
     }
 
     nav.tab-nav a
     {
-        min-width: 0;
-        padding: 8px 4px;
+        padding: 8px 12px;
         font-size: 12px;
     }
 
