@@ -1,0 +1,38 @@
+{% macro work_table(works) %}
+<div class="table-scroll">
+    <table class="resources" data-sortable>
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Author</th>
+                <th scope="col">Structure</th>
+                <th scope="col">Type</th>
+                <th scope="col" class="center fit-content">Editions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for work_id, work in works %}
+                {{ work_row(work_id, work) }}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{% macro work_row(work_id, work) %}
+<tr data-href="{{ work_id }}.html">
+    <td>{{ work.title }}</td>
+    <td>
+        {% for author in work.authors_objs %}
+            {% if not loop.first %}, {% endif %}<a href="{{ work.authors[loop.index0] }}.html">{{ author.name }}</a>
+        {% endfor %}
+    </td>
+    <td>{{ work.work_structure.value.replace('-', ' ').capitalize() }}</td>
+    <td>{{ work.work_type.value.replace('-', ' ').capitalize() }}</td>
+    <td class="center fit-content">
+        <pre>
+            {{ work.edition_objs | length }}
+        </pre>
+    </td>
+</tr>
+{% endmacro %}

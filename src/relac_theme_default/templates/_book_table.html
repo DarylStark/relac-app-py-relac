@@ -5,8 +5,8 @@
             <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Publisher</th>
-                <th scope="col" class="center">Works</th>
-                <th scope="col" class="right">ISBN</th>
+                <th scope="col" class="center fit-content">Works</th>
+                <th scope="col" class="right fit-content">ISBN</th>
             </tr>
         </thead>
         <tbody>
@@ -29,15 +29,15 @@
             {% endif %}
         {% endif %}
     </td>
-    <td class="center">
-        <div class="isbn">
+    <td class="center fit-content">
+        <pre>
             {{ book.work_edition_objs | length }}
-        </div>
+        </pre>
     </td>
-    <td class="right">
-        <div class="isbn">
+    <td class="right fit-content">
+        <pre>
             {{ book.isbn13 | isbn }}
-        </div>
+        </pre>
     </td>
 </tr>
 {% endmacro %}

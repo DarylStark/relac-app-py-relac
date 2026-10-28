@@ -13,6 +13,10 @@ author.george_orwell:
 work.george_orwell__nineteen_eighty_four:
   title: Nineteen Eighty-Four
   <<: *template_work
+  work_structure: novel
+  work_type: literary-fiction
+  authors:
+    - author.george_orwell
 
 work_edition.george_orwell__nineteen_eighty_four__original:
   title: Nineteen Eighty-Four

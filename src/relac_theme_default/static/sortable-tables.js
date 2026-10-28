@@ -3,11 +3,29 @@
         row.addEventListener("click", (event) => {
             const target = event.target;
 
-            if (!(target instanceof Element) || target.closest("a, button, input, select, textarea, summary, [contenteditable='true']")) {
+            if (!(target instanceof Element)) {
+                return;
+            }
+
+            const cell = target.closest("[data-cell-href]");
+            if (cell && row.contains(cell)) {
+                window.location.assign(cell.dataset.cellHref);
+                return;
+            }
+
+            if (target.closest("a, button, input, select, textarea, summary, [contenteditable='true']")) {
                 return;
             }
 
             window.location.assign(row.dataset.href);
+        });
+
+        row.addEventListener("keydown", (event) => {
+            const target = event.target;
+
+            if (event.key === "Enter" && target instanceof Element && target.matches("[data-cell-href]")) {
+                window.location.assign(target.dataset.cellHref);
+            }
         });
     });
 

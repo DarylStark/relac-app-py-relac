@@ -11,6 +11,6 @@ relac_theme = RelacTheme(
     source_dir=base_path / 'templates',
     index_template='index.html',
     resource_pages={'book': 'book.html'},
-    index_pages={'books': 'books.html'},
+    index_pages={'books': 'books.html', 'works': 'works.html'},
     static_folder=base_path / 'static',
 )

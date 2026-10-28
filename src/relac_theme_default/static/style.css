@@ -51,6 +51,14 @@ h2
     margin: 0 0 14px;
 }
 
+h3
+{
+    text-align: left;
+    margin: 0 0 16px 0;
+    font-size: 20px;
+    font-weight: 470;
+}
+
 a
 {
     color: inherit;
@@ -215,7 +223,7 @@ div.content .card:not(.small)
 
 }
 
-div.isbn {
+pre {
     background: var(--surface);
     display: inline-block;
     color: var(--muted);
@@ -225,6 +233,7 @@ div.isbn {
     white-space: nowrap;
     font-size: 13px;
     font-family: "Google Sans Code", monospace;
+    margin: 0;
 }
 
 div.table-scroll {
@@ -310,6 +319,12 @@ table.resources td.right {
 table.resources thead th.center,
 table.resources td.center {
     text-align: center;
+}
+
+table.resources th.fit-content,
+table.resources td.fit-content {
+    width: 1%;
+    white-space: nowrap;
 }
 
 table.resources tbody tr:hover {

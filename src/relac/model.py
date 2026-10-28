@@ -59,7 +59,7 @@ class Work(ResourceBase):
     """Model for a work."""
 
     title: str
-    author: str
+    authors: list[str]
     work_type: WorkType | None = None
     work_structure: WorkStructure | None = None
 

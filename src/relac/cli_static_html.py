@@ -52,6 +52,12 @@ def create(
         out_path = output / 'books.html'
         out_path.write_text(html)
 
+    if 'works' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['works'])
+        html = template.render(works=db.get_works().items())
+        out_path = output / 'works.html'
+        out_path.write_text(html)
+
     # Books
     if 'book' in metadata.resource_pages:
         for book_id, book in db.get_books().items():

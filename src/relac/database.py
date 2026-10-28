@@ -42,7 +42,7 @@ class Database:
         collection[id] = obj
 
     def _converge_works_editions(self) -> None:
-        """Converge all works."""
+        """Converge all work editions."""
         for obj in self._work_editions.values():
             work_obj = self._works.get(obj.work)
             if not work_obj:
@@ -50,6 +50,18 @@ class Database:
                 raise ValueError(f'Work with id "{obj.work}" doesn\'t exist')
             obj.work_obj = work_obj
             work_obj.edition_objs.append(obj)
+
+    def _converge_works(self) -> None:
+        """Converge all works."""
+        for obj in self._works.values():
+            for author in obj.authors:
+                author_obj = self._authors.get(author)
+                if not author_obj:
+                    # TODO: Custom error
+                    raise ValueError(
+                        f'Author with id "{author}" doesn\'t exist'
+                    )
+                obj.authors_objs.append(author_obj)
 
     def _converge_books(self) -> None:
         """Converge all books."""
@@ -84,6 +96,7 @@ class Database:
 
     def converge(self) -> None:
         """Converge all objects."""
+        self._converge_works()
         self._converge_works_editions()
         self._converge_books()
         self._converge_book_collections()

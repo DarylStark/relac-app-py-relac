@@ -12,7 +12,8 @@ author.freida_mcfadden:
 work.freida_mcfadden__the_housemaids_wedding:
   title: The Housemaid's Wedding
   <<: *template_work
-  author: author.freida_mcfadden
+  authors:
+    - author.freida_mcfadden
 
 work_edition.freida_mcfadden__the_housemaids_wedding__original:
   title: The Housemaid's Wedding
@@ -22,7 +23,8 @@ work_edition.freida_mcfadden__the_housemaids_wedding__original:
 work.freida_mcfadden__the_witch:
   title: The Witch
   <<: *template_work
-  author: author.freida_mcfadden
+  authors:
+    - author.freida_mcfadden
 
 work_edition.freida_mcfadden__the_witch__abriged:
   title: The Witch
