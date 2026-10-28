@@ -563,19 +563,14 @@ table.resources thead th {
     font-size: 0.88em;
 }
 
-.book-detail-page
+.detail-detail-page
 {
     display: grid;
     gap: 30px;
 }
 
-.book-summary
-{
-    padding: 0;
-}
-
-.book-summary-header,
-.book-contents-header
+.detail-summary-header,
+.detail-contents-header
 {
     display: flex;
     align-items: flex-start;
@@ -583,17 +578,7 @@ table.resources thead th {
     gap: 20px;
 }
 
-.book-eyebrow
-{
-    margin: 0 0 5px;
-    color: var(--accent-text);
-    font-family: "Google Sans Code", monospace;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-}
-
-.book-title
+.detail-title
 {
     margin: 0;
     font-size: 30px;
@@ -602,7 +587,7 @@ table.resources thead th {
     overflow-wrap: anywhere;
 }
 
-.book-isbn
+.detail-badge
 {
     display: flex;
     flex: none;
@@ -611,7 +596,7 @@ table.resources thead th {
     margin: 0;
 }
 
-.book-fact dt
+.detail-fact dt
 {
     color: var(--muted);
     font-family: "Google Sans Code", monospace;
@@ -620,7 +605,7 @@ table.resources thead th {
     text-transform: uppercase;
 }
 
-.book-isbn code
+.detail-badge code
 {
     padding: 5px 8px;
     border: 1px solid var(--line);
@@ -631,7 +616,7 @@ table.resources thead th {
     font-size: 12px;
 }
 
-.book-metadata
+.detail-metadata
 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -639,14 +624,14 @@ table.resources thead th {
     margin: 26px 0 0;
 }
 
-.book-fact
+.detail-fact
 {
     min-width: 0;
     padding-left: 12px;
     border-left: 2px solid var(--line);
 }
 
-.book-fact dd
+.detail-fact dd
 {
     display: flex;
     flex-direction: column;
@@ -658,27 +643,27 @@ table.resources thead th {
     overflow-wrap: anywhere;
 }
 
-.book-imprint,
-.book-unspecified
+.detail-imprint,
+.detail-unspecified
 {
     color: var(--muted);
     font-size: 12px;
 }
 
-.book-contents-header
+.detail-contents-header
 {
     align-items: center;
     margin-bottom: 12px;
 }
 
-.book-contents-header h2
+.detail-contents-header h2
 {
     margin: 0;
     font-size: 20px;
     font-weight: 500;
 }
 
-.book-work-count
+.detail-count
 {
     flex: none;
     color: var(--muted);
@@ -688,14 +673,14 @@ table.resources thead th {
 
 @media (max-width: 600px)
 {
-    .book-summary-header
+    .detail-summary-header
     {
         align-items: flex-start;
         flex-direction: column;
         gap: 14px;
     }
 
-    .book-metadata
+    .detail-metadata
     {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 16px 12px;

@@ -1,6 +1,7 @@
 """`static_html` part of the CLI application."""
 
 import shutil
+from datetime import date
 from importlib import import_module
 from pathlib import Path
 
@@ -9,6 +10,23 @@ from jinja2 import Environment, FileSystemLoader
 from typer import Context, Option, Typer
 
 from relac.theme import RelacTheme
+
+
+def _calculate_age(
+    birthdate: date | None, reference_date: date | None = None
+) -> int | None:
+    """Calculate an age in whole years at the reference date."""
+    if birthdate is None:
+        return None
+
+    reference_date = reference_date or date.today()
+    age = reference_date.year - birthdate.year
+    if (reference_date.month, reference_date.day) < (
+        birthdate.month,
+        birthdate.day,
+    ):
+        age -= 1
+    return age
 
 
 def _format_enum_label(value: str) -> str:
@@ -27,7 +45,7 @@ cli_static_html = Typer(name='static_html')
 
 
 @cli_static_html.command(name='create')
-def create(
+def create(  # noqa: PLR0915
     ctx: Context,
     output: Path = Option(
         default=Path('.'), help='The output folder for the static website'
@@ -47,6 +65,7 @@ def create(
     env = Environment(loader=FileSystemLoader(metadata.source_dir))
     env.filters['isbn'] = lambda x: mask(str(x))
     env.filters['enum_label'] = _format_enum_label
+    env.filters['age'] = _calculate_age
 
     # Copy static folder
     if metadata.static_folder:
@@ -106,4 +125,12 @@ def create(
             template = env.get_template(metadata.resource_pages['book'])
             html = template.render(book=book)
             out_path = output / f'{book.id}.html'
+            out_path.write_text(html)
+
+    # Authors
+    if 'author' in metadata.resource_pages:
+        for author in db.get_authors():
+            template = env.get_template(metadata.resource_pages['author'])
+            html = template.render(author=author)
+            out_path = output / f'{author.id}.html'
             out_path.write_text(html)

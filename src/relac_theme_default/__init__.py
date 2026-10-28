@@ -10,7 +10,7 @@ relac_theme = RelacTheme(
     name='Default Relac Theme',
     source_dir=base_path / 'templates',
     index_template='index.html',
-    resource_pages={'book': 'book.html'},
+    resource_pages={'book': 'book.html', 'author': 'author.html'},
     index_pages={
         'books': 'books.html',
         'works': 'works.html',

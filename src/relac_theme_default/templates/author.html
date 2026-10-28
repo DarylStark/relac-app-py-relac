@@ -1,0 +1,60 @@
+{% extends "_base.html" %}
+{% set active_page = "authors" %}
+
+{% from "_work_table.html" import work_table %}
+
+{% block content %}
+<div class="content">
+  <div class="card">
+      <section class="detail-summary" aria-labelledby="detail-title">
+        <div class="detail-summary-header">
+          <div>
+            <h3 id="detail-title">{{ author.name }}</h2>
+          </div>
+          <p class="detail-badge">
+            <code>{{ author.state.value | enum_label }}</code>
+          </p>
+        </div>
+        <dl class="detail-metadata">
+          <div class="detail-fact">
+            <dt>Birthdate</dt>
+            <dd>
+                <span>{{ author.birthdate }}</span>
+            </dd>
+          </div>
+          {% if author.deceased_date %}
+          <div class="detail-fact">
+                <dt>Deceased date</dt>
+                <dd>
+                  <span>{{ author.deceased_date }}</span>
+                </dd>
+          </div>
+          {% endif %}
+          {% if author.birthdate %}
+          <div class="detail-fact">
+            <dt>{{ "Aged" if author.deceased_date else "Age" }}</dt>
+            <dd>
+              <span>{{ author.birthdate | age(author.deceased_date) }} years</span>
+            </dd>
+          </div>
+            {% endif %}
+        </dl>
+      </section>
+  </div>
+
+  <div class="card">
+    <section class="detail-contents" aria-labelledby="detail-contents-title">
+      <header class="detail-contents-header">
+        <div>
+          <h3 id="detail-contents-title">Works for this author</h2>
+        </div>
+        <span class="detail-work-count">
+          {{ author.work_objs | length }}
+          {% if author.work_objs | length == 1 %}work{% else %}works{% endif %}
+        </span>
+      </header>
+      {{ work_table(author.work_objs) }}
+    </section>
+  </div>
+</div>
+{% endblock %}
