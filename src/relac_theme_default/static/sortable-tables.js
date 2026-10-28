@@ -18,6 +18,11 @@
         filterTables.get(table).groups.push({
             key: controls.dataset.filterKey,
             buttons: Array.from(controls.querySelectorAll("button[data-filter-value]")),
+            checkboxes: Array.from(controls.querySelectorAll("input[type='checkbox'][data-filter-value]")),
+            multipleValues: controls.dataset.filterMultipleValues === "true",
+            selectionSummary: controls.querySelector("[data-filter-selection-summary]"),
+            search: controls.querySelector("[data-filter-search]"),
+            options: Array.from(controls.querySelectorAll("[data-filter-option]")),
             selectedValues: new Set()
         });
     });
@@ -25,13 +30,22 @@
     filterTables.forEach(({ rows, groups }) => {
         const updateRows = () => {
             rows.forEach((row) => {
-                row.hidden = groups.some(({ key, selectedValues }) => {
-                    return selectedValues.size > 0 && !selectedValues.has(row.getAttribute(`data-filter-${key}`));
+                row.hidden = groups.some(({ key, multipleValues, selectedValues }) => {
+                    if (selectedValues.size === 0) {
+                        return false;
+                    }
+
+                    const rowValue = row.getAttribute(`data-filter-${key}`);
+                    const values = multipleValues
+                        ? JSON.parse(rowValue ?? "[]")
+                        : [rowValue];
+
+                    return !values.some((value) => selectedValues.has(value));
                 });
             });
         };
 
-        groups.forEach(({ buttons, selectedValues }) => {
+        groups.forEach(({ buttons, checkboxes, selectedValues, selectionSummary, search, options }) => {
             buttons.forEach((button) => {
                 button.addEventListener("click", () => {
                     const value = button.dataset.filterValue;
@@ -47,6 +61,34 @@
                     updateRows();
                 });
             });
+
+            checkboxes.forEach((checkbox) => {
+                checkbox.addEventListener("change", () => {
+                    if (checkbox.checked) {
+                        selectedValues.add(checkbox.dataset.filterValue);
+                    } else {
+                        selectedValues.delete(checkbox.dataset.filterValue);
+                    }
+
+                    if (selectionSummary) {
+                        const count = selectedValues.size;
+                        selectionSummary.textContent = count === 0
+                            ? selectionSummary.dataset.emptyLabel
+                            : `${count} ${count === 1 ? selectionSummary.dataset.singleLabel : selectionSummary.dataset.pluralLabel}`;
+                    }
+
+                    updateRows();
+                });
+            });
+
+            if (search) {
+                search.addEventListener("input", () => {
+                    const query = search.value.trim().toLocaleLowerCase();
+                    options.forEach((option) => {
+                        option.hidden = !option.textContent.toLocaleLowerCase().includes(query);
+                    });
+                });
+            }
         });
     });
 

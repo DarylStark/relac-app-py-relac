@@ -1,6 +1,6 @@
 {% macro book_table(books) %}
 <div class="table-scroll">
-    <table class="resources" data-sortable>
+    <table id="books-table" class="resources" data-sortable>
         <thead>
             <tr>
                 <th scope="col">Title</th>
@@ -20,7 +20,11 @@
 {% endmacro %}
 
 {% macro book_row(book_id, book) %}
-<tr data-href="{{ book_id }}.html">
+{% set book_medium = book.medium.value %}
+{% set book_binding = book.binding.value %}
+{% set book_publisher = book.publisher_obj.name if book.publisher_obj else '' %}
+{% set book_imprint = book.publisher_obj.imprint if book.publisher_obj and book.publisher_obj.imprint else '' %}
+<tr data-href="{{ book_id }}.html" data-filter-medium="{{ book_medium }}" data-filter-binding="{{ book_binding }}" data-filter-publisher="{{ book_publisher | e }}" data-filter-imprint="{{ book_imprint | e }}">
     <td>{{ book.title }}</td>
     <td>
         {% if book.publisher_obj %}
@@ -30,9 +34,9 @@
             {% endif %}
         {% endif %}
     </td>
-    <td data-sort-value="{{ book.medium.value }}">
+    <td data-sort-value="{{ book_medium }}">
         {{ book.medium.value | enum_label }}
-        <span class="table-secondary-text">{{ book.binding.value | enum_label }}</span>
+        <span class="table-secondary-text">{{ book_binding | enum_label }}</span>
     </td>
     <td class="center fit-content">
         <pre>

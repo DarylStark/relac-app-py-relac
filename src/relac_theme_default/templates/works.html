@@ -11,6 +11,36 @@
                 <details class="table-filter-panel">
                     <summary>Filters</summary>
                     <div class="table-filter-groups">
+                        <div class="table-filter-group" data-filter-target="works-table" data-filter-key="author" data-filter-multiple-values="true" role="group" aria-label="Filter works by author">
+                            <span class="table-filter-label">Author</span>
+                            <details class="table-author-select">
+                                <summary
+                                    data-filter-selection-summary
+                                    data-empty-label="All authors"
+                                    data-single-label="author selected"
+                                    data-plural-label="authors selected"
+                                >All authors</summary>
+                                <div class="table-author-menu">
+                                    <input
+                                        type="search"
+                                        class="table-author-search"
+                                        data-filter-search
+                                        aria-label="Search authors"
+                                        placeholder="Search authors"
+                                    >
+                                    <div class="table-author-options">
+                                        {% for author in authors %}
+                                            <label class="table-author-option" data-filter-option>
+                                                <input type="checkbox" data-filter-value="{{ author.id | e }}" value="{{ author.id | e }}">
+                                                <span>{{ author.name | e }}</span>
+                                            </label>
+                                        {% else %}
+                                            <span class="table-author-empty">No authors found</span>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </details>
+                        </div>
                         <div class="table-filter-group" data-filter-target="works-table" data-filter-key="category" role="group" aria-label="Filter works by category">
                             <span class="table-filter-label">Category</span>
                             <div class="table-filter-buttons">

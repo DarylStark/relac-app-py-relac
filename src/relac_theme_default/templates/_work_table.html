@@ -22,7 +22,7 @@
 {% macro work_row(work_id, work) %}
 {% set work_type = work.work_type.value if work.work_type else 'unspecified' %}
 {% set work_structure = work.work_structure.value if work.work_structure else 'unspecified' %}
-<tr data-href="{{ work_id }}.html" data-filter-category="{{ work_type }}" data-filter-structure="{{ work_structure }}">
+<tr data-href="{{ work_id }}.html" data-filter-category="{{ work_type }}" data-filter-structure="{{ work_structure }}" data-filter-author='{{ work.authors | tojson }}'>
     <td>{{ work.title }}</td>
     <td>
         {% for author in work.authors_objs %}

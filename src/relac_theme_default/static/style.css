@@ -161,6 +161,92 @@ h3
     outline-offset: 2px;
 }
 
+.table-author-select
+{
+    position: relative;
+    width: min(360px, 100%);
+}
+
+.table-author-select summary
+{
+    width: 100%;
+    margin: 0;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text);
+    background: var(--surface);
+    font-weight: 400;
+}
+
+.table-author-menu
+{
+    position: absolute;
+    z-index: 5;
+    top: calc(100% + 4px);
+    left: 0;
+    width: min(360px, calc(100vw - 96px));
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+    box-shadow: 0 8px 24px rgb(0, 0, 0, 0.35);
+}
+
+.table-author-search
+{
+    width: 100%;
+    min-height: 36px;
+    margin-bottom: 8px;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text);
+    background: var(--page);
+    font: inherit;
+}
+
+.table-author-options
+{
+    display: flex;
+    max-height: 240px;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+}
+
+.table-author-option
+{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.table-author-option[hidden]
+{
+    display: none;
+}
+
+.table-author-option:hover
+{
+    background: rgb(37, 46, 43);
+}
+
+.table-author-option input
+{
+    accent-color: rgb(49, 134, 255);
+}
+
+.table-author-empty
+{
+    padding: 6px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
 a
 {
     color: inherit;
