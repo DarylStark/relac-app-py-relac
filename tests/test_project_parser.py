@@ -18,8 +18,8 @@ def test_parsing_directory() -> None:
     assert len(database.get_work_editions()) == 11
     assert len(database.get_books()) == 5
     assert len(database.get_book_publishers()) == 3
-    assert len(database.get_book_collections()) == 1
+    assert len(database.get_book_collections()) == 2
     assert len(database.get_labels()) == 0
-    assert len(database.get_resource_lists()) == 0
+    assert len(database.get_resource_lists()) == 1
 
     pass
