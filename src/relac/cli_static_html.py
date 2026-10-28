@@ -63,7 +63,7 @@ def create(
     if 'books' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['books'])
         html = template.render(
-            books=db.get_books().items(),
+            books=db.get_books(),
         )
         out_path = output / 'books.html'
         out_path.write_text(html)
@@ -71,7 +71,7 @@ def create(
     if 'works' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['works'])
         html = template.render(
-            works=db.get_works().items(),
+            works=db.get_works(),
         )
         out_path = output / 'works.html'
         out_path.write_text(html)
@@ -79,7 +79,7 @@ def create(
     if 'authors' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['authors'])
         html = template.render(
-            authors=db.get_authors().items(),
+            authors=db.get_authors(),
         )
         out_path = output / 'authors.html'
         out_path.write_text(html)
@@ -87,7 +87,7 @@ def create(
     if 'collections' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['collections'])
         html = template.render(
-            collections=db.get_book_collections().items(),
+            collections=db.get_book_collections(),
         )
         out_path = output / 'collections.html'
         out_path.write_text(html)
@@ -95,15 +95,15 @@ def create(
     if 'lists' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['lists'])
         html = template.render(
-            lists=db.get_resource_lists().items(),
+            lists=db.get_resource_lists(),
         )
         out_path = output / 'lists.html'
         out_path.write_text(html)
 
     # Books
     if 'book' in metadata.resource_pages:
-        for book_id, book in db.get_books().items():
+        for book in db.get_books():
             template = env.get_template(metadata.resource_pages['book'])
             html = template.render(book=book)
-            out_path = output / f'{book_id}.html'
+            out_path = output / f'{book.id}.html'
             out_path.write_text(html)

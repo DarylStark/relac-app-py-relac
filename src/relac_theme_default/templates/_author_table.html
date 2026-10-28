@@ -9,16 +9,16 @@
             </tr>
         </thead>
         <tbody>
-            {% for author_id, author in authors %}
-                {{ author_row(author_id, author) }}
+            {% for author in authors %}
+                {{ author_row(author) }}
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endmacro %}
 
-{% macro author_row(author_id, author) %}
-<tr data-href="{{ author_id }}.html">
+{% macro author_row(author) %}
+<tr data-href="{{ author.id }}.html">
     <td>{{ author.name }}</td>
     <td>{{ author.state.value | enum_label }}</td>
     <td class="center fit-content">

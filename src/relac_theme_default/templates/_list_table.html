@@ -7,16 +7,16 @@
             </tr>
         </thead>
         <tbody>
-            {% for list_id, list in lists %}
-                {{ list_row(list_id, list) }}
+            {% for list in lists %}
+                {{ list_row(list) }}
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endmacro %}
 
-{% macro list_row(list_id, list) %}
-<tr data-href="{{ list_id }}.html">
+{% macro list_row(list) %}
+<tr data-href="{{ list.id }}.html">
     <td>{{ list.name }}</td>
 </tr>
 {% endmacro %}

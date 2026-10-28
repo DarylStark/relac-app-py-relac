@@ -8,16 +8,16 @@
             </tr>
         </thead>
         <tbody>
-            {% for collection_id, collection in collections %}
-                {{ collection_row(collection_id, collection) }}
+            {% for collection in collections %}
+                {{ collection_row(collection) }}
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endmacro %}
 
-{% macro collection_row(collection_id, collection) %}
-<tr data-href="{{ collection_id }}.html">
+{% macro collection_row(collection) %}
+<tr data-href="{{ collection.id }}.html">
     <td>{{ collection.name }}</td>
     <td  class="center fit-content">
         <pre>

@@ -11,22 +11,22 @@
             </tr>
         </thead>
         <tbody>
-            {% for book_id, book in books %}
-                {{ book_row(book_id, book) }}
+            {% for book in books %}
+                {{ book_row(book) }}
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endmacro %}
 
-{% macro book_row(book_id, book) %}
+{% macro book_row(book) %}
 {% set book_medium = book.medium.value %}
 {% set book_binding = book.binding.value %}
 {% set book_publisher = book.publisher_obj.name if book.publisher_obj else '' %}
 {% set book_imprint = book.publisher_obj.imprint if book.publisher_obj and book.publisher_obj.imprint else '' %}
 {% set publisher_values = ([book_publisher] if book_publisher else []) + ([book_imprint] if book_imprint else []) %}
 {% set medium_values = [book.medium.value | enum_label, book_binding | enum_label] %}
-<tr data-href="{{ book_id }}.html">
+<tr data-href="{{ book.id }}.html">
     <td>{{ book.title }}</td>
     <td data-filter-values='{{ publisher_values | tojson }}'>
         {% if book.publisher_obj %}
