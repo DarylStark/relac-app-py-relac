@@ -1,12 +1,12 @@
 {% macro work_table(works) %}
 <div class="table-scroll">
-    <table class="resources" data-sortable>
+    <table id="works-table" class="resources" data-sortable>
         <thead>
             <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Author</th>
-                <th scope="col">Structure</th>
-                <th scope="col">Type</th>
+                <th scope="col" class="fit-content">Structure</th>
+                <th scope="col" class="fit-content">Category</th>
                 <th scope="col" class="center fit-content">Editions</th>
             </tr>
         </thead>
@@ -20,15 +20,17 @@
 {% endmacro %}
 
 {% macro work_row(work_id, work) %}
-<tr data-href="{{ work_id }}.html">
+{% set work_type = work.work_type.value if work.work_type else 'unspecified' %}
+{% set work_structure = work.work_structure.value if work.work_structure else 'unspecified' %}
+<tr data-href="{{ work_id }}.html" data-filter-category="{{ work_type }}" data-filter-structure="{{ work_structure }}">
     <td>{{ work.title }}</td>
     <td>
         {% for author in work.authors_objs %}
             {% if not loop.first %}, {% endif %}<a href="{{ work.authors[loop.index0] }}.html">{{ author.name }}</a>
         {% endfor %}
     </td>
-    <td>{{ work.work_structure.value.replace('-', ' ').capitalize() }}</td>
-    <td>{{ work.work_type.value.replace('-', ' ').capitalize() }}</td>
+    <td class="fit-content">{{ work_structure.replace('-', ' ').capitalize() }}</td>
+    <td class="fit-content">{{ work_type.replace('-', ' ').capitalize() }}</td>
     <td class="center fit-content">
         <pre>
             {{ work.edition_objs | length }}

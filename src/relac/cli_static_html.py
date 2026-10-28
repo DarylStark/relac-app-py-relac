@@ -8,7 +8,21 @@ from isbnlib import mask
 from jinja2 import Environment, FileSystemLoader
 from typer import Context, Option, Typer
 
+from relac.model import WorkStructure, WorkType
 from relac.theme import RelacTheme
+
+
+def _format_enum_label(value: str) -> str:
+    """Format enum values for display without changing their stored values."""
+    labels = {
+        'ebook': 'eBook',
+        'epub': 'ePub',
+        'epub-drm': 'ePub (DRM)',
+        'epub-watermark': 'ePub (watermarked)',
+        'graphical-novel-adaption': 'Graphic novel adaptation',
+    }
+    return labels.get(value, value.replace('-', ' ').capitalize())
+
 
 cli_static_html = Typer(name='static_html')
 
@@ -33,6 +47,7 @@ def create(
 
     env = Environment(loader=FileSystemLoader(metadata.source_dir))
     env.filters['isbn'] = lambda x: mask(str(x))
+    env.filters['enum_label'] = _format_enum_label
 
     # Copy static folder
     if metadata.static_folder:
@@ -54,7 +69,11 @@ def create(
 
     if 'works' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['works'])
-        html = template.render(works=db.get_works().items())
+        html = template.render(
+            works=db.get_works().items(),
+            work_types=list(WorkType),
+            work_structures=list(WorkStructure),
+        )
         out_path = output / 'works.html'
         out_path.write_text(html)
 

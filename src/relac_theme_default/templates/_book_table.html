@@ -5,6 +5,7 @@
             <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Publisher</th>
+                <th scope="col">Medium</th>
                 <th scope="col" class="center fit-content">Works</th>
                 <th scope="col" class="right fit-content">ISBN</th>
             </tr>
@@ -25,9 +26,13 @@
         {% if book.publisher_obj %}
             {{ book.publisher_obj.name }}
             {% if book.publisher_obj.imprint %}
-                / {{ book.publisher_obj.imprint }}
+                <span class="table-secondary-text">{{ book.publisher_obj.imprint }}</span>
             {% endif %}
         {% endif %}
+    </td>
+    <td data-sort-value="{{ book.medium.value }}">
+        {{ book.medium.value | enum_label }}
+        <span class="table-secondary-text">{{ book.binding.value | enum_label }}</span>
     </td>
     <td class="center fit-content">
         <pre>

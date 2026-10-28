@@ -6,7 +6,40 @@
 {% block content %}
     <div class="content">
         <div class="card">
-            <h3>Works</h3>
+            <div class="table-heading">
+                <h3>Works</h3>
+                <details class="table-filter-panel">
+                    <summary>Filters</summary>
+                    <div class="table-filter-groups">
+                        <div class="table-filter-group" data-filter-target="works-table" data-filter-key="category" role="group" aria-label="Filter works by category">
+                            <span class="table-filter-label">Category</span>
+                            <div class="table-filter-buttons">
+                                {% for work_type in work_types %}
+                                    <button
+                                        type="button"
+                                        class="table-filter-button"
+                                        data-filter-value="{{ work_type.value }}"
+                                        aria-pressed="false"
+                                    >{{ work_type.value.replace('-', ' ').title() }}</button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="table-filter-group" data-filter-target="works-table" data-filter-key="structure" role="group" aria-label="Filter works by structure">
+                            <span class="table-filter-label">Structure</span>
+                            <div class="table-filter-buttons">
+                                {% for work_structure in work_structures %}
+                                    <button
+                                        type="button"
+                                        class="table-filter-button"
+                                        data-filter-value="{{ work_structure.value }}"
+                                        aria-pressed="false"
+                                    >{{ work_structure.value.replace('-', ' ').title() }}</button>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
             {{ work_table(works) }}
         </div>
     </div>

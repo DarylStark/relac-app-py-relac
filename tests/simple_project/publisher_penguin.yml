@@ -8,4 +8,8 @@ publisher.penguin_random_house:
 publisher.penguin_random_house__classics:
   name: Penguin Random House
   imprint: Penguin Classics
+
+publisher.penguin_random_house__books:
+  name: Penguin Random House
+  imprint: Penguin Books
 #-------------------------------------------------------------------------------

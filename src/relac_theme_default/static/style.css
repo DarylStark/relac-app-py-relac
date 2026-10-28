@@ -59,6 +59,108 @@ h3
     font-weight: 470;
 }
 
+.table-heading
+{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.table-heading h3
+{
+    margin: 0;
+}
+
+.table-filter-panel
+{
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: rgb(20, 26, 24);
+}
+
+.table-filter-panel summary
+{
+    width: fit-content;
+    margin-bottom: 10px;
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.table-filter-panel:not([open]) summary
+{
+    margin-bottom: 0;
+}
+
+.table-filter-groups
+{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.table-filter-group
+{
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
+}
+
+.table-filter-label
+{
+    color: var(--muted);
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.table-filter-buttons
+{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 6px;
+}
+
+.table-filter-button
+{
+    min-height: 32px;
+    padding: 6px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--surface);
+    font: inherit;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.table-filter-button:hover
+{
+    color: var(--text);
+    background: rgb(37, 46, 43);
+}
+
+.table-filter-button[aria-pressed="true"]
+{
+    border-color: rgb(49, 77, 151);
+    color: rgb(127, 174, 255);
+    background: var(--accent);
+}
+
+.table-filter-button:focus-visible
+{
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+}
+
 a
 {
     color: inherit;
@@ -168,6 +270,12 @@ div.content .card:not(.small)
         padding: 32px 24px 48px;
     }
 
+    .table-filter-groups,
+    .table-filter-buttons
+    {
+        justify-content: flex-start;
+    }
+
     div.statistics
     {
         grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -256,6 +364,13 @@ table.resources thead th {
     text-align: left;
 }
 
+.table-secondary-text
+{
+    display: block;
+    color: var(--muted);
+    font-size: 0.88em;
+}
+
 table[data-sortable] th .sortable-table-button {
     position: relative;
     display: block;
@@ -329,6 +444,10 @@ table.resources td.fit-content {
 
 table.resources tbody tr:hover {
     background-color: rgb(25, 25, 25);
+}
+
+table.resources tbody tr[hidden] {
+    display: none;
 }
 
 table.resources tbody tr[data-href] {

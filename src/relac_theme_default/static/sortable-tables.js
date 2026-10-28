@@ -1,4 +1,55 @@
 (() => {
+    const filterTables = new Map();
+
+    document.querySelectorAll("[data-filter-target][data-filter-key]").forEach((controls) => {
+        const table = document.getElementById(controls.dataset.filterTarget);
+
+        if (!(table instanceof HTMLTableElement) || table.tBodies.length === 0) {
+            return;
+        }
+
+        if (!filterTables.has(table)) {
+            filterTables.set(table, {
+                rows: Array.from(table.tBodies).flatMap((body) => Array.from(body.rows)),
+                groups: []
+            });
+        }
+
+        filterTables.get(table).groups.push({
+            key: controls.dataset.filterKey,
+            buttons: Array.from(controls.querySelectorAll("button[data-filter-value]")),
+            selectedValues: new Set()
+        });
+    });
+
+    filterTables.forEach(({ rows, groups }) => {
+        const updateRows = () => {
+            rows.forEach((row) => {
+                row.hidden = groups.some(({ key, selectedValues }) => {
+                    return selectedValues.size > 0 && !selectedValues.has(row.getAttribute(`data-filter-${key}`));
+                });
+            });
+        };
+
+        groups.forEach(({ buttons, selectedValues }) => {
+            buttons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    const value = button.dataset.filterValue;
+
+                    if (selectedValues.has(value)) {
+                        selectedValues.delete(value);
+                        button.setAttribute("aria-pressed", "false");
+                    } else {
+                        selectedValues.add(value);
+                        button.setAttribute("aria-pressed", "true");
+                    }
+
+                    updateRows();
+                });
+            });
+        });
+    });
+
     document.querySelectorAll("tr[data-href]").forEach((row) => {
         row.addEventListener("click", (event) => {
             const target = event.target;

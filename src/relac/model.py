@@ -129,11 +129,11 @@ class BookBinding(Enum):
     UNSPECIFIED = 'unspecified'
     POCKET = 'pocket'
     NOVELLA = 'novella'
-    LUXE_EDITION = 'luxe_edition'
-    GRAPHICAL_NOVEL_ADAPTION = 'graphical_novel_adaption'
+    LUXE_EDITION = 'luxe-edition'
+    GRAPHICAL_NOVEL_ADAPTION = 'graphical-novel-adaption'
     EPUB = 'epub'
-    EPUB_WATERMARK = 'epub_watermark'
-    EPUB_DRM = 'epub_drm'
+    EPUB_WATERMARK = 'epub-watermark'
+    EPUB_DRM = 'epub-drm'
 
 
 class Book(ResourceBase):

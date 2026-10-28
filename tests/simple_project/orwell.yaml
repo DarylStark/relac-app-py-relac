@@ -30,7 +30,16 @@ book.george_orwell__nineteen_eighty_four__clothbound_classic:
   title: Nineteen Eighty-Four
   publisher: publisher.penguin_random_house__classics
   medium: hardcover
-  binding: luxe_edition
+  binding: luxe-edition
+  work_editions:
+    - work_edition.george_orwell__nineteen_eighty_four__original
+
+book.george_orwell__nineteen_eighty_four__epub:
+  isbn13: 9780141919959
+  title: Nineteen Eighty-Four
+  publisher: publisher.penguin_random_house__books
+  medium: ebook
+  binding: epub-drm
   work_editions:
     - work_edition.george_orwell__nineteen_eighty_four__original
 #-------------------------------------------------------------------------------
