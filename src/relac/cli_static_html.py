@@ -92,6 +92,14 @@ def create(
         out_path = output / 'collections.html'
         out_path.write_text(html)
 
+    if 'lists' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['lists'])
+        html = template.render(
+            lists=db.get_resource_lists().items(),
+        )
+        out_path = output / 'lists.html'
+        out_path.write_text(html)
+
     # Books
     if 'book' in metadata.resource_pages:
         for book_id, book in db.get_books().items():

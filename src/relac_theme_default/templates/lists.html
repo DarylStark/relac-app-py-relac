@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% set active_page = "lists" %}
+
+{% from "_list_table.html" import list_table %}
+
+{% block content %}
+    <div class="content">
+        <div class="card">
+            <h3>lists</h3>
+            {{ list_table(lists) }}
+        </div>
+    </div>
+{% endblock %}
