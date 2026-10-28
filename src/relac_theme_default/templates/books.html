@@ -6,66 +6,7 @@
 {% block content %}
     <div class="content">
         <div class="card">
-            <div class="table-heading">
-                <h3>Books</h3>
-                <details class="table-filter-panel">
-                    <summary>Filters</summary>
-                    <div class="table-filter-groups">
-                        <div class="table-filter-group" data-filter-target="books-table" data-filter-key="publisher" role="group" aria-label="Filter books by publisher">
-                            <span class="table-filter-label">Publisher</span>
-                            <div class="table-filter-buttons">
-                                {% for publisher in publishers %}
-                                    <button
-                                        type="button"
-                                        class="table-filter-button"
-                                        data-filter-value="{{ publisher | e }}"
-                                        aria-pressed="false"
-                                    >{{ (publisher or 'No publisher') | e }}</button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="table-filter-group" data-filter-target="books-table" data-filter-key="imprint" role="group" aria-label="Filter books by imprint">
-                            <span class="table-filter-label">Imprint</span>
-                            <div class="table-filter-buttons">
-                                {% for imprint in imprints %}
-                                    <button
-                                        type="button"
-                                        class="table-filter-button"
-                                        data-filter-value="{{ imprint | e }}"
-                                        aria-pressed="false"
-                                    >{{ (imprint or 'No imprint') | e }}</button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="table-filter-group" data-filter-target="books-table" data-filter-key="medium" role="group" aria-label="Filter books by medium">
-                            <span class="table-filter-label">Medium</span>
-                            <div class="table-filter-buttons">
-                                {% for book_medium in book_mediums %}
-                                    <button
-                                        type="button"
-                                        class="table-filter-button"
-                                        data-filter-value="{{ book_medium.value }}"
-                                        aria-pressed="false"
-                                    >{{ book_medium.value | enum_label }}</button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="table-filter-group" data-filter-target="books-table" data-filter-key="binding" role="group" aria-label="Filter books by binding">
-                            <span class="table-filter-label">Binding</span>
-                            <div class="table-filter-buttons">
-                                {% for book_binding in book_bindings %}
-                                    <button
-                                        type="button"
-                                        class="table-filter-button"
-                                        data-filter-value="{{ book_binding.value }}"
-                                        aria-pressed="false"
-                                    >{{ book_binding.value | enum_label }}</button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </details>
-            </div>
+            <h3>Books</h3>
             {{ book_table(books) }}
         </div>
     </div>

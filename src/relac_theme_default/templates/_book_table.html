@@ -24,9 +24,11 @@
 {% set book_binding = book.binding.value %}
 {% set book_publisher = book.publisher_obj.name if book.publisher_obj else '' %}
 {% set book_imprint = book.publisher_obj.imprint if book.publisher_obj and book.publisher_obj.imprint else '' %}
-<tr data-href="{{ book_id }}.html" data-filter-medium="{{ book_medium }}" data-filter-binding="{{ book_binding }}" data-filter-publisher="{{ book_publisher | e }}" data-filter-imprint="{{ book_imprint | e }}">
+{% set publisher_values = ([book_publisher] if book_publisher else []) + ([book_imprint] if book_imprint else []) %}
+{% set medium_values = [book.medium.value | enum_label, book_binding | enum_label] %}
+<tr data-href="{{ book_id }}.html">
     <td>{{ book.title }}</td>
-    <td>
+    <td data-filter-values='{{ publisher_values | tojson }}'>
         {% if book.publisher_obj %}
             {{ book.publisher_obj.name }}
             {% if book.publisher_obj.imprint %}
@@ -34,7 +36,7 @@
             {% endif %}
         {% endif %}
     </td>
-    <td data-sort-value="{{ book_medium }}">
+    <td data-sort-value="{{ book_medium }}" data-filter-values='{{ medium_values | tojson }}'>
         {{ book.medium.value | enum_label }}
         <span class="table-secondary-text">{{ book_binding | enum_label }}</span>
     </td>

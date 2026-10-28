@@ -6,70 +6,7 @@
 {% block content %}
     <div class="content">
         <div class="card">
-            <div class="table-heading">
-                <h3>Works</h3>
-                <details class="table-filter-panel">
-                    <summary>Filters</summary>
-                    <div class="table-filter-groups">
-                        <div class="table-filter-group" data-filter-target="works-table" data-filter-key="author" data-filter-multiple-values="true" role="group" aria-label="Filter works by author">
-                            <span class="table-filter-label">Author</span>
-                            <details class="table-author-select">
-                                <summary
-                                    data-filter-selection-summary
-                                    data-empty-label="All authors"
-                                    data-single-label="author selected"
-                                    data-plural-label="authors selected"
-                                >All authors</summary>
-                                <div class="table-author-menu">
-                                    <input
-                                        type="search"
-                                        class="table-author-search"
-                                        data-filter-search
-                                        aria-label="Search authors"
-                                        placeholder="Search authors"
-                                    >
-                                    <div class="table-author-options">
-                                        {% for author in authors %}
-                                            <label class="table-author-option" data-filter-option>
-                                                <input type="checkbox" data-filter-value="{{ author.id | e }}" value="{{ author.id | e }}">
-                                                <span>{{ author.name | e }}</span>
-                                            </label>
-                                        {% else %}
-                                            <span class="table-author-empty">No authors found</span>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </details>
-                        </div>
-                        <div class="table-filter-group" data-filter-target="works-table" data-filter-key="category" role="group" aria-label="Filter works by category">
-                            <span class="table-filter-label">Category</span>
-                            <div class="table-filter-buttons">
-                                {% for work_type in work_types %}
-                                    <button
-                                        type="button"
-                                        class="table-filter-button"
-                                        data-filter-value="{{ work_type.value }}"
-                                        aria-pressed="false"
-                                    >{{ work_type.value.replace('-', ' ').title() }}</button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                        <div class="table-filter-group" data-filter-target="works-table" data-filter-key="structure" role="group" aria-label="Filter works by structure">
-                            <span class="table-filter-label">Structure</span>
-                            <div class="table-filter-buttons">
-                                {% for work_structure in work_structures %}
-                                    <button
-                                        type="button"
-                                        class="table-filter-button"
-                                        data-filter-value="{{ work_structure.value }}"
-                                        aria-pressed="false"
-                                    >{{ work_structure.value.replace('-', ' ').title() }}</button>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
-                </details>
-            </div>
+            <h3>Works</h3>
             {{ work_table(works) }}
         </div>
     </div>
