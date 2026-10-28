@@ -1,14 +1,49 @@
 @import url('https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght,MONO@0,300..800,1;1,300..800,1&family=Google+Sans+Flex:opsz,wght@1..144,1..1000&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap');
 
-:root
+.dark
 {
     color-scheme: dark;
     --page: rgb(16, 20, 19);
+    --page-glow: rgb(22, 29, 27);
     --surface: rgb(24, 30, 29);
+    --surface-highlight: rgb(27, 35, 33);
     --line: rgb(49, 59, 57);
     --text: rgb(224, 224, 224);
+    --text-strong: rgb(255, 255, 255);
     --muted: rgb(151, 165, 160);
     --accent: rgb(25, 41, 103);
+    --accent-text: rgb(49, 134, 255);
+    --selection: rgb(49, 134, 255);
+    --hover-surface: rgb(37, 46, 43);
+    --row-hover: rgb(25, 25, 25);
+    --table-header: rgba(255, 255, 255, 0.55);
+    --code-bg: rgb(37, 46, 43);
+    --menu-shadow: rgb(0, 0, 0, 0.35);
+    --focus: rgb(49, 134, 255);
+    --transparent: transparent;
+}
+
+.light
+{
+    color-scheme: light;
+    --page: rgb(246, 248, 247);
+    --page-glow: rgb(232, 240, 236);
+    --surface: rgb(255, 255, 255);
+    --surface-highlight: rgb(248, 251, 249);
+    --line: rgb(205, 216, 210);
+    --text: rgb(34, 45, 40);
+    --text-strong: rgb(20, 29, 25);
+    --muted: rgb(92, 108, 100);
+    --accent: rgb(224, 238, 255);
+    --accent-text: rgb(24, 91, 156);
+    --selection: rgb(31, 113, 196);
+    --hover-surface: rgb(233, 241, 237);
+    --row-hover: rgb(237, 244, 240);
+    --table-header: rgba(37, 51, 44, 0.68);
+    --code-bg: rgb(233, 241, 237);
+    --menu-shadow: rgb(18, 33, 26, 0.16);
+    --focus: rgb(31, 113, 196);
+    --transparent: transparent;
 }
 
 *
@@ -23,7 +58,7 @@ body
     font-family: "Google Sans Flex", "Trebuchet MS", "Gill Sans", sans-serif;
     font-weight: 540;
     color: var(--text);
-    background: linear-gradient(145deg, rgb(22, 29, 27), var(--page) 48%);
+    background: linear-gradient(145deg, var(--page-glow), var(--page) 48%);
     font-size: 15px;
 }
 
@@ -49,11 +84,69 @@ h1
     flex: none;
     margin: 0;
     text-align: left;
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 32px;
-    font-weight: 500;
+    font-family: "Google Sans Flex", "Trebuchet MS", "Gill Sans", sans-serif;
+    font-size: 24px;
+    font-weight: 380;
     line-height: 1.2;
     letter-spacing: 0;
+}
+
+.page-title-group
+{
+    flex: none;
+}
+
+.page-subtitle
+{
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.3;
+    font-family: "Google Sans Code", monospace;
+    font-style: italic;
+    font-variation-settings: "wght" 400, "opsz" 13, "MONO" 0;
+}
+
+.theme-toggle
+{
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--text);
+    background: var(--surface);
+    font: inherit;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+.theme-toggle:hover
+{
+    background: var(--hover-surface);
+}
+
+.theme-toggle:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.theme-toggle-icon
+{
+    display: inline-grid;
+    width: 18px;
+    height: 18px;
+    place-items: center;
+    color: var(--accent-text);
+    font-family: sans-serif;
+    font-size: 17px;
+    line-height: 1;
 }
 
 h2
@@ -95,7 +188,7 @@ h3
     border: 1px solid var(--line);
     border-radius: 4px;
     color: var(--muted);
-    background: transparent;
+    background: var(--transparent);
     font: inherit;
     font-family: "Google Sans Flex", "Trebuchet MS", "Gill Sans", sans-serif;
     font-size: 11px;
@@ -135,7 +228,7 @@ h3
     border: 0;
     border-bottom: 1px solid var(--line);
     color: var(--text);
-    background: transparent;
+    background: var(--transparent);
     font: inherit;
     text-align: left;
     cursor: pointer;
@@ -143,14 +236,14 @@ h3
 
 .table-column-sort-action:hover
 {
-    background: rgb(37, 46, 43);
+    background: var(--hover-surface);
 }
 
 .table-column-filter-toggle[aria-expanded="true"],
 .table-column-filter-toggle:hover
 {
     color: var(--text);
-    background: rgb(37, 46, 43);
+    background: var(--hover-surface);
 }
 
 .table-column-filter-toggle:focus-visible
@@ -172,7 +265,7 @@ h3
     border: 1px solid var(--line);
     border-radius: 6px;
     background: var(--surface);
-    box-shadow: 0 8px 24px rgb(0, 0, 0, 0.35);
+    box-shadow: 0 8px 24px var(--menu-shadow);
 }
 
 .table-column-filter-menu[hidden]
@@ -248,12 +341,12 @@ h3
 
 .table-column-filter-option:hover
 {
-    background: rgb(37, 46, 43);
+    background: var(--hover-surface);
 }
 
 .table-column-filter-option input
 {
-    accent-color: rgb(49, 134, 255);
+    accent-color: var(--selection);
 }
 
 a
@@ -304,18 +397,18 @@ nav.tab-nav a
     font-size: 13px;
     white-space: nowrap;
     text-decoration: none;
-    background: transparent;
+    background: var(--transparent);
 }
 
 nav.tab-nav a:hover
 {
     color: var(--text);
-    background: rgb(37, 46, 43);
+    background: var(--hover-surface);
 }
 
 nav.tab-nav a.active
 {
-    color: rgb(49, 134, 255);
+    color: var(--accent-text);
     background: var(--accent);
     font-weight: bold;
 }
@@ -334,13 +427,13 @@ div.card
     text-align: center;
     border: 1px solid var(--line);
     border-radius: 8px;
-    background: linear-gradient(150deg, rgb(27, 35, 33), var(--surface));
+    background: linear-gradient(150deg, var(--surface-highlight), var(--surface));
 }
 
 div.card p:first-child
 {
     margin: 0 0 10px;
-    color: rgb(255, 255, 255);
+    color: var(--text-strong);
     font-size: 28px;
     font-weight: 600;
     font-variant-numeric: tabular-nums;
@@ -405,11 +498,6 @@ div.content .card:not(.small)
         padding: 24px 16px 36px;
     }
 
-    h1
-    {
-        font-size: 28px;
-    }
-
     nav.tab-nav a
     {
         padding: 8px 12px;
@@ -438,10 +526,9 @@ div.content .card:not(.small)
 }
 
 pre {
-    background: var(--surface);
     display: inline-block;
     color: var(--muted);
-    background: rgb(37, 46, 43);
+    background: var(--code-bg);
     border-radius: 999px;
     padding: 3px 9px 3px 9px;
     white-space: nowrap;
@@ -464,7 +551,7 @@ table.resources {
 table.resources thead th {
     text-transform: uppercase;
     font-family: "Google Sans Code", monospace;
-    color: rgba(255, 255, 255, 0.55);
+    color: var(--table-header);
     font-weight: 500;
     font-size: 12px;
     text-align: left;
@@ -528,7 +615,7 @@ table.resources td.fit-content {
 }
 
 table.resources tbody tr:hover {
-    background-color: rgb(25, 25, 25);
+    background-color: var(--row-hover);
 }
 
 table.resources tbody tr[hidden] {
