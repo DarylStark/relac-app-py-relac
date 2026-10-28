@@ -15,6 +15,7 @@ relac_theme = RelacTheme(
         'books': 'books.html',
         'works': 'works.html',
         'authors': 'authors.html',
+        'collections': 'collections.html',
     },
     static_folder=base_path / 'static',
 )
