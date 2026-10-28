@@ -30,6 +30,7 @@ work_edition.freida_mcfadden__the_witch__abriged:
   title: The Witch
   work: work.freida_mcfadden__the_witch
   <<: *template_work_edition
+  edition_type: abriged
 #-------------------------------------------------------------------------------
 # Books
 #-------------------------------------------------------------------------------

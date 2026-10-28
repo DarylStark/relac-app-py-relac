@@ -78,12 +78,12 @@ wheels = [
 ]
 
 [[package]]
-name = "isbnlib"
-version = "3.10.14"
+name = "isbnlib2"
+version = "3.11.24"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/9e/6d/55b9ee89fdfb3aacb92b975a60357c7aa547db358817e16be3b6f8f5d781/isbnlib-3.10.14.tar.gz", hash = "sha256:96f90864c77b01f55fa11e5bfca9fd909501d9842f3bc710d4eab85195d90539", size = 48046, upload-time = "2023-04-26T08:53:05.486Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b3/63/3d3394634d9e14b1dfbc4d5c1ba9733c1018083cabad65f51636063f85d5/isbnlib2-3.11.24.tar.gz", hash = "sha256:d13dbb147779c975f42bd69c10715111a353d66cb720a858009101b8638f6ee7", size = 57312, upload-time = "2026-09-19T13:55:29.751Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/dd/ce/1eb1e2afaca49add3185e202ce9c2c6d5779b7eecb20973e43ad804eb2a4/isbnlib-3.10.14-py2.py3-none-any.whl", hash = "sha256:f885b350fc8e600a919ed46e3b07253062cd604af69885455a25a299217b3fe2", size = 52535, upload-time = "2023-04-26T08:53:03.024Z" },
+    { url = "https://files.pythonhosted.org/packages/0a/3b/69dfdc1990f6c154b101b656aa662b1f2890511e849fd060976d7e02b6f2/isbnlib2-3.11.24-py3-none-any.whl", hash = "sha256:bb49dffb55b112de3800cbbdf9a484592e2a1033c0d126a73f52db98ecbd69c9", size = 68239, upload-time = "2026-09-19T13:55:28.201Z" },
 ]
 
 [[package]]
@@ -293,7 +293,7 @@ name = "relac"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
-    { name = "isbnlib" },
+    { name = "isbnlib2" },
     { name = "jinja2" },
     { name = "pydantic" },
     { name = "ruamel-yaml" },
@@ -310,7 +310,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "isbnlib", specifier = ">=3.10.14" },
+    { name = "isbnlib2", specifier = ">=3.11.24" },
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "pydantic", specifier = ">=2.14.1" },
     { name = "ruamel-yaml", specifier = ">=0.19.1" },

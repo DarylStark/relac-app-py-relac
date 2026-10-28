@@ -1,0 +1,34 @@
+{% macro work_edition_table(work_editions) %}
+<div class="table-scroll">
+    <table id="work-editions-table" class="resources" data-sortable>
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Release date</th>
+                <th scope="col">Type</th>
+                <th scope="col" class="right fit-content">Language</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for work_edition in work_editions %}
+                {{ work_edition_row(work_edition) }}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{% macro work_edition_row(work_edition) %}
+<tr data-href="{{ work_edition.id }}.html">
+    <td>{{ work_edition.title }}</td>
+    <td>
+        {% if work_edition.release_date %}
+            {{ work_edition.release_date }}
+        {% else %}
+            Unspecified
+        {% endif %}
+    </td>
+    <td>{{ work_edition.edition_type.value | enum_label }}</td>
+    <td class="right fit-content">{{ work_edition.language }}</td>
+</tr>
+{% endmacro %}

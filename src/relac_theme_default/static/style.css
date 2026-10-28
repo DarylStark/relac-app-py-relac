@@ -424,7 +424,6 @@ div.statistics
 div.card
 {
     padding: 18px;
-    text-align: center;
     border: 1px solid var(--line);
     border-radius: 8px;
     background: linear-gradient(150deg, var(--surface-highlight), var(--surface));
@@ -562,6 +561,154 @@ table.resources thead th {
     display: block;
     color: var(--muted);
     font-size: 0.88em;
+}
+
+.book-detail-page
+{
+    display: grid;
+    gap: 30px;
+}
+
+.book-summary
+{
+    padding: 0;
+}
+
+.book-summary-header,
+.book-contents-header
+{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.book-eyebrow
+{
+    margin: 0 0 5px;
+    color: var(--accent-text);
+    font-family: "Google Sans Code", monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.book-title
+{
+    margin: 0;
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1.2;
+    overflow-wrap: anywhere;
+}
+
+.book-isbn
+{
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+}
+
+.book-fact dt
+{
+    color: var(--muted);
+    font-family: "Google Sans Code", monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.book-isbn code
+{
+    padding: 5px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text);
+    background: var(--code-bg);
+    font-family: "Google Sans Code", monospace;
+    font-size: 12px;
+}
+
+.book-metadata
+{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin: 26px 0 0;
+}
+
+.book-fact
+{
+    min-width: 0;
+    padding-left: 12px;
+    border-left: 2px solid var(--line);
+}
+
+.book-fact dd
+{
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin: 6px 0 0;
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.book-imprint,
+.book-unspecified
+{
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.book-contents-header
+{
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.book-contents-header h2
+{
+    margin: 0;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.book-work-count
+{
+    flex: none;
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 600px)
+{
+    .book-summary-header
+    {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .book-metadata
+    {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px 12px;
+        margin-top: 22px;
+    }
+}
+
+@media (max-width: 380px)
+{
+    .book-metadata
+    {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 table[data-sortable] th .table-column-label {

@@ -102,6 +102,7 @@ class ProjectParser:
     ) -> None:
         """Parse an raw work edition object into a WorkEdition object."""
         obj = self._parse_object(WorkEdition, data)
+        obj.id = obj_id
         self._database.add_work_edition(obj_id, obj)
 
     def _parse_book_object(self, obj_id: str, data: dict[str, str]) -> None:

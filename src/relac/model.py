@@ -3,13 +3,13 @@
 from datetime import date
 from enum import Enum
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, Field
 
 
 class ResourceBase(BaseModel):
     """Base model for resources."""
 
-    _id: str | None = PrivateAttr(default=None)
+    id: str | None = Field(default=None)
 
 
 class AuthorState(Enum):
