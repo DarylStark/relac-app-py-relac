@@ -63,7 +63,7 @@ class Database:
                     raise ValueError(
                         f'Author with id "{author}" doesn\'t exist'
                     )
-                obj.authors_objs.append(author_obj)
+                obj.author_objs.append(author_obj)
                 author_obj.work_objs.append(obj)
 
     def _converge_books(self) -> None:

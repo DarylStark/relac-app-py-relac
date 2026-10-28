@@ -64,7 +64,7 @@ class Work(ResourceBase):
     work_structure: WorkStructure | None = None
 
     # Relation (real objects)
-    authors_objs: list[Author] = Field(default_factory=list)
+    author_objs: list[Author] = Field(default_factory=list)
     edition_objs: list[WorkEdition] = Field(default_factory=list)
 
 

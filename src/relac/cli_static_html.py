@@ -45,7 +45,7 @@ cli_static_html = Typer(name='static_html')
 
 
 @cli_static_html.command(name='create')
-def create(  # noqa: PLR0915
+def create(  # noqa: PLR0912, PLR0915
     ctx: Context,
     output: Path = Option(
         default=Path('.'), help='The output folder for the static website'
@@ -129,8 +129,16 @@ def create(  # noqa: PLR0915
 
     # Authors
     if 'author' in metadata.resource_pages:
-        for author in db.get_authors():
+        for work in db.get_authors():
             template = env.get_template(metadata.resource_pages['author'])
-            html = template.render(author=author)
-            out_path = output / f'{author.id}.html'
+            html = template.render(author=work)
+            out_path = output / f'{work.id}.html'
+            out_path.write_text(html)
+
+    # Works
+    if 'work' in metadata.resource_pages:
+        for work in db.get_works():
+            template = env.get_template(metadata.resource_pages['work'])
+            html = template.render(work=work)
+            out_path = output / f'{work.id}.html'
             out_path.write_text(html)
