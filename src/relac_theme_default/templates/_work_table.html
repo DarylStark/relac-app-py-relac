@@ -24,8 +24,8 @@
 {% set work_structure = work.work_structure.value if work.work_structure else 'unspecified' %}
 <tr data-href="{{ work.id }}.html">
     <td>{{ work.title }}</td>
-    <td data-filter-values='{{ work.authors_objs | map(attribute="name") | list | tojson }}'>
-        {% for author in work.authors_objs %}
+    <td data-filter-values='{{ work.author_objs | map(attribute="name") | list | tojson }}'>
+        {% for author in work.author_objs %}
             {% if not loop.first %}, {% endif %}<a href="{{ work.authors[loop.index0] }}.html">{{ author.name }}</a>
         {% endfor %}
     </td>
