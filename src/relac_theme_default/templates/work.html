@@ -1,0 +1,51 @@
+{% extends "_base.html" %}
+{% set active_page = "works" %}
+
+{% from "_work_edition_table.html" import work_edition_table %}
+
+{% block content %}
+<div class="content">
+  <div class="card">
+      <section class="detail-summary" aria-labelledby="detail-title">
+        <div class="detail-summary-header">
+          <div>
+            <p class="detail-kind">Work</p>
+            <h3 id="detail-title">{{ work.title }}</h2>
+          </div>
+        </div>
+        <dl class="detail-metadata">
+          <div class="detail-fact">
+            <dt>Authors</dt>
+            <dd>
+                {% for author in work.author_objs %}
+                  <span>{{ author.name }}</span>
+                {% endfor %}
+            </dd>
+          </div>
+          <div class="detail-fact">
+            <dt>Structure and category</dt>
+            <dd>
+                <span>{{ work.work_structure.value | enum_label }}</span>
+                <span class="detail-small">{{ work.work_type.value | enum_label }}</span>
+            </dd>
+          </div>
+        </dl>
+      </section>
+  </div>
+
+  <div class="card">
+    <section class="detail-contents" aria-labelledby="detail-contents-title">
+      <header class="detail-contents-header">
+        <div>
+          <h3 id="detail-contents-title">Editions</h2>
+        </div>
+        <span class="detail-work-count">
+          {{ work.edition_objs | length }}
+          {% if work.edition_objs | length == 1 %}edition{% else %}editions{% endif %}
+        </span>
+      </header>
+      {{ work_edition_table(work.edition_objs) }}
+    </section>
+  </div>
+</div>
+{% endblock %}

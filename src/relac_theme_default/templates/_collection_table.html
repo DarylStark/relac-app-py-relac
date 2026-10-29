@@ -1,0 +1,28 @@
+{% macro collection_table(collections) %}
+<div class="table-scroll">
+    <table id="collections-table" class="resources" data-sortable>
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col" class="center fit-content">Books</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for collection in collections %}
+                {{ collection_row(collection) }}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{% macro collection_row(collection) %}
+<tr data-href="{{ collection.id }}.html">
+    <td>{{ collection.name }}</td>
+    <td  class="center fit-content">
+        <pre>
+            {{ collection.book_objs | length }} 
+        </pre>
+    </td>
+</tr>
+{% endmacro %}

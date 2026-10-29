@@ -1,0 +1,30 @@
+{% macro author_table(authors) %}
+<div class="table-scroll">
+    <table id="authors-table" class="resources" data-sortable>
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">State</th>
+                <th scope="col" class="center fit-content">Works</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for author in authors %}
+                {{ author_row(author) }}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{% macro author_row(author) %}
+<tr data-href="{{ author.id }}.html">
+    <td>{{ author.name }}</td>
+    <td>{{ author.state.value | enum_label }}</td>
+    <td class="center fit-content">
+        <pre>
+            {{ author.work_objs | length }}
+        </pre>
+    </td>
+</tr>
+{% endmacro %}

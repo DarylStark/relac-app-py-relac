@@ -3,7 +3,8 @@
 # Templates
 #-------------------------------------------------------------------------------
 _template_work: &template_work
-  author: author.stephen_king
+  authors:
+    - author.stephen_king
   work_type: genre-fiction
   work_structure: short-story
 

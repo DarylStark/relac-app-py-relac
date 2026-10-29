@@ -1,0 +1,46 @@
+<html class="dark">
+
+<head>
+    <title>Relac library</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script>
+        try {
+            if (localStorage.getItem("relac-theme") === "light") {
+                document.documentElement.classList.replace("dark", "light");
+            }
+        } catch {
+        }
+    </script>
+    <link rel='stylesheet' href="static/style.css" />
+</head>
+
+<body>
+
+    <main class="page-shell">
+        <header class="page-header">
+            <div class="page-title-group">
+                <h1>Relac library</h1>
+                <p class="page-subtitle">All books!</p>
+            </div>
+
+            <nav class="tab-nav">
+                <a href="index.html" {% if active_page == "overview" %}class="active"{% endif %}>Overview</a>
+                <a href="authors.html" {% if active_page == "authors" %}class="active"{% endif %}>Authors</a>
+                <a href="works.html" {% if active_page == "works" %}class="active"{% endif %}>Works</a>
+                <a href="books.html" {% if active_page == "books" %}class="active"{% endif %}>Books</a>
+                <a href="collections.html" {% if active_page == "collections" %}class="active"{% endif %}>Collections</a>
+                <a href="lists.html" {% if active_page == "lists" %}class="active"{% endif %}>Lists</a>
+                <button class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme">
+                    <span class="theme-toggle-icon" aria-hidden="true">&#x263c;</span>
+                </button>
+            </nav>
+        </header>
+        
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    <script src="static/sortable-tables.js" defer></script>
+    <script src="static/theme.js" defer></script>
+</body>
+</html>

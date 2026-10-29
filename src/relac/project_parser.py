@@ -35,12 +35,15 @@ class ProjectParser:
 
     def _find_all_yaml_files(self) -> list[Path]:
         """Find all YAML files in the working directory."""
-        return [
+        files = [
             path
             for pattern in ('*.yaml', '*.yml')
             for path in self._working_dir.rglob(pattern)
             if path.is_file()
         ]
+        # Files starting with an underscore (like templates with YAML anchors)
+        # must come first, since anchors have to be defined before use.
+        return sorted(files, key=lambda p: (not p.name.startswith('_'), str(p)))
 
     def _combine_yaml(self, yaml_files: list[Path]) -> str:
         """Combine a lot of YAML files into one file."""
@@ -56,7 +59,9 @@ class ProjectParser:
 
         raw_data = yaml.load(yaml_data)
 
-        object_parsers: dict[str, Callable[[str, dict[str, str]], None]] = {
+        object_parsers: dict[
+            str, Callable[[str, dict[str, str]], ResourceBase]
+        ] = {
             'author': self._parse_author_object,
             'work': self._parse_work_object,
             'work_edition': self._parse_work_edition_object,
@@ -77,7 +82,8 @@ class ProjectParser:
                 # TODO: custom Exception
                 raise ValueError(f'Object type "{obj_type}" invalid')
 
-            parser(obj_id, obj)
+            new_obj = parser(obj_id, obj)
+            new_obj.id = obj_id
 
     def _parse_object[ResourceModel: ResourceBase](
         self,
@@ -87,50 +93,58 @@ class ProjectParser:
         """Generic method to parse data."""
         return model.model_validate(obj, extra='forbid')
 
-    def _parse_author_object(self, obj_id: str, data: dict[str, str]) -> None:
+    def _parse_author_object(self, obj_id: str, data: dict[str, str]) -> Author:
         """Parse an raw author object into a Author object."""
         obj = self._parse_object(Author, data)
         self._database.add_author(obj_id, obj)
+        return obj
 
-    def _parse_work_object(self, obj_id: str, data: dict[str, str]) -> None:
+    def _parse_work_object(self, obj_id: str, data: dict[str, str]) -> Work:
         """Parse an raw work object into a Work object."""
         obj = self._parse_object(Work, data)
         self._database.add_work(obj_id, obj)
+        return obj
 
     def _parse_work_edition_object(
         self, obj_id: str, data: dict[str, str]
-    ) -> None:
+    ) -> WorkEdition:
         """Parse an raw work edition object into a WorkEdition object."""
         obj = self._parse_object(WorkEdition, data)
         self._database.add_work_edition(obj_id, obj)
+        return obj
 
-    def _parse_book_object(self, obj_id: str, data: dict[str, str]) -> None:
+    def _parse_book_object(self, obj_id: str, data: dict[str, str]) -> Book:
         """Parse an raw book object into a Book object."""
         obj = self._parse_object(Book, data)
         self._database.add_book(obj_id, obj)
+        return obj
 
     def _parse_book_publisher_object(
         self, obj_id: str, data: dict[str, str]
-    ) -> None:
+    ) -> BookPublisher:
         """Parse an raw book publisher object into a BookPublisher object."""
         obj = self._parse_object(BookPublisher, data)
         self._database.add_book_publisher(obj_id, obj)
+        return obj
 
     def _parse_collection_object(
         self, obj_id: str, data: dict[str, str]
-    ) -> None:
+    ) -> BookCollection:
         """Parse an raw collection object into a BookCollection object."""
         obj = self._parse_object(BookCollection, data)
         self._database.add_book_collections(obj_id, obj)
+        return obj
 
-    def _parse_label_object(self, obj_id: str, data: dict[str, str]) -> None:
+    def _parse_label_object(self, obj_id: str, data: dict[str, str]) -> Label:
         """Parse an raw label object into a Label object."""
         obj = self._parse_object(Label, data)
         self._database.add_label(obj_id, obj)
+        return obj
 
     def _parse_resource_list_object(
         self, obj_id: str, data: dict[str, str]
-    ) -> None:
+    ) -> ResourceList:
         """Parse an raw resource list object into a ResourceList object."""
         obj = self._parse_object(ResourceList, data)
         self._database.add_resource_list(obj_id, obj)
+        return obj

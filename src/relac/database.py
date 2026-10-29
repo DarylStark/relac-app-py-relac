@@ -1,5 +1,7 @@
 """Module with the Database class."""
 
+from collections.abc import Sequence
+
 from relac.model import (
     Author,
     Book,
@@ -42,7 +44,7 @@ class Database:
         collection[id] = obj
 
     def _converge_works_editions(self) -> None:
-        """Converge all works."""
+        """Converge all work editions."""
         for obj in self._work_editions.values():
             work_obj = self._works.get(obj.work)
             if not work_obj:
@@ -51,20 +53,40 @@ class Database:
             obj.work_obj = work_obj
             work_obj.edition_objs.append(obj)
 
+    def _converge_works(self) -> None:
+        """Converge all works."""
+        for obj in self._works.values():
+            for author in obj.authors:
+                author_obj = self._authors.get(author)
+                if not author_obj:
+                    # TODO: Custom error
+                    raise ValueError(
+                        f'Author with id "{author}" doesn\'t exist'
+                    )
+                obj.author_objs.append(author_obj)
+                author_obj.work_objs.append(obj)
+
     def _converge_books(self) -> None:
         """Converge all books."""
         for obj in self._books.values():
-            if not obj.publisher:
-                continue
+            if obj.publisher is not None:
+                publisher_obj = self._book_publishers.get(obj.publisher)
+                if not publisher_obj:
+                    # TODO: Custom error
+                    raise ValueError(
+                        f'Publisher with id "{obj.publisher}" doesn\'t exist'
+                    )
+                obj.publisher_obj = publisher_obj
+                publisher_obj.book_objs.append(obj)
 
-            publisher_obj = self._book_publishers.get(obj.publisher)
-            if not publisher_obj:
-                # TODO: Custom error
-                raise ValueError(
-                    f'Publisher with id "{obj.publisher}" doesn\'t exist'
-                )
-            obj.publisher_obj = publisher_obj
-            publisher_obj.book_objs.append(obj)
+            for work_edition in obj.work_editions:
+                work_edition_obj = self._work_editions.get(work_edition)
+                if work_edition_obj is None:
+                    raise ValueError(
+                        f'WorkEdition with id "{work_edition}" doesn\'t exist'
+                    )
+                obj.work_edition_objs.append(work_edition_obj)
+                work_edition_obj.book_objs.append(obj)
 
     def _converge_book_collections(self) -> None:
         """Converge all book collections."""
@@ -78,6 +100,7 @@ class Database:
 
     def converge(self) -> None:
         """Converge all objects."""
+        self._converge_works()
         self._converge_works_editions()
         self._converge_books()
         self._converge_book_collections()
@@ -86,62 +109,62 @@ class Database:
         """Add a author to the database."""
         self._add_object(id, obj, self._authors)
 
-    def get_authors(self) -> dict[str, Author]:
+    def get_authors(self) -> Sequence[Author]:
         """Get all authors in the database."""
-        return self._authors
+        return list(self._authors.values())
 
     def add_work(self, id: str, obj: Work) -> None:
         """Add a work to the database."""
         self._add_object(id, obj, self._works)
 
-    def get_works(self) -> dict[str, Work]:
+    def get_works(self) -> Sequence[Work]:
         """Get all works in the database."""
-        return self._works
+        return list(self._works.values())
 
     def add_work_edition(self, id: str, obj: WorkEdition) -> None:
         """Add a work edition to the database."""
         self._add_object(id, obj, self._work_editions)
 
-    def get_work_editions(self) -> dict[str, WorkEdition]:
+    def get_work_editions(self) -> Sequence[WorkEdition]:
         """Get all work editions in the database."""
-        return self._work_editions
+        return list(self._work_editions.values())
 
     def add_book(self, id: str, obj: Book) -> None:
         """Add a book to the database."""
         self._add_object(id, obj, self._books)
 
-    def get_books(self) -> dict[str, Book]:
+    def get_books(self) -> Sequence[Book]:
         """Get all books in the database."""
-        return self._books
+        return list(self._books.values())
 
     def add_book_publisher(self, id: str, obj: BookPublisher) -> None:
         """Add a book publisher to the database."""
         self._add_object(id, obj, self._book_publishers)
 
-    def get_book_publishers(self) -> dict[str, BookPublisher]:
+    def get_book_publishers(self) -> Sequence[BookPublisher]:
         """Get all book publishers in the database."""
-        return self._book_publishers
+        return list(self._book_publishers.values())
 
     def add_book_collections(self, id: str, obj: BookCollection) -> None:
         """Add a book collection to the database."""
         self._add_object(id, obj, self._book_collections)
 
-    def get_book_collections(self) -> dict[str, BookCollection]:
+    def get_book_collections(self) -> list[BookCollection]:
         """Get all book collections in the database."""
-        return self._book_collections
+        return list(self._book_collections.values())
 
     def add_label(self, id: str, obj: Label) -> None:
         """Add a label to the database."""
         self._add_object(id, obj, self._labels)
 
-    def get_labels(self) -> dict[str, Label]:
+    def get_labels(self) -> Sequence[Label]:
         """Get all label in the database."""
-        return self._labels
+        return list(self._labels.values())
 
     def add_resource_list(self, id: str, obj: ResourceList) -> None:
         """Add a label to the database."""
         self._add_object(id, obj, self._resource_lists)
 
-    def get_resource_lists(self) -> dict[str, ResourceList]:
+    def get_resource_lists(self) -> list[ResourceList]:
         """Get all resource lists in the database."""
-        return self._resource_lists
+        return list(self._resource_lists.values())

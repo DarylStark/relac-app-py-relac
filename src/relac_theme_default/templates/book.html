@@ -1,0 +1,64 @@
+{% extends "_base.html" %}
+{% set active_page = "books" %}
+
+{% from "_work_edition_table.html" import work_edition_table %}
+
+{% set book_medium = book.medium.value %}
+{% set book_binding = book.binding.value %}
+
+{% block content %}
+<div class="content">
+  <div class="card">
+      <section class="detail-summary" aria-labelledby="detail-title">
+        <div class="detail-summary-header">
+          <div>
+            <p class="detail-kind">Book</p>
+            <h3 id="detail-title">{{ book.title }}</h2>
+          </div>
+          <p class="detail-badge">
+            <code>{{ book.isbn13 | isbn }}</code>
+          </p>
+        </div>
+
+        <dl class="detail-metadata">
+          <div class="detail-fact">
+            <dt>Publisher</dt>
+            <dd>
+              {% if book.publisher_obj %}
+                <span>{{ book.publisher_obj.name }}</span>
+                {% if book.publisher_obj.imprint %}
+                  <span class="detail-small">{{ book.publisher_obj.imprint }}</span>
+                {% endif %}
+              {% else %}
+                <span class="detail-unspecified">Unspecified</span>
+              {% endif %}
+            </dd>
+          </div>
+          <div class="detail-fact">
+            <dt>Medium</dt>
+            <dd>{{ book_medium | enum_label }}</dd>
+          </div>
+          <div class="detail-fact">
+            <dt>Binding</dt>
+            <dd>{{ book_binding | enum_label }}</dd>
+          </div>
+        </dl>
+      </section>
+  </div>
+
+  <div class="card">
+    <section class="detail-contents" aria-labelledby="detail-contents-title">
+      <header class="detail-contents-header">
+        <div>
+          <h3 id="detail-contents-title">Works in this book</h2>
+        </div>
+        <span class="detail-count">
+          {{ book.work_edition_objs | length }}
+          {% if book.work_edition_objs | length == 1 %}work{% else %}works{% endif %}
+        </span>
+      </header>
+      {{ work_edition_table(book.work_edition_objs) }}
+    </section>
+  </div>
+</div>
+{% endblock %}

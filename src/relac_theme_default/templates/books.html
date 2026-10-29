@@ -1,0 +1,13 @@
+{% extends "_base.html" %}
+{% set active_page = "books" %}
+
+{% from "_book_table.html" import book_table %}
+
+{% block content %}
+    <div class="content">
+        <div class="card">
+            <h3>Books</h3>
+            {{ book_table(books) }}
+        </div>
+    </div>
+{% endblock %}

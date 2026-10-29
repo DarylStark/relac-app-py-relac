@@ -1,0 +1,22 @@
+{% macro list_table(lists) %}
+<div class="table-scroll">
+    <table id="lists-table" class="resources" data-sortable>
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for list in lists %}
+                {{ list_row(list) }}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{% macro list_row(list) %}
+<tr data-href="{{ list.id }}.html">
+    <td>{{ list.name }}</td>
+</tr>
+{% endmacro %}

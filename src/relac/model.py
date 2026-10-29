@@ -3,13 +3,13 @@
 from datetime import date
 from enum import Enum
 
-from pydantic import BaseModel, Field, PrivateAttr
+from pydantic import BaseModel, Field
 
 
 class ResourceBase(BaseModel):
     """Base model for resources."""
 
-    _id: str | None = PrivateAttr(default=None)
+    id: str | None = Field(default=None)
 
 
 class AuthorState(Enum):
@@ -59,12 +59,12 @@ class Work(ResourceBase):
     """Model for a work."""
 
     title: str
-    author: str
+    authors: list[str]
     work_type: WorkType | None = None
     work_structure: WorkStructure | None = None
 
     # Relation (real objects)
-    authors_objs: list[Author] = Field(default_factory=list)
+    author_objs: list[Author] = Field(default_factory=list)
     edition_objs: list[WorkEdition] = Field(default_factory=list)
 
 
@@ -91,6 +91,7 @@ class WorkEdition(ResourceBase):
 
     # Relations (real objects)
     work_obj: Work | None = None
+    book_objs: list[Book] = Field(default_factory=list)
 
 
 class BookCollection(ResourceBase):
@@ -128,11 +129,12 @@ class BookBinding(Enum):
 
     UNSPECIFIED = 'unspecified'
     POCKET = 'pocket'
-    LUXE_EDITION = 'luxe_edition'
-    GRAPHICAL_NOVEL_ADAPTION = 'graphical_novel_adaption'
+    NOVELLA = 'novella'
+    LUXE_EDITION = 'luxe-edition'
+    GRAPHICAL_NOVEL_ADAPTION = 'graphical-novel-adaption'
     EPUB = 'epub'
-    EPUB_WATERMARK = 'epub_watermark'
-    EPUB_DRM = 'epub_drm'
+    EPUB_WATERMARK = 'epub-watermark'
+    EPUB_DRM = 'epub-drm'
 
 
 class Book(ResourceBase):
@@ -146,6 +148,7 @@ class Book(ResourceBase):
     binding: BookBinding = BookBinding.UNSPECIFIED
 
     # Relationships (real objects)
+    work_edition_objs: list[WorkEdition] = Field(default_factory=list)
     publisher_obj: BookPublisher = Field(default_factory=list)
     collection_objs: list[BookCollection] = Field(default_factory=list)
 

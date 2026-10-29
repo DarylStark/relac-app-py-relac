@@ -10,9 +10,12 @@
             "request": "launch",
             "module": "relac",
             "args": [
-                "static",
-                "html"
+                "static_html",
+                "create",
+                "--output",
+                "${workspaceFolder}/out"
             ],
+            "cwd": "${workspaceFolder}/tests/simple_project",
             "python": "${workspaceFolder}/.venv/bin/python",
             "console": "integratedTerminal"
         }

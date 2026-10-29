@@ -1,0 +1,70 @@
+---
+#-------------------------------------------------------------------------------
+# Author
+#-------------------------------------------------------------------------------
+author.john_williams:
+  name: John Willams
+  state: deceased
+  birthdate: 1922-08-29
+  deceased_date: 1994-03-03
+#-------------------------------------------------------------------------------
+# Works and work editions
+#-------------------------------------------------------------------------------
+work.john_williams__stoner:
+  title: Stoner
+  <<: *template_work
+  authors:
+    - author.john_williams
+  work_structure: novel
+  work_type: literary-fiction
+
+work_edition.john_williams__stoner__original:
+  title: Stoner
+  work: work.john_williams__stoner
+  <<: *template_work_edition
+  edition_type: original
+  language: en
+
+work.john_williams__augustus:
+  title: Augustus
+  <<: *template_work
+  authors:
+    - author.john_williams
+  work_structure: novel
+  work_type: literary-fiction
+
+work.john_williams__butchers_crossing:
+  title: Butcher's Crossing
+  <<: *template_work
+  authors:
+    - author.john_williams
+  work_structure: novel
+  work_type: literary-fiction
+
+work.john_williams__nothing_but_the_night:
+  title: Nothing but the night
+  <<: *template_work
+  authors:
+    - author.john_williams
+  work_structure: novel
+  work_type: literary-fiction
+#-------------------------------------------------------------------------------
+# Books
+#-------------------------------------------------------------------------------
+book.john_williams__stoner__vintage_classic_red_spine:
+  isbn13: 9780099561545
+  title: Stoner
+  publisher: publisher.penguin_random_house__vintage_classics
+  medium: paperback
+  work_editions:
+    - work_edition.john_williams__stoner__original
+
+book.john_williams__stoner__epub_drm:
+  isbn13: 9781448156023
+  title: Stoner
+  publisher: publisher.penguin_random_house__books
+  medium: ebook
+  binding: epub-drm
+  work_editions:
+    - work_edition.john_williams__stoner__original
+#-------------------------------------------------------------------------------

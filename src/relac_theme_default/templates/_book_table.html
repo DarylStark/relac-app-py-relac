@@ -1,0 +1,54 @@
+{% macro book_table(books) %}
+<div class="table-scroll">
+    <table id="books-table" class="resources" data-sortable>
+        <thead>
+            <tr>
+                <th scope="col">Title</th>
+                <th scope="col">Publisher</th>
+                <th scope="col">Medium</th>
+                <th scope="col" class="center fit-content">Works</th>
+                <th scope="col" class="right fit-content">ISBN</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for book in books %}
+                {{ book_row(book) }}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endmacro %}
+
+{% macro book_row(book) %}
+{% set book_medium = book.medium.value %}
+{% set book_binding = book.binding.value %}
+{% set book_publisher = book.publisher_obj.name if book.publisher_obj else '' %}
+{% set book_imprint = book.publisher_obj.imprint if book.publisher_obj and book.publisher_obj.imprint else '' %}
+{% set publisher_values = ([book_publisher] if book_publisher else []) + ([book_imprint] if book_imprint else []) %}
+{% set medium_values = [book.medium.value | enum_label, book_binding | enum_label] %}
+<tr data-href="{{ book.id }}.html">
+    <td>{{ book.title }}</td>
+    <td data-filter-values='{{ publisher_values | tojson }}'>
+        {% if book.publisher_obj %}
+            {{ book.publisher_obj.name }}
+            {% if book.publisher_obj.imprint %}
+                <span class="table-secondary-text">{{ book.publisher_obj.imprint }}</span>
+            {% endif %}
+        {% endif %}
+    </td>
+    <td data-sort-value="{{ book_medium }}" data-filter-values='{{ medium_values | tojson }}'>
+        {{ book.medium.value | enum_label }}
+        <span class="table-secondary-text">{{ book_binding | enum_label }}</span>
+    </td>
+    <td class="center fit-content">
+        <pre>
+            {{ book.work_edition_objs | length }}
+        </pre>
+    </td>
+    <td class="right fit-content">
+        <pre>
+            {{ book.isbn13 | isbn }}
+        </pre>
+    </td>
+</tr>
+{% endmacro %}

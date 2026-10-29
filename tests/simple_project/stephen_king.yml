@@ -23,6 +23,7 @@ work_edition.stephen_king__mr_harrigans_phone__nl:
   work: work.stephen_king__mr_harrigans_phone
   <<: *template_work_edition
   language: nl
+  edition_type: translation
 
 work.stephen_king__the_life_of_chuck:
   title: The Life of Chuck
@@ -38,6 +39,7 @@ work_edition.stephen_king__the_life_of_chuck__nl:
   work: work.stephen_king__the_life_of_chuck
   <<: *template_work_edition
   language: nl
+  edition_type: translation
 
 work.stephen_king__if_it_bleeds:
   title: If It Bleeds
@@ -53,6 +55,7 @@ work_edition.stephen_king__if_it_bleed__nl:
   work: work.stephen_king__if_it_bleeds
   <<: *template_work_edition
   language: nl
+  edition_type: translation
 
 work.stephen_king__rat:
   title: Rat
@@ -68,6 +71,7 @@ work_edition.stephen_king__rat__nl:
   work: work.stephen_king__rat
   <<: *template_work_edition
   language: nl
+  edition_type: translation
 #-------------------------------------------------------------------------------
 # Books
 #-------------------------------------------------------------------------------
@@ -75,7 +79,7 @@ book.stephen_king__als_het_bloedt:
   isbn13: 9789402315103
   title: Als het bloedt
   medium: ebook
-  binding: epub_watermark
+  binding: epub-watermark
   work_editions:
     - work_edition.stephen_king__if_it_bleed__nl
     - work_edition.stephen_king__mr_harrigans_phone__nl

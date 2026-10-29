@@ -1,0 +1,9 @@
+---
+#-------------------------------------------------------------------------------
+# Vintage Red Spines
+#-------------------------------------------------------------------------------
+collection.vintage_classic_red_spine:
+  name: Vintage Classic Red Spine
+  books:
+    - book.john_williams__stoner__vintage_classic_red_spine
+#-------------------------------------------------------------------------------
