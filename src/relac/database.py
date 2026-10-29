@@ -86,6 +86,7 @@ class Database:
                         f'WorkEdition with id "{work_edition}" doesn\'t exist'
                     )
                 obj.work_edition_objs.append(work_edition_obj)
+                work_edition_obj.book_objs.append(obj)
 
     def _converge_book_collections(self) -> None:
         """Converge all book collections."""

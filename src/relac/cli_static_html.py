@@ -7,6 +7,7 @@ from pathlib import Path
 
 from isbnlib import mask
 from jinja2 import Environment, FileSystemLoader
+from pycountry import languages
 from typer import Context, Option, Typer
 
 from relac.theme import RelacTheme
@@ -41,6 +42,12 @@ def _format_enum_label(value: str) -> str:
     return labels.get(value, value.replace('-', ' ').capitalize())
 
 
+def _code_to_language(language_code: str) -> str:
+    """Get the name for a language code."""
+    lang = languages.get(alpha_2=language_code)
+    return lang.name if lang else language_code
+
+
 cli_static_html = Typer(name='static_html')
 
 
@@ -66,6 +73,7 @@ def create(  # noqa: PLR0912, PLR0915
     env.filters['isbn'] = lambda x: mask(str(x))
     env.filters['enum_label'] = _format_enum_label
     env.filters['age'] = _calculate_age
+    env.filters['language'] = _code_to_language
 
     # Copy static folder
     if metadata.static_folder:
@@ -129,16 +137,24 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Authors
     if 'author' in metadata.resource_pages:
-        for work in db.get_authors():
+        for work_edition in db.get_authors():
             template = env.get_template(metadata.resource_pages['author'])
-            html = template.render(author=work)
-            out_path = output / f'{work.id}.html'
+            html = template.render(author=work_edition)
+            out_path = output / f'{work_edition.id}.html'
             out_path.write_text(html)
 
     # Works
     if 'work' in metadata.resource_pages:
-        for work in db.get_works():
+        for work_edition in db.get_works():
             template = env.get_template(metadata.resource_pages['work'])
-            html = template.render(work=work)
-            out_path = output / f'{work.id}.html'
+            html = template.render(work=work_edition)
+            out_path = output / f'{work_edition.id}.html'
+            out_path.write_text(html)
+
+    # Work editions
+    if 'work_edition' in metadata.resource_pages:
+        for work_edition in db.get_work_editions():
+            template = env.get_template(metadata.resource_pages['work_edition'])
+            html = template.render(work_edition=work_edition)
+            out_path = output / f'{work_edition.id}.html'
             out_path.write_text(html)

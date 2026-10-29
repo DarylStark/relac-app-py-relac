@@ -29,6 +29,6 @@
         {% endif %}
     </td>
     <td>{{ work_edition.edition_type.value | enum_label }}</td>
-    <td class="right fit-content">{{ work_edition.language }}</td>
+    <td class="right fit-content">{{ work_edition.language | language }}</td>
 </tr>
 {% endmacro %}

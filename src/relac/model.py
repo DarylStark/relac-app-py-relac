@@ -91,6 +91,7 @@ class WorkEdition(ResourceBase):
 
     # Relations (real objects)
     work_obj: Work | None = None
+    book_objs: list[Book] = Field(default_factory=list)
 
 
 class BookCollection(ResourceBase):
