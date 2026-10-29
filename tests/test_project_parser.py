@@ -21,5 +21,3 @@ def test_parsing_directory() -> None:
     assert len(database.get_book_collections()) == 2
     assert len(database.get_labels()) == 0
     assert len(database.get_resource_lists()) == 1
-
-    pass
