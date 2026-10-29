@@ -35,12 +35,15 @@ class ProjectParser:
 
     def _find_all_yaml_files(self) -> list[Path]:
         """Find all YAML files in the working directory."""
-        return [
+        files = [
             path
             for pattern in ('*.yaml', '*.yml')
             for path in self._working_dir.rglob(pattern)
             if path.is_file()
         ]
+        # Files starting with an underscore (like templates with YAML anchors)
+        # must come first, since anchors have to be defined before use.
+        return sorted(files, key=lambda p: (not p.name.startswith('_'), str(p)))
 
     def _combine_yaml(self, yaml_files: list[Path]) -> str:
         """Combine a lot of YAML files into one file."""
