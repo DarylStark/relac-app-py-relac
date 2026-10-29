@@ -145,10 +145,10 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Works
     if 'work' in metadata.resource_pages:
-        for work_edition in db.get_works():
+        for work in db.get_works():
             template = env.get_template(metadata.resource_pages['work'])
-            html = template.render(work=work_edition)
-            out_path = output / f'{work_edition.id}.html'
+            html = template.render(work=work)
+            out_path = output / f'{work.id}.html'
             out_path.write_text(html)
 
     # Work editions
@@ -157,4 +157,20 @@ def create(  # noqa: PLR0912, PLR0915
             template = env.get_template(metadata.resource_pages['work_edition'])
             html = template.render(work_edition=work_edition)
             out_path = output / f'{work_edition.id}.html'
+            out_path.write_text(html)
+
+    # Collections
+    if 'collection' in metadata.resource_pages:
+        for collection in db.get_book_collections():
+            template = env.get_template(metadata.resource_pages['collection'])
+            html = template.render(collection=collection)
+            out_path = output / f'{collection.id}.html'
+            out_path.write_text(html)
+
+    # Lists
+    if 'list' in metadata.resource_pages:
+        for lst in db.get_resource_lists():
+            template = env.get_template(metadata.resource_pages['list'])
+            html = template.render(list=lst)
+            out_path = output / f'{lst.id}.html'
             out_path.write_text(html)

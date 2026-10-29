@@ -578,6 +578,28 @@ table.resources thead th {
     gap: 20px;
 }
 
+.detail-kind
+{
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin: 0 0 6px;
+    color: var(--muted);
+    font-family: "Google Sans Code", monospace;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.detail-kind::before
+{
+    width: 14px;
+    height: 2px;
+    background: var(--accent-text);
+    content: "";
+}
+
 .detail-title
 {
     margin: 0;

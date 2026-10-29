@@ -17,5 +17,6 @@ class RelacTheme:
         Literal['books', 'works', 'authors', 'collections', 'lists'], str
     ] = field(default_factory=dict)
     resource_pages: dict[
-        Literal['book', 'work', 'author', 'work_edition'], str
+        Literal['book', 'work', 'author', 'work_edition', 'collection', 'list'],
+        str,
     ] = field(default_factory=dict)

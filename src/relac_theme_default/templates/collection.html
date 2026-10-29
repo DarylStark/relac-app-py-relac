@@ -1,0 +1,34 @@
+{% extends "_base.html" %}
+{% set active_page = "collections" %}
+
+{% from "_book_table.html" import book_table %}
+
+{% block content %}
+<div class="content">
+  <div class="card">
+      <section class="detail-summary" aria-labelledby="detail-title">
+        <div class="detail-summary-header">
+          <div>
+            <p class="detail-kind">Collection</p>
+            <h3 id="detail-title">{{ collection.name }}</h2>
+          </div>
+        </div>
+      </section>
+  </div>
+
+  <div class="card">
+    <section class="detail-contents" aria-labelledby="detail-contents-title">
+      <header class="detail-contents-header">
+        <div>
+          <h3 id="detail-contents-title">Books in this collection</h2>
+        </div>
+        <span class="detail-count">
+          {{ collection.book_objs | length }}
+          {% if collection.book_objs | length == 1 %}book{% else %}books{% endif %}
+        </span>
+      </header>
+      {{ book_table(collection.book_objs) }}
+    </section>
+  </div>
+</div>
+{% endblock %}

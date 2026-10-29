@@ -1,0 +1,19 @@
+{% extends "_base.html" %}
+{% set active_page = "lists" %}
+
+{% from "_book_table.html" import book_table %}
+
+{% block content %}
+<div class="content">
+  <div class="card">
+      <section class="detail-summary" aria-labelledby="detail-title">
+        <div class="detail-summary-header">
+          <div>
+            <p class="detail-kind">List</p>
+            <h3 id="detail-title">{{ list.name }}</h2>
+          </div>
+        </div>
+      </section>
+  </div>
+</div>
+{% endblock %}
