@@ -33,6 +33,17 @@
         numeric: true,
         sensitivity: "base"
     });
+    const pageUrl = new URL(window.location.href);
+
+    const updateQueryValues = (key, values) => {
+        pageUrl.searchParams.delete(key);
+        values.forEach((value) => pageUrl.searchParams.append(key, value));
+        window.history.replaceState(
+            window.history.state,
+            "",
+            `${pageUrl.pathname}${pageUrl.search}${pageUrl.hash}`
+        );
+    };
 
     const getCellValue = (cell) => {
         if (!cell) {
@@ -94,6 +105,9 @@
         const rows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
         const selectedValuesByColumn = new Map();
         const sortActionsByColumn = new Map();
+        const tableKey = table.id || "table";
+        const sortParameter = `relac.sort.${tableKey}`;
+        let isRestoringState = true;
 
         const updateRows = () => {
             rows.forEach((row) => {
@@ -170,6 +184,8 @@
 
             const selectedValues = new Set();
             selectedValuesByColumn.set(columnIndex, selectedValues);
+            const filterParameter = `relac.filter.${tableKey}.${columnIndex}`;
+            const savedValues = new Set(pageUrl.searchParams.getAll(filterParameter));
 
             const values = Array.from(new Set(rows.flatMap((row) => {
                 return getFilterValues(row.cells[columnIndex]);
@@ -221,10 +237,19 @@
 
                     updateSummary();
                     updateRows();
+                    updateQueryValues(filterParameter, Array.from(selectedValues));
                 });
 
                 return { checkbox, option, value };
             });
+
+            checkboxes.forEach(({ checkbox, value }) => {
+                if (savedValues.has(value)) {
+                    checkbox.checked = true;
+                    selectedValues.add(value);
+                }
+            });
+            updateSummary();
 
             search.addEventListener("input", () => {
                 const query = search.value.trim().toLocaleLowerCase();
@@ -241,6 +266,7 @@
 
                 updateSummary();
                 updateRows();
+                updateQueryValues(filterParameter, Array.from(selectedValues));
             });
 
             const positionFilterMenu = () => {
@@ -312,6 +338,11 @@
                 });
                 header.setAttribute("aria-sort", direction === 1 ? "ascending" : "descending");
                 sortAction.textContent = direction === 1 ? "Sort descending" : "Sort ascending";
+                if (!isRestoringState) {
+                    updateQueryValues(sortParameter, [
+                        `${columnIndex}:${direction === 1 ? "asc" : "desc"}`
+                    ]);
+                }
 
                 Array.from(table.tBodies).forEach((body) => {
                     const rows = Array.from(body.rows).map((row, originalIndex) => ({
@@ -338,8 +369,22 @@
             });
         });
 
-        const firstColumnIndex = headers.findIndex((header) => header.tagName === "TH");
-        sortActionsByColumn.get(firstColumnIndex)?.click();
+        updateRows();
+        const savedSort = pageUrl.searchParams.get(sortParameter)?.match(/^([0-9]+):(asc|desc)$/);
+        const savedSortColumnIndex = savedSort ? Number(savedSort[1]) : -1;
+        const savedSortAction = sortActionsByColumn.get(savedSortColumnIndex);
+
+        if (savedSort && savedSortAction) {
+            headers[savedSortColumnIndex].setAttribute(
+                "aria-sort",
+                savedSort[2] === "asc" ? "descending" : "ascending"
+            );
+            savedSortAction.click();
+        } else {
+            const firstColumnIndex = headers.findIndex((header) => header.tagName === "TH");
+            sortActionsByColumn.get(firstColumnIndex)?.click();
+        }
+        isRestoringState = false;
     });
 
     document.addEventListener("pointerdown", (event) => {

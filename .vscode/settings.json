@@ -7,6 +7,10 @@
         "tests",
     ],
     "chat.tools.terminal.autoApprove": {
-        "uv": true
+        "uv": true,
+        "/^python -m http\\.server 8765$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }
