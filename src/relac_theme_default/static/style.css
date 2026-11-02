@@ -461,6 +461,48 @@ div.content .card:not(.small)
     min-width: 0;
 }
 
+nav.breadcrumbs
+{
+    grid-column: 1 / -1;
+    min-width: 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+nav.breadcrumbs ol
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+nav.breadcrumbs li:not(:first-child)::before
+{
+    margin-right: 8px;
+    color: var(--muted);
+    content: "/";
+}
+
+nav.breadcrumbs a
+{
+    color: var(--muted);
+    text-decoration: none;
+}
+
+nav.breadcrumbs a:hover
+{
+    color: var(--text);
+    text-decoration: underline;
+}
+
+nav.breadcrumbs [aria-current="page"]
+{
+    color: var(--text);
+}
+
 @media (max-width: 760px)
 {
     main.page-shell

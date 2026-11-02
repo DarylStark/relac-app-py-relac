@@ -3,9 +3,11 @@
 
 {% from "_work_edition_table.html" import work_edition_table %}
 {% from "_entity_link.html" import entity_link %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% block content %}
 <div class="content">
+  {{ breadcrumbs([("Works", "works.html"), (work.title, none)]) }}
   <div class="card">
       <section class="detail-summary" aria-labelledby="detail-title">
         <div class="detail-summary-header">

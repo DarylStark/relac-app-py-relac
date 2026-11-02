@@ -2,12 +2,14 @@
 {% set active_page = "books" %}
 
 {% from "_work_edition_table.html" import work_edition_table %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% set book_medium = book.medium.value %}
 {% set book_binding = book.binding.value %}
 
 {% block content %}
 <div class="content">
+  {{ breadcrumbs([("Books", "books.html"), (book.title, none)]) }}
   <div class="card">
       <section class="detail-summary" aria-labelledby="detail-title">
         <div class="detail-summary-header">

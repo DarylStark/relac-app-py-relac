@@ -2,9 +2,11 @@
 {% set active_page = "collections" %}
 
 {% from "_book_table.html" import book_table %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% block content %}
 <div class="content">
+  {{ breadcrumbs([("Collections", "collections.html"), (collection.name, none)]) }}
   <div class="card">
       <section class="detail-summary" aria-labelledby="detail-title">
         <div class="detail-summary-header">

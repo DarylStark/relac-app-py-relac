@@ -11,6 +11,8 @@
         "/^python -m http\\.server 8765$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "pushd": true,
+        "popd": true
     }
 }
