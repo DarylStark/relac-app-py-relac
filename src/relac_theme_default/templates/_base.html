@@ -30,17 +30,36 @@
                 <a href="books.html" {% if active_page == "books" %}class="active"{% endif %}>Books</a>
                 <a href="collections.html" {% if active_page == "collections" %}class="active"{% endif %}>Collections</a>
                 <a href="lists.html" {% if active_page == "lists" %}class="active"{% endif %}>Reading lists</a>
+                <button class="library-search-toggle" type="button" aria-label="Search library" title="Search library">
+                    <span class="library-search-icon" aria-hidden="true"></span>
+                </button>
                 <button class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme">
                     <span class="theme-toggle-icon" aria-hidden="true">&#x263c;</span>
                 </button>
             </nav>
         </header>
+
+        <dialog class="library-search-dialog" aria-labelledby="library-search-title">
+            <section class="library-search-panel">
+                <header class="library-search-header">
+                    <h2 id="library-search-title">Search library</h2>
+                    <button class="library-search-close" type="button" aria-label="Close search">&times;</button>
+                </header>
+                <label class="library-search-field">
+                    <span class="visually-hidden">Search titles and metadata</span>
+                    <input class="library-search-input" type="search" placeholder="Search titles, authors, ISBN..." autocomplete="off">
+                </label>
+                <p class="library-search-status" role="status" aria-live="polite"></p>
+                <ul class="library-search-results"></ul>
+            </section>
+        </dialog>
         
         {% block content %}
         {% endblock content %}
     </main>
 
     <script src="static/sortable-tables.js" defer></script>
+    <script src="static/search.js" defer></script>
     <script src="static/theme.js" defer></script>
 </body>
 </html>
