@@ -176,6 +176,48 @@ h3
     flex: none;
 }
 
+.table-column-resize-handle
+{
+    position: relative;
+    display: block;
+    width: 8px;
+    flex: none;
+    align-self: stretch;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: col-resize;
+    touch-action: none;
+}
+
+.table-column-resize-handle::after
+{
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: 1px;
+    background: var(--line);
+    content: "";
+}
+
+.table-column-resize-handle:hover::after,
+.table-column-resize-handle:focus-visible::after
+{
+    background: var(--focus);
+}
+
+.table-column-resize-handle:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+}
+
+.table-column-resize-handle[hidden]
+{
+    display: none;
+}
+
 .table-card-header
 {
     display: flex;
@@ -337,6 +379,7 @@ h3
     border-radius: 6px;
     background: var(--surface);
     box-shadow: 0 8px 24px var(--menu-shadow);
+    font-family: "Google Sans Flex", "Trebuchet MS", "Gill Sans", sans-serif;
 }
 
 .table-column-filter-menu[hidden],
@@ -382,11 +425,13 @@ h3
 .table-column-filter-actions
 {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
 }
 
 .table-column-filter-search
 {
+    flex: 1 1 100%;
     width: 100%;
     min-width: 0;
     min-height: 34px;
@@ -400,6 +445,7 @@ h3
 
 .table-column-filter-clear
 {
+    flex: 1;
     min-height: 34px;
     padding: 6px 9px;
     border: 1px solid var(--line);
@@ -423,6 +469,42 @@ h3
     flex-direction: column;
     gap: 2px;
     overflow-y: auto;
+}
+
+.table-column-filter-group
+{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.table-column-filter-group[hidden]
+{
+    display: none;
+}
+
+.table-column-filter-group + .table-column-filter-group
+{
+    padding-top: 6px;
+    border-top: 1px solid var(--line);
+}
+
+.table-column-filter-group-heading
+{
+    margin: 3px 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+div.card p:first-child.table-column-filter-group-heading
+{
+    margin: 3px 6px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: normal;
+    line-height: 1.4;
 }
 
 .table-column-filter-option,
@@ -895,9 +977,22 @@ table[data-sortable] th .table-column-label {
     position: relative;
     flex: 1;
     min-width: 0;
-    cursor: pointer;
+    cursor: grab;
+    user-select: none;
     text-align: inherit;
     text-transform: uppercase;
+}
+
+table[data-sortable] th.is-column-dragging .table-column-label {
+    cursor: grabbing;
+}
+
+table[data-sortable] th[data-column-drop-position="before"] {
+    box-shadow: inset 3px 0 var(--focus);
+}
+
+table[data-sortable] th[data-column-drop-position="after"] {
+    box-shadow: inset -3px 0 var(--focus);
 }
 
 table[data-sortable] th[aria-sort] .table-column-label::after {

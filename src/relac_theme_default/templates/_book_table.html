@@ -34,7 +34,9 @@
 {% set book_publisher = book.publisher_obj.name if book.publisher_obj else '' %}
 {% set book_imprint = book.publisher_obj.imprint if book.publisher_obj and book.publisher_obj.imprint else '' %}
 {% set publisher_values = ([book_publisher] if book_publisher else []) + ([book_imprint] if book_imprint else []) %}
+{% set publisher_filter_groups = {"Publisher": ([book_publisher] if book_publisher else []), "Imprint": ([book_imprint] if book_imprint else [])} %}
 {% set medium_values = [book.medium.value | enum_label, book_binding | enum_label] %}
+{% set medium_filter_groups = {"Medium": [book.medium.value | enum_label], "Binding": [book_binding | enum_label]} %}
 <tr data-href="{{ book.id }}.html">
     <td>{{ book.title }}</td>
     <td data-filter-values='{{ book.author_objs | map(attribute="name") | list | tojson }}'>
@@ -42,7 +44,7 @@
             {% if not loop.first %}, {% endif %}{{ entity_link(author, author.name) }}
         {% endfor %}
     </td>
-    <td data-filter-values='{{ publisher_values | tojson }}'>
+    <td data-filter-values='{{ publisher_values | tojson }}' data-filter-groups='{{ publisher_filter_groups | tojson }}'>
         {% if book.publisher_obj %}
             {{ book.publisher_obj.name }}
             {% if book.publisher_obj.imprint %}
@@ -50,7 +52,7 @@
             {% endif %}
         {% endif %}
     </td>
-    <td data-sort-value="{{ book_medium }}" data-filter-values='{{ medium_values | tojson }}'>
+    <td data-sort-value="{{ book_medium }}" data-filter-values='{{ medium_values | tojson }}' data-filter-groups='{{ medium_filter_groups | tojson }}'>
         {{ book.medium.value | enum_label }}
         <span class="table-secondary-text">{{ book_binding | enum_label }}</span>
     </td>

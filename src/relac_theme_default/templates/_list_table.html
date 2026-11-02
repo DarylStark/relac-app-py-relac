@@ -9,6 +9,7 @@
         <thead>
             <tr>
                 <th scope="col">Name</th>
+                <th scope="col" class="center fit-content">Works</th>
             </tr>
         </thead>
         <tbody>
@@ -24,5 +25,10 @@
 {% macro list_row(list) %}
 <tr data-href="{{ list.id }}.html">
     <td>{{ list.name }}</td>
+    <td class="center fit-content">
+        <pre>
+            {{ list.works | length }}
+        </pre>
+    </td>
 </tr>
 {% endmacro %}
