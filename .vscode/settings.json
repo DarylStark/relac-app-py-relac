@@ -5,5 +5,14 @@
     "python.testing.pytestArgs": [
         "--no-cov",
         "tests",
-    ]
+    ],
+    "chat.tools.terminal.autoApprove": {
+        "uv": true,
+        "/^python -m http\\.server 8765$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "pushd": true,
+        "popd": true
+    }
 }

@@ -3,15 +3,18 @@
 
 {% from "_work_table.html" import work_table %}
 {% from "_book_table.html" import book_table %}
+{% from "_entity_link.html" import entity_link %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% block content %}
 <div class="content">
+  {{ breadcrumbs([("Authors", "authors.html"), (author.name, none)]) }}
   <div class="card">
       <section class="detail-summary" aria-labelledby="detail-title">
         <div class="detail-summary-header">
           <div>
             <p class="detail-kind">Author</p>
-            <h3 id="detail-title">{{ author.name }}</h2>
+            <h3 id="detail-title">{{ entity_link(author, author.name) }}</h2>
           </div>
           <p class="detail-badge">
             <code>{{ author.state.value | enum_label }}</code>
@@ -50,10 +53,6 @@
         <div>
           <h3 id="detail-contents-title">Works for this author</h2>
         </div>
-        <span class="detail-work-count">
-          {{ author.work_objs | length }}
-          {% if author.work_objs | length == 1 %}work{% else %}works{% endif %}
-        </span>
       </header>
       {{ work_table(author.work_objs) }}
     </section>
@@ -65,10 +64,6 @@
         <div>
           <h3 id="detail-contents-title">Books with this author</h2>
         </div>
-        <span class="detail-work-count">
-          {{ author.book_objs | length }}
-          {% if author.book_objs | length == 1 %}book{% else %}book{% endif %}
-        </span>
       </header>
       {{ book_table(author.book_objs) }}
     </section>

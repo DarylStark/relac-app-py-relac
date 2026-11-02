@@ -33,6 +33,17 @@
         numeric: true,
         sensitivity: "base"
     });
+    const pageUrl = new URL(window.location.href);
+
+    const updateQueryValues = (key, values) => {
+        pageUrl.searchParams.delete(key);
+        values.forEach((value) => pageUrl.searchParams.append(key, value));
+        window.history.replaceState(
+            window.history.state,
+            "",
+            `${pageUrl.pathname}${pageUrl.search}${pageUrl.hash}`
+        );
+    };
 
     const getCellValue = (cell) => {
         if (!cell) {
@@ -92,16 +103,42 @@
 
         const headers = Array.from(table.tHead.rows[0].cells);
         const rows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
+        const emptyStateBody = table.tBodies[table.tBodies.length - 1];
+        const emptyStateRow = emptyStateBody.insertRow();
+        emptyStateRow.className = "table-empty-state";
+        emptyStateRow.hidden = true;
+        const emptyStateCell = emptyStateRow.insertCell();
+        emptyStateCell.colSpan = headers.length;
         const selectedValuesByColumn = new Map();
         const sortActionsByColumn = new Map();
+        const tableKey = table.id || "table";
+        const itemName = table.id
+            ? table.id.replace(/-table$/, "").replace(/-/g, " ")
+            : "items";
+        const sortParameter = `relac.sort.${tableKey}`;
+        let isRestoringState = true;
+        const tableCount = document.createElement("p");
+        tableCount.className = "table-count";
+        tableCount.setAttribute("aria-live", "polite");
+        (table.closest(".table-scroll") ?? table).before(tableCount);
 
         const updateRows = () => {
+            let visibleCount = 0;
             rows.forEach((row) => {
                 row.hidden = Array.from(selectedValuesByColumn).some(([columnIndex, selectedValues]) => {
                     return selectedValues.size > 0 && !getFilterValues(row.cells[columnIndex])
                         .some((value) => selectedValues.has(value));
                 });
+                if (!row.hidden) {
+                    visibleCount += 1;
+                }
             });
+            const itemLabel = rows.length === 1 ? "item" : "items";
+            tableCount.textContent = `${visibleCount} of ${rows.length} ${itemLabel}`;
+            emptyStateCell.textContent = rows.length === 0
+                ? `No ${itemName} to display.`
+                : `No ${itemName} match the current filters.`;
+            emptyStateRow.hidden = visibleCount > 0;
         };
 
         headers.forEach((header, columnIndex) => {
@@ -170,6 +207,8 @@
 
             const selectedValues = new Set();
             selectedValuesByColumn.set(columnIndex, selectedValues);
+            const filterParameter = `relac.filter.${tableKey}.${columnIndex}`;
+            const savedValues = new Set(pageUrl.searchParams.getAll(filterParameter));
 
             const values = Array.from(new Set(rows.flatMap((row) => {
                 return getFilterValues(row.cells[columnIndex]);
@@ -221,10 +260,19 @@
 
                     updateSummary();
                     updateRows();
+                    updateQueryValues(filterParameter, Array.from(selectedValues));
                 });
 
                 return { checkbox, option, value };
             });
+
+            checkboxes.forEach(({ checkbox, value }) => {
+                if (savedValues.has(value)) {
+                    checkbox.checked = true;
+                    selectedValues.add(value);
+                }
+            });
+            updateSummary();
 
             search.addEventListener("input", () => {
                 const query = search.value.trim().toLocaleLowerCase();
@@ -241,6 +289,7 @@
 
                 updateSummary();
                 updateRows();
+                updateQueryValues(filterParameter, Array.from(selectedValues));
             });
 
             const positionFilterMenu = () => {
@@ -312,13 +361,20 @@
                 });
                 header.setAttribute("aria-sort", direction === 1 ? "ascending" : "descending");
                 sortAction.textContent = direction === 1 ? "Sort descending" : "Sort ascending";
+                if (!isRestoringState) {
+                    updateQueryValues(sortParameter, [
+                        `${columnIndex}:${direction === 1 ? "asc" : "desc"}`
+                    ]);
+                }
 
                 Array.from(table.tBodies).forEach((body) => {
-                    const rows = Array.from(body.rows).map((row, originalIndex) => ({
-                        row,
-                        originalIndex,
-                        value: getCellValue(row.cells[columnIndex])
-                    }));
+                    const rows = Array.from(body.rows)
+                        .filter((row) => row !== emptyStateRow)
+                        .map((row, originalIndex) => ({
+                            row,
+                            originalIndex,
+                            value: getCellValue(row.cells[columnIndex])
+                        }));
 
                     rows.sort((left, right) => {
                         const comparison = compareValues(
@@ -335,8 +391,26 @@
 
                     rows.forEach(({ row }) => body.append(row));
                 });
+                emptyStateBody.append(emptyStateRow);
             });
         });
+
+        updateRows();
+        const savedSort = pageUrl.searchParams.get(sortParameter)?.match(/^([0-9]+):(asc|desc)$/);
+        const savedSortColumnIndex = savedSort ? Number(savedSort[1]) : -1;
+        const savedSortAction = sortActionsByColumn.get(savedSortColumnIndex);
+
+        if (savedSort && savedSortAction) {
+            headers[savedSortColumnIndex].setAttribute(
+                "aria-sort",
+                savedSort[2] === "asc" ? "descending" : "ascending"
+            );
+            savedSortAction.click();
+        } else {
+            const firstColumnIndex = headers.findIndex((header) => header.tagName === "TH");
+            sortActionsByColumn.get(firstColumnIndex)?.click();
+        }
+        isRestoringState = false;
     });
 
     document.addEventListener("pointerdown", (event) => {

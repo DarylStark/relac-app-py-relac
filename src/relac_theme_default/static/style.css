@@ -461,6 +461,48 @@ div.content .card:not(.small)
     min-width: 0;
 }
 
+nav.breadcrumbs
+{
+    grid-column: 1 / -1;
+    min-width: 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+nav.breadcrumbs ol
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+nav.breadcrumbs li:not(:first-child)::before
+{
+    margin-right: 8px;
+    color: var(--muted);
+    content: "/";
+}
+
+nav.breadcrumbs a
+{
+    color: var(--muted);
+    text-decoration: none;
+}
+
+nav.breadcrumbs a:hover
+{
+    color: var(--text);
+    text-decoration: underline;
+}
+
+nav.breadcrumbs [aria-current="page"]
+{
+    color: var(--text);
+}
+
 @media (max-width: 760px)
 {
     main.page-shell
@@ -541,6 +583,14 @@ div.table-scroll {
     overflow-x: auto;
 }
 
+p.table-count {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
 table.resources {
     width: 100%;
     min-width: 480px;
@@ -554,6 +604,12 @@ table.resources thead th {
     font-weight: 500;
     font-size: 12px;
     text-align: left;
+}
+
+table.resources tbody tr.table-empty-state td {
+    padding: 18px 12px;
+    color: var(--muted);
+    text-align: center;
 }
 
 .table-secondary-text
