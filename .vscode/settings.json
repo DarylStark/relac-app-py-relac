@@ -5,5 +5,8 @@
     "python.testing.pytestArgs": [
         "--no-cov",
         "tests",
-    ]
+    ],
+    "chat.tools.terminal.autoApprove": {
+        "uv": true
+    }
 }

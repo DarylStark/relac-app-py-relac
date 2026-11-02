@@ -337,6 +337,9 @@
                 });
             });
         });
+
+        const firstColumnIndex = headers.findIndex((header) => header.tagName === "TH");
+        sortActionsByColumn.get(firstColumnIndex)?.click();
     });
 
     document.addEventListener("pointerdown", (event) => {
