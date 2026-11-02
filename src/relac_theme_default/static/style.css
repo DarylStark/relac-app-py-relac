@@ -697,7 +697,7 @@ table.resources tbody tr.table-empty-state td {
 .detail-metadata
 {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 18px;
     margin: 26px 0 0;
 }

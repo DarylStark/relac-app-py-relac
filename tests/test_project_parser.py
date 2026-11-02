@@ -22,6 +22,8 @@ def test_parsing_directory() -> None:
     )
     database.converge()
 
+    assert [author.id for author in book.author_objs] == ['author.stephen_king']
+
     assert len(database.get_authors()) == 4
     assert len(database.get_works()) == 11
     assert len(database.get_work_editions()) == 12

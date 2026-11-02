@@ -151,6 +151,7 @@ class Book(ResourceBase):
 
     # Relationships (real objects)
     work_edition_objs: list[WorkEdition] = Field(default_factory=list)
+    author_objs: list[Author] = Field(default_factory=list)
     publisher_obj: BookPublisher = Field(default_factory=list)
     collection_objs: list[BookCollection] = Field(default_factory=list)
 
