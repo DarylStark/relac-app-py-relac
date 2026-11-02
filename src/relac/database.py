@@ -88,6 +88,11 @@ class Database:
                 obj.work_edition_objs.append(work_edition_obj)
                 work_edition_obj.book_objs.append(obj)
                 if work_edition_obj.work_obj:
+                    work_obj = work_edition_obj.work_obj
+                    if not any(
+                        book.id == obj.id for book in work_obj.book_objs
+                    ):
+                        work_obj.book_objs.append(obj)
                     for author in work_edition_obj.work_obj.author_objs:
                         author.book_objs.append(obj)
 
