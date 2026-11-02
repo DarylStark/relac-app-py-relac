@@ -1,7 +1,7 @@
 {% extends "_base.html" %}
 {% set active_page = "lists" %}
 
-{% from "_book_table.html" import book_table %}
+{% from "_work_table.html" import work_table %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% block content %}
@@ -12,10 +12,20 @@
         <div class="detail-summary-header">
           <div>
             <p class="detail-kind">List</p>
-            <h3 id="detail-title">{{ list.name }}</h2>
+            <h3 id="detail-title">{{ list.name }}</h3>
           </div>
         </div>
       </section>
   </div>
+
+  <div class="card">
+    <section class="detail-contents" aria-labelledby="detail-contents-title">
+      <header class="detail-contents-header">
+        <h3 id="detail-contents-title">Books in this reading list</h3>
+      </header>
+      {{ work_table(list.works, show_order=true) }}
+    </section>
+  </div>
+
 </div>
 {% endblock %}

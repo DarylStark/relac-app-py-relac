@@ -176,7 +176,16 @@ class Label(ResourceBase):
     name: str
 
 
-class ResourceList(ResourceBase):
+class ReadingListItem(ResourceBase):
+    """A item in a reading list."""
+
+    order: int
+    work: str
+    work_obj: Work | None = None
+
+
+class ReadingList(ResourceBase):
     """A list of resources."""
 
     name: str
+    works: list[ReadingListItem] = Field(default_factory=list)

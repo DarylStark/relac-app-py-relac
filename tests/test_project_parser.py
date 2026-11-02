@@ -31,7 +31,7 @@ def test_parsing_directory() -> None:
     assert len(database.get_book_publishers()) == 4
     assert len(database.get_book_collections()) == 2
     assert len(database.get_labels()) == 0
-    assert len(database.get_resource_lists()) == 1
+    assert len(database.get_reading_lists()) == 1
 
     work = next(
         work

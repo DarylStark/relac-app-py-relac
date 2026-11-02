@@ -1,10 +1,11 @@
 {% from "_entity_link.html" import entity_link %}
 
-{% macro work_table(works) %}
+{% macro work_table(works, show_order=false) %}
 <div class="table-scroll">
     <table id="works-table" class="resources" data-sortable>
         <thead>
             <tr>
+                {% if show_order %}<th scope="col" class="center fit-content">#</th>{% endif %}
                 <th scope="col">Title</th>
                 <th scope="col">Author</th>
                 <th scope="col" class="fit-content">Structure</th>
@@ -13,18 +14,27 @@
             </tr>
         </thead>
         <tbody>
-            {% for work in works %}
-                {{ work_row(work) }}
+            {% for item in works %}
+                {% if show_order %}
+                    {{ work_row(item.work_obj, item.order) }}
+                {% else %}
+                    {{ work_row(item) }}
+                {% endif %}
             {% endfor %}
         </tbody>
     </table>
 </div>
 {% endmacro %}
 
-{% macro work_row(work) %}
+{% macro work_row(work, order=none) %}
 {% set work_type = work.work_type.value if work.work_type else 'unspecified' %}
 {% set work_structure = work.work_structure.value if work.work_structure else 'unspecified' %}
 <tr data-href="{{ work.id }}.html">
+    {% if order is not none %}
+    <td class="center fit-content">
+        <pre>{{ order }}</pre>
+    </td>
+    {% endif %}
     <td>{{ entity_link(work, work.title) }}</td>
     <td data-filter-values='{{ work.author_objs | map(attribute="name") | list | tojson }}'>
         {% for author in work.author_objs %}

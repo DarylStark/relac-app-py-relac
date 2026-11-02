@@ -8,8 +8,8 @@ from relac.model import (
     BookCollection,
     BookPublisher,
     Label,
+    ReadingList,
     ResourceBase,
-    ResourceList,
     Work,
     WorkEdition,
 )
@@ -27,7 +27,7 @@ class Database:
         self._book_publishers: dict[str, BookPublisher] = {}
         self._book_collections: dict[str, BookCollection] = {}
         self._labels: dict[str, Label] = {}
-        self._resource_lists: dict[str, ResourceList] = {}
+        self._reading_lsits: dict[str, ReadingList] = {}
 
     def _id_exists[ResourceModel: ResourceBase](
         self, id: str, collection: dict[str, ResourceModel]
@@ -114,12 +114,22 @@ class Database:
                 obj.book_objs.append(book_obj)
                 book_obj.collection_objs.append(obj)
 
+    def _converge_reading_lists(self) -> None:
+        """Converge all book reading lists."""
+        for obj in self._reading_lsits.values():
+            for work in obj.works:
+                work_obj = self._works.get(work.work)
+                if work_obj is None:
+                    raise ValueError(f'Work with id "{work}" doesn\'t exist')
+                work.work_obj = work_obj
+
     def converge(self) -> None:
         """Converge all objects."""
         self._converge_works()
         self._converge_works_editions()
         self._converge_books()
         self._converge_book_collections()
+        self._converge_reading_lists()
 
     def add_author(self, id: str, obj: Author) -> None:
         """Add a author to the database."""
@@ -177,10 +187,10 @@ class Database:
         """Get all label in the database."""
         return list(self._labels.values())
 
-    def add_resource_list(self, id: str, obj: ResourceList) -> None:
-        """Add a label to the database."""
-        self._add_object(id, obj, self._resource_lists)
+    def add_reading_list(self, id: str, obj: ReadingList) -> None:
+        """Add a reading list to the database."""
+        self._add_object(id, obj, self._reading_lsits)
 
-    def get_resource_lists(self) -> list[ResourceList]:
-        """Get all resource lists in the database."""
-        return list(self._resource_lists.values())
+    def get_reading_lists(self) -> list[ReadingList]:
+        """Get all reading lists in the database."""
+        return list(self._reading_lsits.values())

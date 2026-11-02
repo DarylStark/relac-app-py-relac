@@ -122,7 +122,7 @@ def create(  # noqa: PLR0912, PLR0915
     if 'lists' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['lists'])
         html = template.render(
-            lists=db.get_resource_lists(),
+            lists=db.get_reading_lists(),
         )
         out_path = output / 'lists.html'
         out_path.write_text(html)
@@ -169,7 +169,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Lists
     if 'list' in metadata.resource_pages:
-        for lst in db.get_resource_lists():
+        for lst in db.get_reading_lists():
             template = env.get_template(metadata.resource_pages['list'])
             html = template.render(list=lst)
             out_path = output / f'{lst.id}.html'
