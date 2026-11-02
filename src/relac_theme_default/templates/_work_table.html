@@ -1,6 +1,11 @@
 {% from "_entity_link.html" import entity_link %}
 
-{% macro work_table(works, show_order=false) %}
+{% macro work_table(works, show_order=false, title="Works") %}
+<div class="card table-card">
+    <header class="table-card-header">
+        <h3 class="table-card-title">{{ title }}</h3>
+        <div class="table-card-actions"></div>
+    </header>
 <div class="table-scroll">
     <table id="works-table" class="resources" data-sortable>
         <thead>
@@ -23,6 +28,7 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 </div>
 {% endmacro %}
 

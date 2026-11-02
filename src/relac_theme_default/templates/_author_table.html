@@ -1,6 +1,11 @@
 {% from "_entity_link.html" import entity_link %}
 
-{% macro author_table(authors) %}
+{% macro author_table(authors, title="Authors") %}
+<div class="card table-card">
+    <header class="table-card-header">
+        <h3 class="table-card-title">{{ title }}</h3>
+        <div class="table-card-actions"></div>
+    </header>
 <div class="table-scroll">
     <table id="authors-table" class="resources" data-sortable>
         <thead>
@@ -16,6 +21,7 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 </div>
 {% endmacro %}
 

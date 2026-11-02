@@ -176,6 +176,118 @@ h3
     flex: none;
 }
 
+.table-column-resize-handle
+{
+    position: relative;
+    display: block;
+    width: 8px;
+    flex: none;
+    align-self: stretch;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: col-resize;
+    touch-action: none;
+}
+
+.table-column-resize-handle::after
+{
+    position: absolute;
+    top: 3px;
+    bottom: 3px;
+    left: 3px;
+    width: 1px;
+    background: var(--line);
+    content: "";
+}
+
+.table-column-resize-handle:hover::after,
+.table-column-resize-handle:focus-visible::after
+{
+    background: var(--focus);
+}
+
+.table-column-resize-handle:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: -2px;
+}
+
+.table-column-resize-handle[hidden]
+{
+    display: none;
+}
+
+.table-card-header
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.table-card-title
+{
+    margin: 0;
+    font-size: 20px;
+    font-weight: 470;
+}
+
+.table-card-actions
+{
+    position: relative;
+    display: flex;
+    flex: none;
+    align-items: center;
+}
+
+.table-toolbar
+{
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.table-settings-toggle
+{
+    display: inline-flex;
+    width: 28px;
+    height: 28px;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--muted);
+    background: var(--transparent);
+    cursor: pointer;
+}
+
+.table-settings-toggle::before
+{
+    content: "\2699";
+    font-family: sans-serif;
+    font-size: 16px;
+    line-height: 1;
+}
+
+.table-settings-toggle:hover,
+.table-settings-toggle[aria-expanded="true"]
+{
+    color: var(--text);
+    background: var(--hover-surface);
+}
+
+.table-settings-toggle:focus-visible
+{
+    outline: 2px solid var(--text);
+    outline-offset: 2px;
+}
+
 .table-column-filter-toggle
 {
     position: relative;
@@ -252,7 +364,8 @@ h3
     outline-offset: 2px;
 }
 
-.table-column-filter-menu
+.table-column-filter-menu,
+.table-settings-menu
 {
     position: fixed;
     z-index: 20;
@@ -266,21 +379,59 @@ h3
     border-radius: 6px;
     background: var(--surface);
     box-shadow: 0 8px 24px var(--menu-shadow);
+    font-family: "Google Sans Flex", "Trebuchet MS", "Gill Sans", sans-serif;
 }
 
-.table-column-filter-menu[hidden]
+.table-column-filter-menu[hidden],
+.table-settings-menu[hidden]
 {
     display: none !important;
+}
+
+.table-settings-reset
+{
+    width: 100%;
+    padding: 7px 8px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--text);
+    background: var(--transparent);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.table-settings-reset:hover
+{
+    background: var(--hover-surface);
+}
+
+.table-settings-heading
+{
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.table-column-visibility-options
+{
+    display: flex;
+    max-height: 240px;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
 }
 
 .table-column-filter-actions
 {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
 }
 
 .table-column-filter-search
 {
+    flex: 1 1 100%;
     width: 100%;
     min-width: 0;
     min-height: 34px;
@@ -294,6 +445,7 @@ h3
 
 .table-column-filter-clear
 {
+    flex: 1;
     min-height: 34px;
     padding: 6px 9px;
     border: 1px solid var(--line);
@@ -319,7 +471,44 @@ h3
     overflow-y: auto;
 }
 
-.table-column-filter-option
+.table-column-filter-group
+{
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.table-column-filter-group[hidden]
+{
+    display: none;
+}
+
+.table-column-filter-group + .table-column-filter-group
+{
+    padding-top: 6px;
+    border-top: 1px solid var(--line);
+}
+
+.table-column-filter-group-heading
+{
+    margin: 3px 6px;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+div.card p:first-child.table-column-filter-group-heading
+{
+    margin: 3px 6px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 600;
+    font-variant-numeric: normal;
+    line-height: 1.4;
+}
+
+.table-column-filter-option,
+.table-column-visibility-option
 {
     display: flex;
     align-items: center;
@@ -339,12 +528,14 @@ h3
     display: none;
 }
 
-.table-column-filter-option:hover
+.table-column-filter-option:hover,
+.table-column-visibility-option:hover
 {
     background: var(--hover-surface);
 }
 
-.table-column-filter-option input
+.table-column-filter-option input,
+.table-column-visibility-option input
 {
     accent-color: var(--selection);
 }
@@ -584,11 +775,19 @@ div.table-scroll {
 }
 
 p.table-count {
-    margin: 0 0 8px;
+    margin: 0;
     color: var(--muted);
     font-size: 12px;
     font-variant-numeric: tabular-nums;
     text-align: right;
+}
+
+div.card p.table-count {
+    margin: 0;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
 }
 
 table.resources {
@@ -778,8 +977,22 @@ table[data-sortable] th .table-column-label {
     position: relative;
     flex: 1;
     min-width: 0;
+    cursor: grab;
+    user-select: none;
     text-align: inherit;
     text-transform: uppercase;
+}
+
+table[data-sortable] th.is-column-dragging .table-column-label {
+    cursor: grabbing;
+}
+
+table[data-sortable] th[data-column-drop-position="before"] {
+    box-shadow: inset 3px 0 var(--focus);
+}
+
+table[data-sortable] th[data-column-drop-position="after"] {
+    box-shadow: inset -3px 0 var(--focus);
 }
 
 table[data-sortable] th[aria-sort] .table-column-label::after {

@@ -37,26 +37,7 @@
       </section>
   </div>
 
-  <div class="card">
-    <section class="detail-contents" aria-labelledby="detail-contents-title">
-      <header class="detail-contents-header">
-        <div>
-          <h3 id="detail-contents-title">Editions of this work</h2>
-        </div>
-      </header>
-      {{ work_edition_table(work.edition_objs) }}
-    </section>
-  </div>
-
-  <div class="card">
-    <section class="detail-contents" aria-labelledby="work-books-title">
-      <header class="detail-contents-header">
-        <div>
-          <h3 id="work-books-title">Books featuring this work</h2>
-        </div>
-      </header>
-      {{ book_table(work.book_objs) }}
-    </section>
-  </div>
+  {{ work_edition_table(work.edition_objs, "Editions of this work") }}
+  {{ book_table(work.book_objs, "Books featuring this work") }}
 </div>
 {% endblock %}

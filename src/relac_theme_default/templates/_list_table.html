@@ -1,9 +1,15 @@
-{% macro list_table(lists) %}
+{% macro list_table(lists, title="Lists") %}
+<div class="card table-card">
+    <header class="table-card-header">
+        <h3 class="table-card-title">{{ title }}</h3>
+        <div class="table-card-actions"></div>
+    </header>
 <div class="table-scroll">
     <table id="lists-table" class="resources" data-sortable>
         <thead>
             <tr>
                 <th scope="col">Name</th>
+                <th scope="col" class="center fit-content">Works</th>
             </tr>
         </thead>
         <tbody>
@@ -13,10 +19,16 @@
         </tbody>
     </table>
 </div>
+</div>
 {% endmacro %}
 
 {% macro list_row(list) %}
 <tr data-href="{{ list.id }}.html">
     <td>{{ list.name }}</td>
+    <td class="center fit-content">
+        <pre>
+            {{ list.works | length }}
+        </pre>
+    </td>
 </tr>
 {% endmacro %}

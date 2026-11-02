@@ -5,9 +5,6 @@
 
 {% block content %}
     <div class="content">
-        <div class="card">
-            <h3>Collections</h3>
-            {{ collection_table(collections) }}
-        </div>
+        {{ collection_table(collections, "Collections") }}
     </div>
 {% endblock %}
