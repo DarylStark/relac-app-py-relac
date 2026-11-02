@@ -2,6 +2,7 @@
 {% set active_page = "books" %}
 
 {% from "_work_edition_table.html" import work_edition_table %}
+{% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% set book_medium = book.medium.value %}
@@ -24,6 +25,18 @@
 
         <dl class="detail-metadata">
           <div class="detail-fact">
+            <dt>Authors</dt>
+            <dd>
+              {% if book.author_objs %}
+                {% for author in book.author_objs %}
+                  {{ entity_link(author, author.name) }}
+                {% endfor %}
+              {% else %}
+                <span class="detail-unspecified">Unspecified</span>
+              {% endif %}
+            </dd>
+          </div>
+          <div class="detail-fact">
             <dt>Publisher</dt>
             <dd>
               {% if book.publisher_obj %}
@@ -37,12 +50,11 @@
             </dd>
           </div>
           <div class="detail-fact">
-            <dt>Medium</dt>
-            <dd>{{ book_medium | enum_label }}</dd>
-          </div>
-          <div class="detail-fact">
-            <dt>Binding</dt>
-            <dd>{{ book_binding | enum_label }}</dd>
+            <dt>Medium and binding</dt>
+            <dd>
+              {{ book_medium | enum_label }}
+              <span class="detail-small">{{ book_binding | enum_label }}</span>
+            </dd>
           </div>
         </dl>
       </section>

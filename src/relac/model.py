@@ -67,6 +67,7 @@ class Work(ResourceBase):
     # Relation (real objects)
     author_objs: list[Author] = Field(default_factory=list)
     edition_objs: list[WorkEdition] = Field(default_factory=list)
+    book_objs: list[Book] = Field(default_factory=list)
 
 
 class WorkEditionType(Enum):
@@ -150,6 +151,7 @@ class Book(ResourceBase):
 
     # Relationships (real objects)
     work_edition_objs: list[WorkEdition] = Field(default_factory=list)
+    author_objs: list[Author] = Field(default_factory=list)
     publisher_obj: BookPublisher = Field(default_factory=list)
     collection_objs: list[BookCollection] = Field(default_factory=list)
 

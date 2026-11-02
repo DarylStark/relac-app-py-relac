@@ -88,8 +88,21 @@ class Database:
                 obj.work_edition_objs.append(work_edition_obj)
                 work_edition_obj.book_objs.append(obj)
                 if work_edition_obj.work_obj:
+                    work_obj = work_edition_obj.work_obj
+                    if not any(
+                        book.id == obj.id for book in work_obj.book_objs
+                    ):
+                        work_obj.book_objs.append(obj)
                     for author in work_edition_obj.work_obj.author_objs:
-                        author.book_objs.append(obj)
+                        if not any(
+                            book_author.id == author.id
+                            for book_author in obj.author_objs
+                        ):
+                            obj.author_objs.append(author)
+                        if not any(
+                            book.id == obj.id for book in author.book_objs
+                        ):
+                            author.book_objs.append(obj)
 
     def _converge_book_collections(self) -> None:
         """Converge all book collections."""
