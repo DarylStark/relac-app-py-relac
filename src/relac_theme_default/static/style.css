@@ -126,6 +126,226 @@ h1
     cursor: pointer;
 }
 
+.library-search-toggle
+{
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--text);
+    background: var(--surface);
+    cursor: pointer;
+}
+
+.library-search-toggle:hover,
+.library-search-close:hover
+{
+    background: var(--hover-surface);
+}
+
+.library-search-toggle:focus-visible,
+.library-search-close:focus-visible,
+.library-search-input:focus-visible,
+.library-search-result:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.library-search-icon
+{
+    position: relative;
+    display: block;
+    width: 16px;
+    height: 16px;
+    border: 1.7px solid currentColor;
+    border-radius: 50%;
+}
+
+.library-search-icon::after
+{
+    position: absolute;
+    right: -5px;
+    bottom: -3px;
+    width: 7px;
+    height: 1.7px;
+    border-radius: 2px;
+    background: currentColor;
+    content: "";
+    transform: rotate(45deg);
+    transform-origin: left center;
+}
+
+.library-search-dialog
+{
+    width: min(620px, calc(100vw - 28px));
+    max-height: min(78vh, 720px);
+    margin: clamp(24px, 7vh, 64px) auto auto;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--text);
+    background: var(--surface);
+    box-shadow: 0 20px 60px var(--menu-shadow);
+}
+
+.library-search-dialog::backdrop
+{
+    background: rgb(0 0 0 / 0.58);
+    backdrop-filter: blur(3px);
+}
+
+.library-search-panel
+{
+    display: flex;
+    max-height: min(78vh, 720px);
+    flex-direction: column;
+}
+
+.library-search-header
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+}
+
+.library-search-header h2
+{
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.library-search-close
+{
+    display: inline-flex;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--muted);
+    background: var(--transparent);
+    font: inherit;
+    font-size: 21px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.library-search-field
+{
+    display: block;
+    padding: 14px 18px 8px;
+}
+
+.visually-hidden
+{
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.library-search-input
+{
+    width: 100%;
+    min-height: 44px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text);
+    background: var(--page);
+    font: inherit;
+}
+
+.library-search-status
+{
+    margin: 0;
+    padding: 0 18px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.library-search-results
+{
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    margin: 12px 0 0;
+    padding: 4px 18px 16px;
+    overflow-y: auto;
+    scroll-padding-block: 4px;
+    list-style: none;
+}
+
+.library-search-result-item + .library-search-result-item
+{
+    border-top: 1px solid var(--line);
+}
+
+.library-search-result
+{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 4px;
+}
+
+.library-search-result:hover
+{
+    background: var(--hover-surface);
+}
+
+.library-search-result-main
+{
+    min-width: 0;
+}
+
+.library-search-result-title
+{
+    display: block;
+    color: var(--text-strong);
+    font-size: 15px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.library-search-result-details
+{
+    display: block;
+    margin-top: 3px;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.library-search-result-type
+{
+    flex: none;
+    color: var(--muted);
+    font-family: "Google Sans Code", monospace;
+    font-size: 10px;
+    text-transform: uppercase;
+}
+
 .theme-toggle:hover
 {
     background: var(--hover-surface);

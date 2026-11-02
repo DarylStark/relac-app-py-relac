@@ -1,5 +1,6 @@
 """`static_html` part of the CLI application."""
 
+import json
 import shutil
 from datetime import date
 from importlib import import_module
@@ -11,6 +12,8 @@ from pycountry import languages
 from typer import Context, Option, Typer
 
 from relac.theme import RelacTheme
+
+from .database import Database
 
 
 def _calculate_age(
@@ -48,6 +51,121 @@ def _code_to_language(language_code: str) -> str:
     return lang.name if lang else language_code
 
 
+def _build_search_index(
+    db: Database,
+) -> dict[str, list[dict[str, str | list[str]]]]:
+    """Build the client-side search data for every linked resource."""
+    entries: list[dict[str, str | list[str]]] = []
+
+    def add_entry(
+        resource_type: str,
+        resource_id: str | None,
+        title: str,
+        details: list[str],
+        search_terms: list[str] | None = None,
+    ) -> None:
+        if resource_id is None:
+            return
+
+        terms = [resource_type, title, *details, *(search_terms or [])]
+        entries.append(
+            {
+                'type': resource_type,
+                'title': title,
+                'href': f'{resource_id}.html',
+                'details': details,
+                'searchText': ' '.join(terms),
+            }
+        )
+
+    for book in db.get_books():
+        authors = ', '.join(author.name for author in book.author_objs)
+        publisher = getattr(book.publisher_obj, 'name', '')
+        imprint = getattr(book.publisher_obj, 'imprint', '')
+        details = [
+            f'Authors: {authors}' if authors else '',
+            f'Publisher: {publisher}' if publisher else '',
+            f'Imprint: {imprint}' if imprint else '',
+            f'ISBN: {mask(str(book.isbn13))}',
+            f'Medium: {_format_enum_label(book.medium.value)}',
+            f'Binding: {_format_enum_label(book.binding.value)}',
+            f'Works: {", ".join(e.title for e in book.work_edition_objs)}',
+            f'Collections: {", ".join(c.name for c in book.collection_objs)}',
+        ]
+        details = [detail for detail in details if not detail.endswith(': ')]
+        add_entry('Book', book.id, book.title, details, [str(book.isbn13)])
+
+    for work in db.get_works():
+        authors = ', '.join(author.name for author in work.author_objs)
+        details = [
+            f'Authors: {authors}' if authors else '',
+            f'Structure: {_format_enum_label(work.work_structure.value)}'
+            if work.work_structure
+            else '',
+            f'Category: {_format_enum_label(work.work_type.value)}'
+            if work.work_type
+            else '',
+            f'Editions: {", ''".join(e.title for e in work.edition_objs)}',
+        ]
+        add_entry(
+            'Work',
+            work.id,
+            work.title,
+            [detail for detail in details if detail],
+        )
+
+    for author in db.get_authors():
+        details = [
+            f'Works: {", ".join(work.title for work in author.work_objs)}',
+            f'Books: {", ".join(book.title for book in author.book_objs)}',
+        ]
+        add_entry(
+            'Author',
+            author.id,
+            author.name,
+            [detail for detail in details if detail],
+        )
+
+    for edition in db.get_work_editions():
+        details = [
+            f'Work: {edition.work_obj.title}' if edition.work_obj else '',
+            f'Release date: {edition.release_date}'
+            if edition.release_date
+            else '',
+            f'Language: {_code_to_language(edition.language)}'
+            if edition.language
+            else '',
+            f'Type: {_format_enum_label(edition.edition_type.value)}',
+            f'Books: {", ".join(book.title for book in edition.book_objs)}',
+        ]
+        add_entry(
+            'Edition',
+            edition.id,
+            edition.title,
+            [detail for detail in details if detail],
+        )
+
+    for collection in db.get_book_collections():
+        details = [
+            f'Books: {", ".join(book.title for book in collection.book_objs)}'
+        ]
+        add_entry(
+            'Collection',
+            collection.id,
+            collection.name,
+            [detail for detail in details if detail],
+        )
+
+    for reading_list in db.get_reading_lists():
+        work_titles = [
+            item.work_obj.title for item in reading_list.works if item.work_obj
+        ]
+        details = [f'Works: {", ".join(work_titles)}'] if work_titles else []
+        add_entry('Reading list', reading_list.id, reading_list.name, details)
+
+    return {'items': entries}
+
+
 cli_static_html = Typer(name='static_html')
 
 
@@ -68,6 +186,12 @@ def create(  # noqa: PLR0912, PLR0915
     if not metadata or not isinstance(metadata, RelacTheme):
         # TODO: Custom exception
         raise TypeError(f'Module "{theme_module}" has no "relac_theme" object.')
+
+    output.mkdir(parents=True, exist_ok=True)
+    (output / 'search-index.json').write_text(
+        json.dumps(_build_search_index(db), ensure_ascii=False),
+        encoding='utf-8',
+    )
 
     env = Environment(loader=FileSystemLoader(metadata.source_dir))
     env.filters['isbn'] = lambda x: mask(str(x))

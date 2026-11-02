@@ -2,7 +2,9 @@
 
 from datetime import date
 
-from relac.cli_static_html import _calculate_age
+from relac.cli_static_html import _build_search_index, _calculate_age
+from relac.database import Database
+from relac.model import Author, Book
 
 
 def test_calculate_age_before_birthday() -> None:
@@ -23,3 +25,27 @@ def test_calculate_age_at_death() -> None:
 def test_calculate_age_without_birthdate() -> None:
     """Do not show an age when the birthdate is unknown."""
     assert _calculate_age(None, date(2026, 7, 15)) is None
+
+
+def test_build_search_index_includes_book_metadata_and_url() -> None:
+    """Include a book's related author, ISBN, and generated page URL."""
+    database = Database()
+    author = Author(id='jane_doe', name='Jane Doe')
+    book = Book(
+        id='glass_hotel',
+        isbn13=9781982137984,
+        title='The Glass Hotel',
+        author_objs=[author],
+    )
+    database.add_author('jane_doe', author)
+    database.add_book('glass_hotel', book)
+
+    book_entry = next(
+        item
+        for item in _build_search_index(database)['items']
+        if item['type'] == 'Book'
+    )
+
+    assert book_entry['href'] == 'glass_hotel.html'
+    assert 'Jane Doe' in book_entry['searchText']
+    assert str(book.isbn13) in book_entry['searchText']
