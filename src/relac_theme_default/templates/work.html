@@ -2,6 +2,7 @@
 {% set active_page = "works" %}
 
 {% from "_work_edition_table.html" import work_edition_table %}
+{% from "_entity_link.html" import entity_link %}
 
 {% block content %}
 <div class="content">
@@ -10,7 +11,7 @@
         <div class="detail-summary-header">
           <div>
             <p class="detail-kind">Work</p>
-            <h3 id="detail-title">{{ work.title }}</h2>
+            <h3 id="detail-title">{{ entity_link(work, work.title) }}</h2>
           </div>
         </div>
         <dl class="detail-metadata">
@@ -18,7 +19,7 @@
             <dt>Authors</dt>
             <dd>
                 {% for author in work.author_objs %}
-                  <span>{{ author.name }}</span>
+                  {{ entity_link(author, author.name) }}
                 {% endfor %}
             </dd>
           </div>

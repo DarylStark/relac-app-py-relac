@@ -1,3 +1,5 @@
+{% from "_entity_link.html" import entity_link %}
+
 {% macro author_table(authors) %}
 <div class="table-scroll">
     <table id="authors-table" class="resources" data-sortable>
@@ -19,7 +21,7 @@
 
 {% macro author_row(author) %}
 <tr data-href="{{ author.id }}.html">
-    <td>{{ author.name }}</td>
+    <td>{{ entity_link(author, author.name) }}</td>
     <td>{{ author.state.value | enum_label }}</td>
     <td class="center fit-content">
         <pre>

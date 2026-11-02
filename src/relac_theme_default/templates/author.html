@@ -3,6 +3,7 @@
 
 {% from "_work_table.html" import work_table %}
 {% from "_book_table.html" import book_table %}
+{% from "_entity_link.html" import entity_link %}
 
 {% block content %}
 <div class="content">
@@ -11,7 +12,7 @@
         <div class="detail-summary-header">
           <div>
             <p class="detail-kind">Author</p>
-            <h3 id="detail-title">{{ author.name }}</h2>
+            <h3 id="detail-title">{{ entity_link(author, author.name) }}</h2>
           </div>
           <p class="detail-badge">
             <code>{{ author.state.value | enum_label }}</code>
