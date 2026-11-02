@@ -41,3 +41,14 @@ def test_parsing_directory() -> None:
         'book.stephen_king__if_it_bleeds',
     }
     assert len(work.book_objs) == 2
+
+    author = next(
+        author
+        for author in database.get_authors()
+        if author.id == 'author.stephen_king'
+    )
+    assert {book.id for book in author.book_objs} == {
+        'book.stephen_king__als_het_bloedt',
+        'book.stephen_king__if_it_bleeds',
+    }
+    assert len(author.book_objs) == 2

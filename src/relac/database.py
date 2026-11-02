@@ -94,7 +94,10 @@ class Database:
                     ):
                         work_obj.book_objs.append(obj)
                     for author in work_edition_obj.work_obj.author_objs:
-                        author.book_objs.append(obj)
+                        if not any(
+                            book.id == obj.id for book in author.book_objs
+                        ):
+                            author.book_objs.append(obj)
 
     def _converge_book_collections(self) -> None:
         """Converge all book collections."""
