@@ -2,6 +2,7 @@
 {% set active_page = "authors" %}
 
 {% from "_work_table.html" import work_table %}
+{% from "_book_table.html" import book_table %}
 
 {% block content %}
 <div class="content">
@@ -57,5 +58,21 @@
       {{ work_table(author.work_objs) }}
     </section>
   </div>
+
+  <div class="card">
+    <section class="detail-contents" aria-labelledby="detail-contents-title">
+      <header class="detail-contents-header">
+        <div>
+          <h3 id="detail-contents-title">Books with this author</h2>
+        </div>
+        <span class="detail-work-count">
+          {{ author.book_objs | length }}
+          {% if author.book_objs | length == 1 %}book{% else %}book{% endif %}
+        </span>
+      </header>
+      {{ book_table(author.book_objs) }}
+    </section>
+  </div>
+
 </div>
 {% endblock %}
