@@ -28,7 +28,7 @@ def test_calculate_age_without_birthdate() -> None:
 
 
 def test_build_search_index_includes_book_metadata_and_url() -> None:
-    """Include a book's related author, ISBN, and generated page URL."""
+    """Include a book's ID, related author, ISBN, and generated page URL."""
     database = Database()
     author = Author(id='jane_doe', name='Jane Doe')
     book = Book(
@@ -47,5 +47,7 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     )
 
     assert book_entry['href'] == 'glass_hotel.html'
+    assert 'glass_hotel' in book_entry['searchText']
+    assert 'glass_hotel' not in book_entry['details']
     assert 'Jane Doe' in book_entry['searchText']
     assert str(book.isbn13) in book_entry['searchText']

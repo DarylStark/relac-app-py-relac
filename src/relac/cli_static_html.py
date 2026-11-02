@@ -67,7 +67,13 @@ def _build_search_index(
         if resource_id is None:
             return
 
-        terms = [resource_type, title, *details, *(search_terms or [])]
+        terms = [
+            resource_type,
+            resource_id,
+            title,
+            *details,
+            *(search_terms or []),
+        ]
         entries.append(
             {
                 'type': resource_type,
