@@ -541,6 +541,14 @@ div.table-scroll {
     overflow-x: auto;
 }
 
+p.table-count {
+    margin: 0 0 8px;
+    color: var(--muted);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
 table.resources {
     width: 100%;
     min-width: 480px;
@@ -554,6 +562,12 @@ table.resources thead th {
     font-weight: 500;
     font-size: 12px;
     text-align: left;
+}
+
+table.resources tbody tr.table-empty-state td {
+    padding: 18px 12px;
+    color: var(--muted);
+    text-align: center;
 }
 
 .table-secondary-text

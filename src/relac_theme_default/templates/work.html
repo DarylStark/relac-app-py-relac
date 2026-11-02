@@ -39,10 +39,6 @@
         <div>
           <h3 id="detail-contents-title">Editions</h2>
         </div>
-        <span class="detail-work-count">
-          {{ work.edition_objs | length }}
-          {% if work.edition_objs | length == 1 %}edition{% else %}editions{% endif %}
-        </span>
       </header>
       {{ work_edition_table(work.edition_objs) }}
     </section>

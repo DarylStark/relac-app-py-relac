@@ -103,19 +103,42 @@
 
         const headers = Array.from(table.tHead.rows[0].cells);
         const rows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
+        const emptyStateBody = table.tBodies[table.tBodies.length - 1];
+        const emptyStateRow = emptyStateBody.insertRow();
+        emptyStateRow.className = "table-empty-state";
+        emptyStateRow.hidden = true;
+        const emptyStateCell = emptyStateRow.insertCell();
+        emptyStateCell.colSpan = headers.length;
         const selectedValuesByColumn = new Map();
         const sortActionsByColumn = new Map();
         const tableKey = table.id || "table";
+        const itemName = table.id
+            ? table.id.replace(/-table$/, "").replace(/-/g, " ")
+            : "items";
         const sortParameter = `relac.sort.${tableKey}`;
         let isRestoringState = true;
+        const tableCount = document.createElement("p");
+        tableCount.className = "table-count";
+        tableCount.setAttribute("aria-live", "polite");
+        (table.closest(".table-scroll") ?? table).before(tableCount);
 
         const updateRows = () => {
+            let visibleCount = 0;
             rows.forEach((row) => {
                 row.hidden = Array.from(selectedValuesByColumn).some(([columnIndex, selectedValues]) => {
                     return selectedValues.size > 0 && !getFilterValues(row.cells[columnIndex])
                         .some((value) => selectedValues.has(value));
                 });
+                if (!row.hidden) {
+                    visibleCount += 1;
+                }
             });
+            const itemLabel = rows.length === 1 ? "item" : "items";
+            tableCount.textContent = `${visibleCount} of ${rows.length} ${itemLabel}`;
+            emptyStateCell.textContent = rows.length === 0
+                ? `No ${itemName} to display.`
+                : `No ${itemName} match the current filters.`;
+            emptyStateRow.hidden = visibleCount > 0;
         };
 
         headers.forEach((header, columnIndex) => {
@@ -345,11 +368,13 @@
                 }
 
                 Array.from(table.tBodies).forEach((body) => {
-                    const rows = Array.from(body.rows).map((row, originalIndex) => ({
-                        row,
-                        originalIndex,
-                        value: getCellValue(row.cells[columnIndex])
-                    }));
+                    const rows = Array.from(body.rows)
+                        .filter((row) => row !== emptyStateRow)
+                        .map((row, originalIndex) => ({
+                            row,
+                            originalIndex,
+                            value: getCellValue(row.cells[columnIndex])
+                        }));
 
                     rows.sort((left, right) => {
                         const comparison = compareValues(
@@ -366,6 +391,7 @@
 
                     rows.forEach(({ row }) => body.append(row));
                 });
+                emptyStateBody.append(emptyStateRow);
             });
         });
 

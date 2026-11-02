@@ -52,10 +52,6 @@
         <div>
           <h3 id="detail-contents-title">Works in this book</h2>
         </div>
-        <span class="detail-count">
-          {{ book.work_edition_objs | length }}
-          {% if book.work_edition_objs | length == 1 %}work{% else %}works{% endif %}
-        </span>
       </header>
       {{ work_edition_table(book.work_edition_objs) }}
     </section>
