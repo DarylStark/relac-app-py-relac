@@ -12,8 +12,8 @@ from .model import (
     BookCollection,
     BookPublisher,
     Label,
+    ReadingList,
     ResourceBase,
-    ResourceList,
     Work,
     WorkEdition,
 )
@@ -143,8 +143,8 @@ class ProjectParser:
 
     def _parse_resource_list_object(
         self, obj_id: str, data: dict[str, str]
-    ) -> ResourceList:
+    ) -> ReadingList:
         """Parse an raw resource list object into a ResourceList object."""
-        obj = self._parse_object(ResourceList, data)
+        obj = self._parse_object(ReadingList, data)
         self._database.add_resource_list(obj_id, obj)
         return obj

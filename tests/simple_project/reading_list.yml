@@ -4,4 +4,11 @@
 #-------------------------------------------------------------------------------
 resource_list.reading_list:
   name: Reading list
+  works:
+    - order: 1
+      work: work.john_williams__stoner
+    - order: 2
+      work: work.john_williams__butchers_crossing
+    - order: 3
+      work: work.freida_mcfadden__the_witch
 #-------------------------------------------------------------------------------
