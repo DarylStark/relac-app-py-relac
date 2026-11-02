@@ -177,7 +177,7 @@ class Label(ResourceBase):
 
 
 class ReadingListItem(ResourceBase):
-    """A item in a resource list."""
+    """A item in a reading list."""
 
     order: int
     work: str

@@ -2,8 +2,8 @@
 #-------------------------------------------------------------------------------
 # Person reading list
 #-------------------------------------------------------------------------------
-resource_list.reading_list:
-  name: Reading list
+reading_list.my_reading_list:
+  name: My reading list
   works:
     - order: 1
       work: work.john_williams__stoner

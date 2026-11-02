@@ -27,7 +27,7 @@ class Database:
         self._book_publishers: dict[str, BookPublisher] = {}
         self._book_collections: dict[str, BookCollection] = {}
         self._labels: dict[str, Label] = {}
-        self._resource_lists: dict[str, ReadingList] = {}
+        self._reading_lsits: dict[str, ReadingList] = {}
 
     def _id_exists[ResourceModel: ResourceBase](
         self, id: str, collection: dict[str, ResourceModel]
@@ -116,7 +116,7 @@ class Database:
 
     def _converge_reading_lists(self) -> None:
         """Converge all book reading lists."""
-        for obj in self._resource_lists.values():
+        for obj in self._reading_lsits.values():
             for work in obj.works:
                 work_obj = self._works.get(work.work)
                 if work_obj is None:
@@ -187,10 +187,10 @@ class Database:
         """Get all label in the database."""
         return list(self._labels.values())
 
-    def add_resource_list(self, id: str, obj: ReadingList) -> None:
-        """Add a label to the database."""
-        self._add_object(id, obj, self._resource_lists)
+    def add_reading_list(self, id: str, obj: ReadingList) -> None:
+        """Add a reading list to the database."""
+        self._add_object(id, obj, self._reading_lsits)
 
-    def get_resource_lists(self) -> list[ReadingList]:
-        """Get all resource lists in the database."""
-        return list(self._resource_lists.values())
+    def get_reading_lists(self) -> list[ReadingList]:
+        """Get all reading lists in the database."""
+        return list(self._reading_lsits.values())

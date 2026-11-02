@@ -68,7 +68,7 @@ class ProjectParser:
             'book': self._parse_book_object,
             'collection': self._parse_collection_object,
             'label': self._parse_label_object,
-            'resource_list': self._parse_resource_list_object,
+            'reading_list': self._parse_reading_list_object,
             'publisher': self._parse_book_publisher_object,
         }
 
@@ -141,10 +141,10 @@ class ProjectParser:
         self._database.add_label(obj_id, obj)
         return obj
 
-    def _parse_resource_list_object(
+    def _parse_reading_list_object(
         self, obj_id: str, data: dict[str, str]
     ) -> ReadingList:
-        """Parse an raw resource list object into a ResourceList object."""
+        """Parse an raw reading list object into a ReadingList object."""
         obj = self._parse_object(ReadingList, data)
-        self._database.add_resource_list(obj_id, obj)
+        self._database.add_reading_list(obj_id, obj)
         return obj
