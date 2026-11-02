@@ -30,6 +30,7 @@ class Author(ResourceBase):
 
     # Relation (real objects)
     work_objs: list[Work] = Field(default_factory=list)
+    book_objs: list[Book] = Field(default_factory=list)
 
 
 class WorkType(Enum):
