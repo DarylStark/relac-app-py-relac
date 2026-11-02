@@ -5,9 +5,6 @@
 
 {% block content %}
     <div class="content">
-        <div class="card">
-            <h3>Works</h3>
-            {{ work_table(works) }}
-        </div>
+        {{ work_table(works, title="Works") }}
     </div>
 {% endblock %}

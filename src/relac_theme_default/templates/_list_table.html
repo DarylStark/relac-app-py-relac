@@ -1,4 +1,9 @@
-{% macro list_table(lists) %}
+{% macro list_table(lists, title="Lists") %}
+<div class="card table-card">
+    <header class="table-card-header">
+        <h3 class="table-card-title">{{ title }}</h3>
+        <div class="table-card-actions"></div>
+    </header>
 <div class="table-scroll">
     <table id="lists-table" class="resources" data-sortable>
         <thead>
@@ -12,6 +17,7 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
 </div>
 {% endmacro %}
 

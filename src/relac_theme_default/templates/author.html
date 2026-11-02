@@ -47,27 +47,8 @@
       </section>
   </div>
 
-  <div class="card">
-    <section class="detail-contents" aria-labelledby="detail-contents-title">
-      <header class="detail-contents-header">
-        <div>
-          <h3 id="detail-contents-title">Works for this author</h2>
-        </div>
-      </header>
-      {{ work_table(author.work_objs) }}
-    </section>
-  </div>
-
-  <div class="card">
-    <section class="detail-contents" aria-labelledby="detail-contents-title">
-      <header class="detail-contents-header">
-        <div>
-          <h3 id="detail-contents-title">Books with this author</h2>
-        </div>
-      </header>
-      {{ book_table(author.book_objs) }}
-    </section>
-  </div>
+  {{ work_table(author.work_objs, title="Works for this author") }}
+  {{ book_table(author.book_objs, "Books with this author") }}
 
 </div>
 {% endblock %}

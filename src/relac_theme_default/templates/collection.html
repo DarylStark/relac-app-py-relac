@@ -18,15 +18,6 @@
       </section>
   </div>
 
-  <div class="card">
-    <section class="detail-contents" aria-labelledby="detail-contents-title">
-      <header class="detail-contents-header">
-        <div>
-          <h3 id="detail-contents-title">Books in this collection</h2>
-        </div>
-      </header>
-      {{ book_table(collection.book_objs) }}
-    </section>
-  </div>
+  {{ book_table(collection.book_objs, "Books in this collection") }}
 </div>
 {% endblock %}

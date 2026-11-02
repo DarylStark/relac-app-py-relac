@@ -116,11 +116,133 @@
             ? table.id.replace(/-table$/, "").replace(/-/g, " ")
             : "items";
         const sortParameter = `relac.sort.${tableKey}`;
+        const hiddenColumnsParameter = `relac.columns.${tableKey}`;
+        const columnKeyCounts = new Map();
+        const columnKeys = headers.map((header) => {
+            const label = header.textContent.trim();
+            const occurrence = (columnKeyCounts.get(label) ?? 0) + 1;
+            columnKeyCounts.set(label, occurrence);
+            return `${label}:${occurrence}`;
+        });
+        let hiddenColumnKeys = new Set();
+        try {
+            const savedColumns = JSON.parse(localStorage.getItem(hiddenColumnsParameter) ?? "[]");
+            if (Array.isArray(savedColumns)) {
+                hiddenColumnKeys = new Set(savedColumns.filter((key) => typeof key === "string"));
+            }
+        } catch {
+        }
+        hiddenColumnKeys = new Set(
+            Array.from(hiddenColumnKeys).filter((key) => columnKeys.includes(key))
+        );
+        if (columnKeys.length > 0 && hiddenColumnKeys.size === columnKeys.length) {
+            hiddenColumnKeys.delete(columnKeys[0]);
+        }
+        const visibilityToggles = new Map();
+        const clearActionsByColumn = new Map();
         let isRestoringState = true;
+        const tableToolbar = document.createElement("div");
+        tableToolbar.className = "table-toolbar";
         const tableCount = document.createElement("p");
         tableCount.className = "table-count";
         tableCount.setAttribute("aria-live", "polite");
-        (table.closest(".table-scroll") ?? table).before(tableCount);
+
+        const settingsToggle = document.createElement("button");
+        settingsToggle.type = "button";
+        settingsToggle.className = "table-settings-toggle";
+        settingsToggle.setAttribute("aria-label", `Table settings for ${itemName}`);
+        settingsToggle.setAttribute("aria-expanded", "false");
+        const settingsMenuId = `${table.id || "sortable-table"}-settings`;
+        settingsToggle.setAttribute("aria-controls", settingsMenuId);
+
+        const settingsMenu = document.createElement("div");
+        settingsMenu.className = "table-settings-menu";
+        settingsMenu.id = settingsMenuId;
+        settingsMenu.hidden = true;
+        settingsMenu.setAttribute("aria-label", `Table settings for ${itemName}`);
+
+        const resetTableButton = document.createElement("button");
+        resetTableButton.type = "button";
+        resetTableButton.className = "table-settings-reset";
+        resetTableButton.textContent = "Reset table";
+
+        const visibilityHeading = document.createElement("p");
+        visibilityHeading.className = "table-settings-heading";
+        visibilityHeading.textContent = "Visible columns";
+
+        const visibilityOptions = document.createElement("div");
+        visibilityOptions.className = "table-column-visibility-options";
+        settingsMenu.append(resetTableButton, visibilityHeading, visibilityOptions);
+        tableToolbar.append(tableCount);
+        const settingsHost = table.closest(".table-card")?.querySelector(".table-card-actions")
+            ?? tableToolbar;
+        settingsHost.append(settingsToggle, settingsMenu);
+        (table.closest(".table-scroll") ?? table).before(tableToolbar);
+
+        const updateColumnVisibility = () => {
+            let visibleColumnCount = 0;
+            headers.forEach((header, columnIndex) => {
+                const isHidden = hiddenColumnKeys.has(columnKeys[columnIndex]);
+                header.hidden = isHidden;
+                rows.forEach((row) => {
+                    if (row.cells[columnIndex]) {
+                        row.cells[columnIndex].hidden = isHidden;
+                    }
+                });
+                if (!isHidden) {
+                    visibleColumnCount += 1;
+                }
+            });
+            emptyStateCell.colSpan = Math.max(1, visibleColumnCount);
+            visibilityToggles.forEach(({ checkbox, key }) => {
+                checkbox.checked = !hiddenColumnKeys.has(key);
+                checkbox.disabled = checkbox.checked && visibleColumnCount === 1;
+            });
+        };
+
+        const persistColumnVisibility = () => {
+            try {
+                localStorage.setItem(hiddenColumnsParameter, JSON.stringify(Array.from(hiddenColumnKeys)));
+            } catch {
+            }
+        };
+
+        const positionSettingsMenu = () => {
+            if (settingsMenu.hidden) {
+                return;
+            }
+
+            const toggleRect = settingsToggle.getBoundingClientRect();
+            const menuHeight = settingsMenu.offsetHeight;
+            const menuWidth = settingsMenu.offsetWidth;
+            const top = toggleRect.bottom + menuHeight + 8 <= window.innerHeight
+                ? toggleRect.bottom + 4
+                : Math.max(8, toggleRect.top - menuHeight - 4);
+            const left = Math.max(
+                8,
+                Math.min(toggleRect.right - menuWidth, window.innerWidth - menuWidth - 8)
+            );
+
+            settingsMenu.style.top = `${top}px`;
+            settingsMenu.style.left = `${left}px`;
+        };
+
+        settingsToggle.addEventListener("click", () => {
+            settingsMenu.hidden = !settingsMenu.hidden;
+            settingsToggle.setAttribute("aria-expanded", String(!settingsMenu.hidden));
+            positionSettingsMenu();
+        });
+
+        settingsMenu.addEventListener("keydown", (event) => {
+            if (event.key === "Escape") {
+                settingsMenu.hidden = true;
+                settingsToggle.setAttribute("aria-expanded", "false");
+                settingsToggle.focus();
+            }
+        });
+
+        window.addEventListener("resize", positionSettingsMenu);
+        window.addEventListener("scroll", positionSettingsMenu, true);
 
         const updateRows = () => {
             let visibleCount = 0;
@@ -204,6 +326,38 @@
 
             const options = document.createElement("div");
             options.className = "table-column-filter-options";
+
+            const visibilityOption = document.createElement("label");
+            visibilityOption.className = "table-column-visibility-option";
+            const visibilityCheckbox = document.createElement("input");
+            visibilityCheckbox.type = "checkbox";
+            visibilityCheckbox.checked = !hiddenColumnKeys.has(columnKeys[columnIndex]);
+            const visibilityLabel = document.createElement("span");
+            visibilityLabel.textContent = label;
+            visibilityOption.append(visibilityCheckbox, visibilityLabel);
+            visibilityOptions.append(visibilityOption);
+            visibilityToggles.set(columnIndex, {
+                checkbox: visibilityCheckbox,
+                key: columnKeys[columnIndex]
+            });
+            visibilityCheckbox.addEventListener("change", () => {
+                if (visibilityCheckbox.checked) {
+                    hiddenColumnKeys.delete(columnKeys[columnIndex]);
+                } else {
+                    const visibleCount = headers.filter((candidate, candidateIndex) => {
+                        return candidateIndex !== columnIndex &&
+                            !hiddenColumnKeys.has(columnKeys[candidateIndex]);
+                    }).length;
+                    if (visibleCount === 0) {
+                        visibilityCheckbox.checked = true;
+                        return;
+                    }
+                    hiddenColumnKeys.add(columnKeys[columnIndex]);
+                }
+
+                updateColumnVisibility();
+                persistColumnVisibility();
+            });
 
             const selectedValues = new Set();
             selectedValuesByColumn.set(columnIndex, selectedValues);
@@ -291,6 +445,7 @@
                 updateRows();
                 updateQueryValues(filterParameter, Array.from(selectedValues));
             });
+            clearActionsByColumn.set(columnIndex, clearButton);
 
             const positionFilterMenu = () => {
                 if (filterMenu.hidden) {
@@ -393,6 +548,39 @@
                 });
                 emptyStateBody.append(emptyStateRow);
             });
+
+            header.addEventListener("click", (event) => {
+                if (event.target instanceof Element && event.target.closest(".table-column-filter")) {
+                    return;
+                }
+
+                sortAction.click();
+            });
+        });
+
+        updateColumnVisibility();
+        resetTableButton.addEventListener("click", () => {
+            hiddenColumnKeys.clear();
+            try {
+                localStorage.removeItem(hiddenColumnsParameter);
+            } catch {
+            }
+            updateColumnVisibility();
+
+            clearActionsByColumn.forEach((clearAction) => clearAction.click());
+
+            const firstColumnIndex = headers.findIndex((header) => header.tagName === "TH");
+            const firstSortAction = sortActionsByColumn.get(firstColumnIndex);
+            if (firstSortAction) {
+                isRestoringState = true;
+                headers[firstColumnIndex].setAttribute("aria-sort", "descending");
+                firstSortAction.click();
+                isRestoringState = false;
+            }
+            updateQueryValues(sortParameter, []);
+
+            settingsMenu.hidden = true;
+            settingsToggle.setAttribute("aria-expanded", "false");
         });
 
         updateRows();
@@ -420,11 +608,16 @@
             return;
         }
 
-        document.querySelectorAll(".table-column-filter-menu:not([hidden])").forEach((menu) => {
+        document.querySelectorAll(
+            ".table-column-filter-menu:not([hidden]), .table-settings-menu:not([hidden])"
+        ).forEach((menu) => {
             const filter = menu.parentElement;
             if (!filter.contains(target)) {
                 menu.hidden = true;
-                filter.querySelector(".table-column-filter-toggle").setAttribute("aria-expanded", "false");
+                const toggle = menu.classList.contains("table-settings-menu")
+                    ? filter.querySelector(".table-settings-toggle")
+                    : filter.querySelector(".table-column-filter-toggle");
+                toggle.setAttribute("aria-expanded", "false");
             }
         });
     });
