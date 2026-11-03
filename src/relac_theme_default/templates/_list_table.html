@@ -1,3 +1,5 @@
+{% from "_availability_counts.html" import availability_cell %}
+
 {% macro list_table(lists, title="Lists") %}
 <div class="card table-card">
     <header class="table-card-header">
@@ -10,6 +12,7 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col" class="center fit-content">Works</th>
+                <th scope="col" class="right fit-content">Availability</th>
             </tr>
         </thead>
         <tbody>
@@ -30,5 +33,6 @@
             {{ list.works | length }}
         </pre>
     </td>
+    {{ availability_cell(list.works) }}
 </tr>
 {% endmacro %}

@@ -10,6 +10,7 @@ from relac.model import (
     Book,
     Owner,
     OwnerType,
+    Series,
 )
 
 
@@ -97,3 +98,20 @@ def test_build_search_index_includes_owner_metadata_and_url() -> None:
     assert not any(
         detail.startswith('Books:') for detail in store_entry['details']
     )
+
+
+def test_build_search_index_includes_series_and_url() -> None:
+    """Include series names and generated detail page URLs."""
+    database = Database()
+    series = Series(id='the_housemaid', name='The Housemaid')
+    database.add_series('the_housemaid', series)
+
+    series_entry = next(
+        item
+        for item in _build_search_index(database)['items']
+        if item['type'] == 'Series'
+    )
+
+    assert series_entry['href'] == 'the_housemaid.html'
+    assert series_entry['title'] == 'The Housemaid'
+    assert 'The Housemaid' in series_entry['searchText']

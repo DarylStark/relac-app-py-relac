@@ -2,6 +2,7 @@
 {% set active_page = "works" %}
 
 {% from "_book_table.html" import book_table %}
+{% from "_list_table.html" import list_table %}
 {% from "_work_edition_table.html" import work_edition_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
@@ -37,6 +38,16 @@
                 {% endfor %}
             </dd>
           </div>
+          {% if work.series_objs %}
+          <div class="detail-fact">
+            <dt>Series</dt>
+            <dd>
+                {% for series in work.series_objs %}
+                  {% if not loop.first %}, {% endif %}{{ entity_link(series, series.name) }}
+                {% endfor %}
+            </dd>
+          </div>
+          {% endif %}
           <div class="detail-fact">
             <dt>Structure and category</dt>
             <dd>
@@ -50,5 +61,8 @@
 
   {{ work_edition_table(work.edition_objs, "Editions of this work") }}
   {{ book_table(work.book_objs, "Books featuring this work") }}
+  {% if reading_lists %}
+  {{ list_table(reading_lists, "Reading lists including this work") }}
+  {% endif %}
 </div>
 {% endblock %}

@@ -1,3 +1,5 @@
+{% from "_availability_counts.html" import availability_cell %}
+
 {% macro series_table(series_list, title="Series") %}
 <div class="card table-card">
     <header class="table-card-header">
@@ -10,6 +12,7 @@
                 <tr>
                     <th scope="col">Name</th>
                     <th scope="col">Works</th>
+                    <th scope="col" class="right fit-content">Availability</th>
                 </tr>
             </thead>
             <tbody>
@@ -19,6 +22,7 @@
                     <td class="center fit-content">
                         <pre>{{ series.works | length }}</pre>
                     </td>
+                    {{ availability_cell(series.works) }}
                 </tr>
                 {% endfor %}
             </tbody>
