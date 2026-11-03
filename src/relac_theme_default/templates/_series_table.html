@@ -1,0 +1,28 @@
+{% macro series_table(series_list, title="Series") %}
+<div class="card table-card">
+    <header class="table-card-header">
+        <h3 class="table-card-title">{{ title }}</h3>
+        <div class="table-card-actions"></div>
+    </header>
+    <div class="table-scroll">
+        <table id="series-table" class="resources" data-sortable>
+            <thead>
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Works</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for series in series_list %}
+                <tr data-href="{{ series.id }}.html">
+                    <td>{{ series.name }}</td>
+                    <td class="center fit-content">
+                        <pre>{{ series.works | length }}</pre>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}

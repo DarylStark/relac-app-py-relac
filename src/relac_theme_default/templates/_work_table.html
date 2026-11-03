@@ -1,6 +1,6 @@
 {% from "_entity_link.html" import entity_link %}
 
-{% macro work_table(works, show_order=false, title="Works") %}
+{% macro work_table(works, show_order=false, title="Works", order_attribute="order") %}
 <div class="card table-card">
     <header class="table-card-header">
         <h3 class="table-card-title">{{ title }}</h3>
@@ -15,6 +15,7 @@
                 <th scope="col">Author</th>
                 <th scope="col" class="fit-content">Structure</th>
                 <th scope="col" class="fit-content">Category</th>
+                <th scope="col">Series</th>
                 <th scope="col" class="center fit-content">Editions</th>
                 <th scope="col" class="right fit-content">Availability</th>
             </tr>
@@ -22,7 +23,7 @@
         <tbody>
             {% for item in works %}
                 {% if show_order %}
-                    {{ work_row(item.work_obj, item.order) }}
+                    {{ work_row(item.work_obj, item[order_attribute]) }}
                 {% else %}
                     {{ work_row(item) }}
                 {% endif %}
@@ -50,6 +51,11 @@
     </td>
     <td class="fit-content">{{ work_structure.replace('-', ' ').capitalize() }}</td>
     <td class="fit-content">{{ work_type.replace('-', ' ').capitalize() }}</td>
+    <td data-filter-values='{{ work.series_objs | map(attribute="name") | list | tojson }}'>
+        {% for series in work.series_objs %}
+            {% if not loop.first %}, {% endif %}<a href="{{ series.id }}.html">{{ series.name }}</a>
+        {% endfor %}
+    </td>
     <td class="center fit-content">
         <pre>
             {{ work.edition_objs | length }}

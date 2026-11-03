@@ -1,0 +1,23 @@
+{% extends "_base.html" %}
+{% set active_page = "series" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_work_table.html" import work_table %}
+
+{% block content %}
+<div class="content">
+    {{ breadcrumbs([("Works", "works.html"), ("Series", "series.html"), (series.name, none)]) }}
+    <div class="card">
+        <section class="detail-summary" aria-labelledby="detail-title">
+            <div class="detail-summary-header">
+                <div>
+                    <p class="detail-kind">Series</p>
+                    <h3 id="detail-title">{{ series.name }}</h3>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    {{ work_table(series.works, show_order=true, title="Works in this series", order_attribute="number") }}
+</div>
+{% endblock %}
