@@ -15,6 +15,7 @@ from .model import (
     Owner,
     ReadingList,
     ResourceBase,
+    Series,
     Work,
     WorkEdition,
 )
@@ -72,6 +73,7 @@ class ProjectParser:
             'reading_list': self._parse_reading_list_object,
             'publisher': self._parse_book_publisher_object,
             'owner': self._parse_owner_object,
+            'series': self._parse_series_object,
         }
 
         for obj_id, obj in raw_data.items():
@@ -155,4 +157,10 @@ class ProjectParser:
         """Parse an raw owner object into a Owner object."""
         obj = self._parse_object(Owner, data)
         self._database.add_owner(obj_id, obj)
+        return obj
+
+    def _parse_series_object(self, obj_id: str, data: dict[str, str]) -> Series:
+        """Parse an raw series object into a Series object."""
+        obj = self._parse_object(Series, data)
+        self._database.add_series(obj_id, obj)
         return obj

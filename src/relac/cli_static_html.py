@@ -246,6 +246,14 @@ def create(  # noqa: PLR0912, PLR0915
         out_path = output / 'works.html'
         out_path.write_text(html)
 
+    if 'series' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['series'])
+        html = template.render(
+            series=db.get_series(),
+        )
+        out_path = output / 'series.html'
+        out_path.write_text(html)
+
     if 'authors' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['authors'])
         html = template.render(
@@ -332,4 +340,12 @@ def create(  # noqa: PLR0912, PLR0915
             template = env.get_template(metadata.resource_pages['list'])
             html = template.render(list=lst)
             out_path = output / f'{lst.id}.html'
+            out_path.write_text(html)
+
+    # Series
+    if 'series' in metadata.resource_pages:
+        for series in db.get_series():
+            template = env.get_template(metadata.resource_pages['series'])
+            html = template.render(series=series)
+            out_path = output / f'{series.id}.html'
             out_path.write_text(html)

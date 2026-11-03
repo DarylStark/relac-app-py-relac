@@ -73,9 +73,10 @@ main.page-shell
 .page-header
 {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: 24px;
+    gap: 8px 24px;
     margin-bottom: 28px;
 }
 
@@ -781,18 +782,21 @@ nav.tab-nav
     min-width: 0;
     padding: 4px;
     gap: 4px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
 }
 
-nav.tab-nav::-webkit-scrollbar
+nav.section-subnav
 {
-    display: none;
+    display: flex;
+    flex: 1 0 100%;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+    padding: 0 4px;
+    gap: 4px;
 }
 
-nav.tab-nav a
+nav.tab-nav a,
+nav.section-subnav a
 {
     flex: none;
     cursor: pointer;
@@ -811,17 +815,26 @@ nav.tab-nav a
     background: var(--transparent);
 }
 
-nav.tab-nav a:hover
+nav.tab-nav a:hover,
+nav.section-subnav a:hover
 {
     color: var(--text);
     background: var(--hover-surface);
 }
 
-nav.tab-nav a.active
+nav.tab-nav a.active,
+nav.section-subnav a.active
 {
     color: var(--accent-text);
     background: var(--accent);
     font-weight: bold;
+}
+
+nav.tab-nav a:focus-visible,
+nav.section-subnav a:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
 }
 
 div.statistics
@@ -933,8 +946,26 @@ nav.breadcrumbs [aria-current="page"]
     {
         justify-content: flex-start;
         width: 100%;
+        flex-wrap: nowrap;
         padding: 4px 0;
+        overflow-x: auto;
+        overflow-y: hidden;
         overscroll-behavior-x: contain;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    nav.tab-nav::-webkit-scrollbar
+    {
+        display: none;
+    }
+
+    nav.section-subnav
+    {
+        justify-content: flex-end;
+        width: 100%;
+        flex-wrap: wrap;
+        padding: 4px 0;
     }
 
     div.statistics
@@ -950,7 +981,8 @@ nav.breadcrumbs [aria-current="page"]
         padding: 24px 16px 36px;
     }
 
-    nav.tab-nav a
+    nav.tab-nav a,
+    nav.section-subnav a
     {
         padding: 8px 12px;
         font-size: 12px;

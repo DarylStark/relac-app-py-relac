@@ -17,11 +17,13 @@ relac_theme = RelacTheme(
         'work_edition': 'work_edition.html',
         'collection': 'collection.html',
         'list': 'list.html',
+        'series': 'series_detail.html',
         'owner': 'owner.html',
     },
     index_pages={
         'books': 'books.html',
         'works': 'works.html',
+        'series': 'series.html',
         'authors': 'authors.html',
         'collections': 'collections.html',
         'lists': 'lists.html',

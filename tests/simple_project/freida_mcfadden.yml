@@ -9,28 +9,70 @@ author.freida_mcfadden:
 #-------------------------------------------------------------------------------
 # Works and work editions
 #-------------------------------------------------------------------------------
-work.freida_mcfadden__the_housemaids_wedding:
-  title: The Housemaid's Wedding
-  <<: *template_work
+work.freida_mcfadden__the_housemaid:
+  title: "The Housemaid"
+  work_structure: novel
+  work_type: genre-fiction
   authors:
     - author.freida_mcfadden
 
-work_edition.freida_mcfadden__the_housemaids_wedding__original:
-  title: The Housemaid's Wedding
-  work: work.freida_mcfadden__the_housemaids_wedding
-  <<: *template_work_edition
+work.freida_mcfadden__the_housemaid_is_watching:
+  title: "The Housemaid is Watching"
+  work_structure: novel
+  work_type: genre-fiction
+  authors:
+    - author.freida_mcfadden
+
+work.freida_mcfadden__the_housemaid_s_secret:
+  title: "The Housemaid's Secret"
+  work_structure: novel
+  work_type: genre-fiction
+  authors:
+    - author.freida_mcfadden
+
+work.freida_mcfadden__the_housemaid_s_wedding:
+  title: "The Housemaid's Wedding"
+  work_structure: novel
+  work_type: genre-fiction
+  authors:
+    - author.freida_mcfadden
 
 work.freida_mcfadden__the_witch:
-  title: The Witch
-  <<: *template_work
+  title: "The Witch"
+  work_structure: novel
+  work_type: genre-fiction
   authors:
     - author.freida_mcfadden
 
-work_edition.freida_mcfadden__the_witch__abriged:
-  title: The Witch
+work_edition.freida_mcfadden__the_housemaid__original:
+  title: "The Housemaid"
+  work: work.freida_mcfadden__the_housemaid
+  edition_type: original
+  language: en
+
+work_edition.freida_mcfadden__the_housemaid_is_watching__original:
+  title: "The Housemaid is Watching"
+  work: work.freida_mcfadden__the_housemaid_is_watching
+  edition_type: original
+  language: en
+
+work_edition.freida_mcfadden__the_housemaid_s_secret__original:
+  title: "The Housemaid's Secret"
+  work: work.freida_mcfadden__the_housemaid_s_secret
+  edition_type: original
+  language: en
+
+work_edition.freida_mcfadden__the_housemaid_s_wedding__original:
+  title: "The Housemaid's Wedding"
+  work: work.freida_mcfadden__the_housemaid_s_wedding
+  edition_type: original
+  language: en
+
+work_edition.freida_mcfadden__the_witch__abridged:
+  title: "The Witch"
   work: work.freida_mcfadden__the_witch
-  <<: *template_work_edition
   edition_type: abriged
+  language: en
 #-------------------------------------------------------------------------------
 # Books
 #-------------------------------------------------------------------------------
@@ -40,8 +82,8 @@ book.freida_mcfadden__the_housemaids_wedding:
   medium: paperback
   binding: novella
   work_editions:
-    - work_edition.freida_mcfadden__the_housemaids_wedding__original
-    - work_edition.freida_mcfadden__the_witch__abriged
+    - work_edition.freida_mcfadden__the_housemaid_s_wedding__original
+    - work_edition.freida_mcfadden__the_witch__abridged
   owners:
     - owner.daryl
 #-------------------------------------------------------------------------------

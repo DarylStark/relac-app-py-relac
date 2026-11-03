@@ -14,7 +14,15 @@ class RelacTheme:
     index_template: str
     static_folder: Path | None = None
     index_pages: dict[
-        Literal['books', 'works', 'authors', 'collections', 'lists', 'owners'],
+        Literal[
+            'books',
+            'works',
+            'authors',
+            'collections',
+            'lists',
+            'owners',
+            'series',
+        ],
         str,
     ] = field(default_factory=dict)
     resource_pages: dict[
@@ -26,6 +34,7 @@ class RelacTheme:
             'collection',
             'list',
             'owner',
+            'series',
         ],
         str,
     ] = field(default_factory=dict)
