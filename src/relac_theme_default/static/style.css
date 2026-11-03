@@ -1136,6 +1136,35 @@ table.resources tbody tr.table-empty-state td {
     white-space: nowrap;
 }
 
+.availability-counts
+{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+}
+
+.availability-count
+{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    padding: 4px 6px;
+    border: 1px solid;
+    border-radius: 4px;
+    font-size: 11px;
+    line-height: 1.2;
+    white-space: nowrap;
+}
+
+.availability-count strong
+{
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+}
+
 .availability-directly
 {
     border-color: rgb(39 145 83 / 0.45);

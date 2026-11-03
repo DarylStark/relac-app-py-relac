@@ -1,0 +1,25 @@
+{% macro availability_cell(items) -%}
+{% set counts = namespace(direct=0, indirect=0, unavailable=0) %}
+{% for item in items %}
+    {% if item.work_obj %}
+        {% if item.work_obj.availability.value == "directly" %}
+            {% set counts.direct = counts.direct + 1 %}
+        {% elif item.work_obj.availability.value == "indirectly" %}
+            {% set counts.indirect = counts.indirect + 1 %}
+        {% else %}
+            {% set counts.unavailable = counts.unavailable + 1 %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+{% set filter_values = [] %}
+{% if counts.direct > 0 %}{% set _ = filter_values.append("Directly available") %}{% endif %}
+{% if counts.indirect > 0 %}{% set _ = filter_values.append("Indirectly available") %}{% endif %}
+{% if counts.unavailable > 0 %}{% set _ = filter_values.append("Not available") %}{% endif %}
+<td class="right fit-content availability-cell" data-filter-values='{{ filter_values | tojson }}'>
+<span class="availability-counts" role="group" aria-label="Work availability totals">
+    <span class="availability-count availability-directly" aria-label="Directly available: {{ counts.direct }}" title="Directly available">{{ counts.direct }}</span>
+    <span class="availability-count availability-indirectly" aria-label="Indirectly available: {{ counts.indirect }}" title="Indirectly available">{{ counts.indirect }}</span>
+    <span class="availability-count availability-not-available" aria-label="Not available: {{ counts.unavailable }}" title="Not available">{{ counts.unavailable }}</span>
+</span>
+</td>
+{%- endmacro %}

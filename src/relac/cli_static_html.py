@@ -319,9 +319,17 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Works
     if 'work' in metadata.resource_pages:
+        reading_lists = db.get_reading_lists()
         for work in db.get_works():
             template = env.get_template(metadata.resource_pages['work'])
-            html = template.render(work=work)
+            matching_reading_lists = [
+                reading_list
+                for reading_list in reading_lists
+                if any(item.work == work.id for item in reading_list.works)
+            ]
+            html = template.render(
+                work=work, reading_lists=matching_reading_lists
+            )
             out_path = output / f'{work.id}.html'
             out_path.write_text(html)
 
