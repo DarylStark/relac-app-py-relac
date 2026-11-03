@@ -8,6 +8,7 @@ from relac.model import (
     BookCollection,
     BookPublisher,
     Label,
+    Owner,
     ReadingList,
     ResourceBase,
     Work,
@@ -27,7 +28,8 @@ class Database:
         self._book_publishers: dict[str, BookPublisher] = {}
         self._book_collections: dict[str, BookCollection] = {}
         self._labels: dict[str, Label] = {}
-        self._reading_lsits: dict[str, ReadingList] = {}
+        self._reading_lists: dict[str, ReadingList] = {}
+        self._owners: dict[str, Owner] = {}
 
     def _id_exists[ResourceModel: ResourceBase](
         self, id: str, collection: dict[str, ResourceModel]
@@ -104,6 +106,14 @@ class Database:
                         ):
                             author.book_objs.append(obj)
 
+            for owner in obj.owners or []:
+                owner_obj = self._owners.get(owner)
+                if not owner_obj:
+                    # TODO: Custom error
+                    raise ValueError(f'Owner with id "{owner}" doesn\'t exist')
+                obj.owner_objs.append(owner_obj)
+                owner_obj.book_objs.append(obj)
+
     def _converge_book_collections(self) -> None:
         """Converge all book collections."""
         for obj in self._book_collections.values():
@@ -116,7 +126,7 @@ class Database:
 
     def _converge_reading_lists(self) -> None:
         """Converge all book reading lists."""
-        for obj in self._reading_lsits.values():
+        for obj in self._reading_lists.values():
             for work in obj.works:
                 work_obj = self._works.get(work.work)
                 if work_obj is None:
@@ -189,8 +199,16 @@ class Database:
 
     def add_reading_list(self, id: str, obj: ReadingList) -> None:
         """Add a reading list to the database."""
-        self._add_object(id, obj, self._reading_lsits)
+        self._add_object(id, obj, self._reading_lists)
 
     def get_reading_lists(self) -> list[ReadingList]:
         """Get all reading lists in the database."""
-        return list(self._reading_lsits.values())
+        return list(self._reading_lists.values())
+
+    def add_owner(self, id: str, obj: Owner) -> None:
+        """Add a owner to the database."""
+        self._add_object(id, obj, self._owners)
+
+    def get_owners(self) -> list[Owner]:
+        """Get all owners in the database."""
+        return list(self._owners.values())

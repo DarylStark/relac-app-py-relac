@@ -148,12 +148,14 @@ class Book(ResourceBase):
     work_editions: list[str] = Field(default_factory=list)
     medium: BookMedium = BookMedium.UNSPECIFIED
     binding: BookBinding = BookBinding.UNSPECIFIED
+    owners: list[str] | None = None
 
     # Relationships (real objects)
     work_edition_objs: list[WorkEdition] = Field(default_factory=list)
     author_objs: list[Author] = Field(default_factory=list)
     publisher_obj: BookPublisher = Field(default_factory=list)
     collection_objs: list[BookCollection] = Field(default_factory=list)
+    owner_objs: list[Owner] = Field(default_factory=list)
 
 
 class ReadingSession(ResourceBase):
@@ -189,3 +191,31 @@ class ReadingList(ResourceBase):
 
     name: str
     works: list[ReadingListItem] = Field(default_factory=list)
+
+
+class OwnerType(Enum):
+    """Type for a owner."""
+
+    UNSPECIFIED = 'unspecified'
+    PERSON = 'person'
+    LIBRARY = 'library'
+    STORE = 'store'
+
+
+class OwnerAvailability(Enum):
+    """Availability for a owner."""
+
+    NOT_AVAILABLE = 'not_available'
+    DIRECTLY_AVAILABLE = 'directly'
+    INDIRECTLY_AVAILABLE = 'indirectly'
+
+
+class Owner(ResourceBase):
+    """Model for a owner."""
+
+    name: str
+    owner_type: OwnerType = OwnerType.UNSPECIFIED
+    availability: OwnerAvailability = OwnerAvailability.NOT_AVAILABLE
+
+    # Relationships (real objects)
+    book_objs: list[Book] = Field(default_factory=list)
