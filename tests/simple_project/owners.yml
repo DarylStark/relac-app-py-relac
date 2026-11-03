@@ -1,5 +1,7 @@
 owner.daryl:
   name: Daryl Stark
+  owner_type: person
+  availability: directly
 
 owner.example:
   name: Example owner

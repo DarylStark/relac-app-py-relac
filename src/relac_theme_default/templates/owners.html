@@ -1,0 +1,10 @@
+{% extends "_base.html" %}
+{% set active_page = "owners" %}
+
+{% from "_owner_table.html" import owner_table %}
+
+{% block content %}
+<div class="content">
+  {{ owner_table(owners, "Owners") }}
+</div>
+{% endblock %}

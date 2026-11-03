@@ -2,6 +2,7 @@
 {% set active_page = "books" %}
 
 {% from "_work_edition_table.html" import work_edition_table %}
+{% from "_owner_table.html" import owner_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
 
@@ -59,6 +60,10 @@
         </dl>
       </section>
   </div>
+
+  {% if book.owner_objs %}
+    {{ owner_table(book.owner_objs) }}
+  {% endif %}
 
   {{ work_edition_table(book.work_edition_objs, "Works in this book") }}
 </div>

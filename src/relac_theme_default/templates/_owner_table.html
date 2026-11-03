@@ -1,0 +1,34 @@
+{% from "_entity_link.html" import entity_link %}
+
+{% macro owner_table(owners, title="Owners") %}
+<div class="card table-card">
+    <header class="table-card-header">
+        <h3 class="table-card-title">{{ title }}</h3>
+        <div class="table-card-actions"></div>
+    </header>
+<div class="table-scroll">
+    <table id="owners-table" class="resources" data-sortable>
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Type</th>
+                <th scope="col">Availability</th>
+                <th scope="col" class="center fit-content">Books</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for owner in owners %}
+                <tr data-href="{{ owner.id }}.html">
+                    <td>{{ entity_link(owner, owner.name) }}</td>
+                    <td>{{ owner.owner_type.value | enum_label }}</td>
+                    <td>{{ owner.availability.value | replace('_', '-') | enum_label }}</td>
+                    <td class="center fit-content">
+                        <pre>{{ owner.book_objs | length }}</pre>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endmacro %}
