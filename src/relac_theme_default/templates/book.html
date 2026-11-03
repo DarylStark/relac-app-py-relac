@@ -2,6 +2,7 @@
 {% set active_page = "books" %}
 
 {% from "_work_edition_table.html" import work_edition_table %}
+{% from "_owner_table.html" import owner_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
 
@@ -19,7 +20,15 @@
             <h3 id="detail-title">{{ book.title }}</h2>
           </div>
           <p class="detail-badge">
-            <code>{{ book.isbn13 | isbn }}</code>
+            <span class="availability-badge availability-{{ book.availability.value }}">
+              {% if book.availability.value == "directly" %}
+                Available
+              {% elif book.availability.value == "indirectly" %}
+                Indirectly available
+              {% else %}
+                Not available
+              {% endif %}
+            </span>
           </p>
         </div>
 
@@ -56,9 +65,17 @@
               <span class="detail-small">{{ book_binding | enum_label }}</span>
             </dd>
           </div>
+          <div class="detail-fact">
+            <dt>ISBN</dt>
+            <dd><code>{{ book.isbn13 | isbn }}</code></dd>
+          </div>
         </dl>
       </section>
   </div>
+
+  {% if book.owner_objs %}
+    {{ owner_table(book.owner_objs) }}
+  {% endif %}
 
   {{ work_edition_table(book.work_edition_objs, "Works in this book") }}
 </div>

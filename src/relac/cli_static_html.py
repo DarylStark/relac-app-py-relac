@@ -162,6 +162,19 @@ def _build_search_index(
             [detail for detail in details if detail],
         )
 
+    for owner in db.get_owners():
+        details = [
+            f'Type: {_format_enum_label(owner.owner_type.value)}',
+            f'Availability: {_format_enum_label(owner.availability.value)}',
+            f'Books: {", ".join(book.title for book in owner.book_objs)}',
+        ]
+        add_entry(
+            'Owner',
+            owner.id,
+            owner.name,
+            [detail for detail in details if not detail.endswith(': ')],
+        )
+
     for reading_list in db.get_reading_lists():
         work_titles = [
             item.work_obj.title for item in reading_list.works if item.work_obj
@@ -241,6 +254,14 @@ def create(  # noqa: PLR0912, PLR0915
         out_path = output / 'authors.html'
         out_path.write_text(html)
 
+    if 'owners' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['owners'])
+        html = template.render(
+            owners=db.get_owners(),
+        )
+        out_path = output / 'owners.html'
+        out_path.write_text(html)
+
     if 'collections' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['collections'])
         html = template.render(
@@ -271,6 +292,14 @@ def create(  # noqa: PLR0912, PLR0915
             template = env.get_template(metadata.resource_pages['author'])
             html = template.render(author=work_edition)
             out_path = output / f'{work_edition.id}.html'
+            out_path.write_text(html)
+
+    # Owners
+    if 'owner' in metadata.resource_pages:
+        for owner in db.get_owners():
+            template = env.get_template(metadata.resource_pages['owner'])
+            html = template.render(owner=owner)
+            out_path = output / f'{owner.id}.html'
             out_path.write_text(html)
 
     # Works

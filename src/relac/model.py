@@ -1,9 +1,28 @@
 """Module with the models for the application."""
 
+from collections.abc import Iterable
 from datetime import date
 from enum import Enum
 
 from pydantic import BaseModel, Field
+
+
+def _aggregate_availability(
+    availabilities: Iterable[Availability],
+) -> Availability:
+    """Return the highest availability, preferring direct access."""
+    indirectly_available = False
+    for availability in availabilities:
+        if availability is Availability.DIRECTLY_AVAILABLE:
+            return Availability.DIRECTLY_AVAILABLE
+        if availability is Availability.INDIRECTLY_AVAILABLE:
+            indirectly_available = True
+
+    return (
+        Availability.INDIRECTLY_AVAILABLE
+        if indirectly_available
+        else Availability.NOT_AVAILABLE
+    )
 
 
 class ResourceBase(BaseModel):
@@ -69,6 +88,14 @@ class Work(ResourceBase):
     edition_objs: list[WorkEdition] = Field(default_factory=list)
     book_objs: list[Book] = Field(default_factory=list)
 
+    # Properties
+    @property
+    def availability(self) -> Availability:
+        """Get the availability for this edition."""
+        return _aggregate_availability(
+            book.availability for book in self.book_objs
+        )
+
 
 class WorkEditionType(Enum):
     """Work edition types."""
@@ -94,6 +121,14 @@ class WorkEdition(ResourceBase):
     # Relations (real objects)
     work_obj: Work | None = None
     book_objs: list[Book] = Field(default_factory=list)
+
+    # Properties
+    @property
+    def availability(self) -> Availability:
+        """Get the availability for this edition."""
+        return _aggregate_availability(
+            book.availability for book in self.book_objs
+        )
 
 
 class BookCollection(ResourceBase):
@@ -148,12 +183,22 @@ class Book(ResourceBase):
     work_editions: list[str] = Field(default_factory=list)
     medium: BookMedium = BookMedium.UNSPECIFIED
     binding: BookBinding = BookBinding.UNSPECIFIED
+    owners: list[str] | None = None
 
     # Relationships (real objects)
     work_edition_objs: list[WorkEdition] = Field(default_factory=list)
     author_objs: list[Author] = Field(default_factory=list)
     publisher_obj: BookPublisher = Field(default_factory=list)
     collection_objs: list[BookCollection] = Field(default_factory=list)
+    owner_objs: list[Owner] = Field(default_factory=list)
+
+    # Properties
+    @property
+    def availability(self) -> Availability:
+        """Get the availability for this book."""
+        return _aggregate_availability(
+            owner.availability for owner in self.owner_objs
+        )
 
 
 class ReadingSession(ResourceBase):
@@ -189,3 +234,31 @@ class ReadingList(ResourceBase):
 
     name: str
     works: list[ReadingListItem] = Field(default_factory=list)
+
+
+class OwnerType(Enum):
+    """Type for a owner."""
+
+    UNSPECIFIED = 'unspecified'
+    PERSON = 'person'
+    LIBRARY = 'library'
+    STORE = 'store'
+
+
+class Availability(Enum):
+    """Availability for a owner."""
+
+    NOT_AVAILABLE = 'not-available'
+    DIRECTLY_AVAILABLE = 'directly'
+    INDIRECTLY_AVAILABLE = 'indirectly'
+
+
+class Owner(ResourceBase):
+    """Model for a owner."""
+
+    name: str
+    owner_type: OwnerType = OwnerType.UNSPECIFIED
+    availability: Availability = Availability.NOT_AVAILABLE
+
+    # Relationships (real objects)
+    book_objs: list[Book] = Field(default_factory=list)

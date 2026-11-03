@@ -42,4 +42,6 @@ book.freida_mcfadden__the_housemaids_wedding:
   work_editions:
     - work_edition.freida_mcfadden__the_housemaids_wedding__original
     - work_edition.freida_mcfadden__the_witch__abriged
+  owners:
+    - owner.daryl
 #-------------------------------------------------------------------------------
