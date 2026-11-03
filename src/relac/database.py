@@ -11,6 +11,7 @@ from relac.model import (
     Owner,
     ReadingList,
     ResourceBase,
+    Series,
     Work,
     WorkEdition,
 )
@@ -30,6 +31,7 @@ class Database:
         self._labels: dict[str, Label] = {}
         self._reading_lists: dict[str, ReadingList] = {}
         self._owners: dict[str, Owner] = {}
+        self._series: dict[str, Series] = {}
 
     def _id_exists[ResourceModel: ResourceBase](
         self, id: str, collection: dict[str, ResourceModel]
@@ -133,6 +135,18 @@ class Database:
                     raise ValueError(f'Work with id "{work}" doesn\'t exist')
                 work.work_obj = work_obj
 
+    def _converge_series(self) -> None:
+        """Converge all book reading lists."""
+        for obj in self._series.values():
+            for serie_item in obj.works:
+                work_obj = self._works.get(serie_item.work)
+                if work_obj is None:
+                    raise ValueError(
+                        f'Work with id "{serie_item}" doesn\'t exist'
+                    )
+                serie_item.work_obj = work_obj
+                work_obj.series_objs.append(obj)
+
     def converge(self) -> None:
         """Converge all objects."""
         self._converge_works()
@@ -140,6 +154,7 @@ class Database:
         self._converge_books()
         self._converge_book_collections()
         self._converge_reading_lists()
+        self._converge_series()
 
     def add_author(self, id: str, obj: Author) -> None:
         """Add a author to the database."""
@@ -212,3 +227,11 @@ class Database:
     def get_owners(self) -> list[Owner]:
         """Get all owners in the database."""
         return list(self._owners.values())
+
+    def add_series(self, id: str, obj: Series) -> None:
+        """Add a series to the database."""
+        self._add_object(id, obj, self._series)
+
+    def get_series(self) -> list[Series]:
+        """Get all series in the database."""
+        return list(self._series.values())

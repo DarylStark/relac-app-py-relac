@@ -1,0 +1,11 @@
+series.the_housemaid:
+  name: The Housemaid
+  works:
+    - number: 1
+      work: work.freida_mcfadden__the_housemaid
+    - number: 2
+      work: work.freida_mcfadden__the_housemaid_is_watching
+    - number: 3
+      work: work.freida_mcfadden__the_housemaid_s_wedding
+    - number: 4
+      work: work.freida_mcfadden__the_housemaid_s_secret

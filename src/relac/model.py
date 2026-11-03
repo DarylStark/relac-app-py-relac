@@ -87,6 +87,7 @@ class Work(ResourceBase):
     author_objs: list[Author] = Field(default_factory=list)
     edition_objs: list[WorkEdition] = Field(default_factory=list)
     book_objs: list[Book] = Field(default_factory=list)
+    series_objs: list[Series] = Field(default_factory=list)
 
     # Properties
     @property
@@ -262,3 +263,20 @@ class Owner(ResourceBase):
 
     # Relationships (real objects)
     book_objs: list[Book] = Field(default_factory=list)
+
+
+class SeriesItem(ResourceBase):
+    """A item in a serie."""
+
+    number: int
+    work: str
+
+    # Relationships (real objects)
+    work_obj: Work | None = None
+
+
+class Series(ResourceBase):
+    """A serie of works."""
+
+    name: str
+    works: list[SeriesItem] = Field(default_factory=list)
