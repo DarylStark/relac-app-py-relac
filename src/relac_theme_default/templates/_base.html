@@ -24,13 +24,10 @@
             </div>
 
             <nav class="tab-nav">
-                <a href="index.html" {% if active_page == "overview" %}class="active"{% endif %}>Overview</a>
-                <a href="authors.html" {% if active_page == "authors" %}class="active"{% endif %}>Authors</a>
-                <a href="owners.html" {% if active_page == "owners" %}class="active"{% endif %}>Owners</a>
-                <a href="works.html" {% if active_page == "works" %}class="active"{% endif %}>Works</a>
-                <a href="books.html" {% if active_page == "books" %}class="active"{% endif %}>Books</a>
-                <a href="collections.html" {% if active_page == "collections" %}class="active"{% endif %}>Collections</a>
-                <a href="lists.html" {% if active_page == "lists" %}class="active"{% endif %}>Reading lists</a>
+                <a href="index.html" {% if active_page == "overview" %}class="active" aria-current="page"{% endif %}>Overview</a>
+                <a href="authors.html" {% if active_page == "authors" %}class="active" aria-current="page"{% endif %}>Authors</a>
+                <a href="works.html" {% if active_page in ["works", "lists"] %}class="active"{% if active_page == "works" %} aria-current="page"{% endif %}{% endif %}>Works</a>
+                <a href="books.html" {% if active_page in ["books", "owners", "collections"] %}class="active"{% if active_page == "books" %} aria-current="page"{% endif %}{% endif %}>Books</a>
                 <button class="library-search-toggle" type="button" aria-label="Search library" title="Search library">
                     <span class="library-search-icon" aria-hidden="true"></span>
                 </button>
@@ -38,6 +35,16 @@
                     <span class="theme-toggle-icon" aria-hidden="true">&#x263c;</span>
                 </button>
             </nav>
+            {% if active_page in ["books", "owners", "collections"] %}
+            <nav class="section-subnav" aria-label="Books">
+                <a href="owners.html" {% if active_page == "owners" %}class="active" aria-current="page"{% endif %}>Owners</a>
+                <a href="collections.html" {% if active_page == "collections" %}class="active" aria-current="page"{% endif %}>Collections</a>
+            </nav>
+            {% elif active_page in ["works", "lists"] %}
+            <nav class="section-subnav" aria-label="Works">
+                <a href="lists.html" {% if active_page == "lists" %}class="active" aria-current="page"{% endif %}>Reading lists</a>
+            </nav>
+            {% endif %}
         </header>
 
         <dialog class="library-search-dialog" aria-labelledby="library-search-title">
