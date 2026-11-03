@@ -182,6 +182,13 @@ def _build_search_index(
         details = [f'Works: {", ".join(work_titles)}'] if work_titles else []
         add_entry('Reading list', reading_list.id, reading_list.name, details)
 
+    for series in db.get_series():
+        work_titles = [
+            item.work_obj.title for item in series.works if item.work_obj
+        ]
+        details = [f'Works: {", ".join(work_titles)}'] if work_titles else []
+        add_entry('Series', series.id, series.name, details)
+
     return {'items': entries}
 
 
