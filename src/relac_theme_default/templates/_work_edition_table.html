@@ -14,6 +14,7 @@
                 <th scope="col">Release date</th>
                 <th scope="col">Type</th>
                 <th scope="col" class="right fit-content">Language</th>
+                <th scope="col" class="right fit-content">Availability</th>
             </tr>
         </thead>
         <tbody>
@@ -38,5 +39,10 @@
     </td>
     <td>{{ work_edition.edition_type.value | enum_label }}</td>
     <td class="right fit-content">{{ work_edition.language | language }}</td>
+        <td class="right fit-content">
+        <span class="availability-badge availability-{{ work_edition.availability.value }}">
+            {{ work_edition.availability.value | enum_label }}
+        </span>
+    </td>
 </tr>
 {% endmacro %}

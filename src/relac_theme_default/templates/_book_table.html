@@ -67,7 +67,10 @@
             {{ book.isbn13 | isbn }}
         </pre>
     </td>
-    <td class="right fit-content">{{ book.availability.value | enum_label }}</pre>
+    <td class="right fit-content">
+        <span class="availability-badge availability-{{ book.availability.value }}">
+            {{ book.availability.value | enum_label }}
+        </span>
     </td>
 </tr>
 {% endmacro %}

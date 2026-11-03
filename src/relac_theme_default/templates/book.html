@@ -20,7 +20,15 @@
             <h3 id="detail-title">{{ book.title }}</h2>
           </div>
           <p class="detail-badge">
-            <code>{{ book.isbn13 | isbn }}</code>
+            <span class="availability-badge availability-{{ book.availability.value }}">
+              {% if book.availability.value == "directly" %}
+                Available
+              {% elif book.availability.value == "indirectly" %}
+                Indirectly available
+              {% else %}
+                Not available
+              {% endif %}
+            </span>
           </p>
         </div>
 
@@ -56,6 +64,10 @@
               {{ book_medium | enum_label }}
               <span class="detail-small">{{ book_binding | enum_label }}</span>
             </dd>
+          </div>
+          <div class="detail-fact">
+            <dt>ISBN</dt>
+            <dd><code>{{ book.isbn13 | isbn }}</code></dd>
           </div>
         </dl>
       </section>

@@ -16,6 +16,7 @@
                 <th scope="col" class="fit-content">Structure</th>
                 <th scope="col" class="fit-content">Category</th>
                 <th scope="col" class="center fit-content">Editions</th>
+                <th scope="col" class="right fit-content">Availability</th>
             </tr>
         </thead>
         <tbody>
@@ -53,6 +54,11 @@
         <pre>
             {{ work.edition_objs | length }}
         </pre>
+    </td>
+    <td class="right fit-content">
+        <span class="availability-badge availability-{{ work.availability.value }}">
+            {{ work.availability.value | enum_label }}
+        </span>
     </td>
 </tr>
 {% endmacro %}

@@ -16,6 +16,17 @@
             <p class="detail-kind">Work</p>
             <h3 id="detail-title">{{ entity_link(work, work.title) }}</h2>
           </div>
+          <p class="detail-badge">
+            <span class="availability-badge availability-{{ work.availability.value }}">
+              {% if work.availability.value == "directly" %}
+                Available
+              {% elif work.availability.value == "indirectly" %}
+                Indirectly available
+              {% else %}
+                Not available
+              {% endif %}
+            </span>
+          </p>
         </div>
         <dl class="detail-metadata">
           <div class="detail-fact">

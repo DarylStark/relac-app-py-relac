@@ -1,9 +1,28 @@
 """Module with the models for the application."""
 
+from collections.abc import Iterable
 from datetime import date
 from enum import Enum
 
 from pydantic import BaseModel, Field
+
+
+def _aggregate_availability(
+    availabilities: Iterable[Availability],
+) -> Availability:
+    """Return the highest availability, preferring direct access."""
+    indirectly_available = False
+    for availability in availabilities:
+        if availability is Availability.DIRECTLY_AVAILABLE:
+            return Availability.DIRECTLY_AVAILABLE
+        if availability is Availability.INDIRECTLY_AVAILABLE:
+            indirectly_available = True
+
+    return (
+        Availability.INDIRECTLY_AVAILABLE
+        if indirectly_available
+        else Availability.NOT_AVAILABLE
+    )
 
 
 class ResourceBase(BaseModel):
@@ -69,6 +88,14 @@ class Work(ResourceBase):
     edition_objs: list[WorkEdition] = Field(default_factory=list)
     book_objs: list[Book] = Field(default_factory=list)
 
+    # Properties
+    @property
+    def availability(self) -> Availability:
+        """Get the availability for this edition."""
+        return _aggregate_availability(
+            book.availability for book in self.book_objs
+        )
+
 
 class WorkEditionType(Enum):
     """Work edition types."""
@@ -94,6 +121,14 @@ class WorkEdition(ResourceBase):
     # Relations (real objects)
     work_obj: Work | None = None
     book_objs: list[Book] = Field(default_factory=list)
+
+    # Properties
+    @property
+    def availability(self) -> Availability:
+        """Get the availability for this edition."""
+        return _aggregate_availability(
+            book.availability for book in self.book_objs
+        )
 
 
 class BookCollection(ResourceBase):
@@ -161,17 +196,8 @@ class Book(ResourceBase):
     @property
     def availability(self) -> Availability:
         """Get the availability for this book."""
-        indirectly_available = 0
-        for owner in self.owner_objs:
-            if owner.availability == Availability.DIRECTLY_AVAILABLE:
-                return Availability.DIRECTLY_AVAILABLE
-            elif owner.availability == Availability.INDIRECTLY_AVAILABLE:
-                indirectly_available += 1
-
-        return (
-            Availability.INDIRECTLY_AVAILABLE
-            if indirectly_available > 0
-            else Availability.NOT_AVAILABLE
+        return _aggregate_availability(
+            owner.availability for owner in self.owner_objs
         )
 
 
