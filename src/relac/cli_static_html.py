@@ -162,6 +162,19 @@ def _build_search_index(
             [detail for detail in details if detail],
         )
 
+    for owner in db.get_owners():
+        details = [
+            f'Type: {_format_enum_label(owner.owner_type.value)}',
+            f'Availability: {_format_enum_label(owner.availability.value)}',
+            f'Books: {", ".join(book.title for book in owner.book_objs)}',
+        ]
+        add_entry(
+            'Owner',
+            owner.id,
+            owner.name,
+            [detail for detail in details if not detail.endswith(': ')],
+        )
+
     for reading_list in db.get_reading_lists():
         work_titles = [
             item.work_obj.title for item in reading_list.works if item.work_obj
