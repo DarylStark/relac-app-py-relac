@@ -58,6 +58,8 @@ book.john_williams__stoner__vintage_classic_red_spine:
   medium: paperback
   work_editions:
     - work_edition.john_williams__stoner__original
+  owners:
+    - owner.library
 
 book.john_williams__stoner__epub_drm:
   isbn13: 9781448156023
@@ -67,4 +69,6 @@ book.john_williams__stoner__epub_drm:
   binding: epub-drm
   work_editions:
     - work_edition.john_williams__stoner__original
+  owners:
+    - owner.store
 #-------------------------------------------------------------------------------

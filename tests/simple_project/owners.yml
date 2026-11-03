@@ -5,3 +5,15 @@ owner.daryl:
 
 owner.example:
   name: Example owner
+  availability: not-available
+  owner_type: person
+
+owner.library:
+  name: Library
+  owner_type: library
+  availability: indirectly
+
+owner.store:
+  name: Book store
+  owner_type: store
+  availability: indirectly

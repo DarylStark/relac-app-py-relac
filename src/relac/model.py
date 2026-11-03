@@ -157,6 +157,23 @@ class Book(ResourceBase):
     collection_objs: list[BookCollection] = Field(default_factory=list)
     owner_objs: list[Owner] = Field(default_factory=list)
 
+    # Properties
+    @property
+    def availability(self) -> Availability:
+        """Get the availability for this book."""
+        indirectly_available = 0
+        for owner in self.owner_objs:
+            if owner.availability == Availability.DIRECTLY_AVAILABLE:
+                return Availability.DIRECTLY_AVAILABLE
+            elif owner.availability == Availability.INDIRECTLY_AVAILABLE:
+                indirectly_available += 1
+
+        return (
+            Availability.INDIRECTLY_AVAILABLE
+            if indirectly_available > 0
+            else Availability.NOT_AVAILABLE
+        )
+
 
 class ReadingSession(ResourceBase):
     """A reading session."""
@@ -202,10 +219,10 @@ class OwnerType(Enum):
     STORE = 'store'
 
 
-class OwnerAvailability(Enum):
+class Availability(Enum):
     """Availability for a owner."""
 
-    NOT_AVAILABLE = 'not_available'
+    NOT_AVAILABLE = 'not-available'
     DIRECTLY_AVAILABLE = 'directly'
     INDIRECTLY_AVAILABLE = 'indirectly'
 
@@ -215,7 +232,7 @@ class Owner(ResourceBase):
 
     name: str
     owner_type: OwnerType = OwnerType.UNSPECIFIED
-    availability: OwnerAvailability = OwnerAvailability.NOT_AVAILABLE
+    availability: Availability = Availability.NOT_AVAILABLE
 
     # Relationships (real objects)
     book_objs: list[Book] = Field(default_factory=list)
