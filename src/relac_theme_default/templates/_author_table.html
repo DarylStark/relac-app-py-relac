@@ -12,6 +12,9 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">State</th>
+                <th scope="col" class="right fit-content">Birthdate</th>
+                <th scope="col" class="right fit-content">Deceased date</th>
+                <th scope="col" class="right fit-content">Age</th>
                 <th scope="col" class="center fit-content">Works</th>
             </tr>
         </thead>
@@ -29,6 +32,21 @@
 <tr data-href="{{ author.id }}.html">
     <td>{{ entity_link(author, author.name) }}</td>
     <td>{{ author.state.value | enum_label }}</td>
+    <td class="center fit-content">
+        {% if author.birthdate %}
+            {{ author.birthdate }}
+        {% endif %}
+    </td>
+    <td class="center fit-content">
+        {% if author.deceased_date %}
+            {{ author.deceased_date }}
+        {% endif %}
+    </td>
+    <td class="center fit-content">
+        {% if author.birthdate %}
+            <pre>{{ author.birthdate | age(author.deceased_date) }}</pre>
+        {% endif %}
+    </td>
     <td class="center fit-content">
         <pre>
             {{ author.work_objs | length }}
