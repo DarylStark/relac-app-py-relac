@@ -36,6 +36,11 @@ def _calculate_age(
 def _format_enum_label(value: str) -> str:
     """Format enum values for display without changing their stored values."""
     labels = {
+        'unavailable': 'Unavailable',
+        'available-direct': 'Available',
+        'available-indirect': 'Available (indirect)',
+        'available-to-loan': 'Available to loan',
+        'available-to-buy': 'Available to buy',
         'ebook': 'eBook',
         'epub': 'ePub',
         'epub-drm': 'ePub (DRM)',

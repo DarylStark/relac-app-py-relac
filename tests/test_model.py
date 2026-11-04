@@ -6,46 +6,102 @@ from relac.model import (
     Availability,
     Book,
     Owner,
+    OwnerType,
+    ResourceAvailability,
+    Work,
     WorkEdition,
 )
 
 
 @pytest.mark.parametrize(
-    ('owner_availabilities', 'expected'),
+    ('owners', 'expected'),
     [
-        ([], Availability.NOT_AVAILABLE),
-        ([Availability.NOT_AVAILABLE], Availability.NOT_AVAILABLE),
+        ([], ResourceAvailability.UNAVAILABLE),
         (
-            [Availability.INDIRECTLY_AVAILABLE],
-            Availability.INDIRECTLY_AVAILABLE,
+            [
+                (OwnerType.PERSON, Availability.NOT_AVAILABLE),
+            ],
+            ResourceAvailability.UNAVAILABLE,
         ),
         (
             [
-                Availability.INDIRECTLY_AVAILABLE,
-                Availability.DIRECTLY_AVAILABLE,
+                (OwnerType.PERSON, Availability.INDIRECTLY_AVAILABLE),
             ],
-            Availability.DIRECTLY_AVAILABLE,
+            ResourceAvailability.AVAILABLE_INDIRECT,
+        ),
+        (
+            [
+                (OwnerType.PERSON, Availability.DIRECTLY_AVAILABLE),
+            ],
+            ResourceAvailability.AVAILABLE_DIRECT,
+        ),
+        (
+            [
+                (OwnerType.LIBRARY, Availability.DIRECTLY_AVAILABLE),
+            ],
+            ResourceAvailability.AVAILABLE_TO_LOAN,
+        ),
+        (
+            [
+                (OwnerType.STORE, Availability.DIRECTLY_AVAILABLE),
+            ],
+            ResourceAvailability.AVAILABLE_TO_BUY,
+        ),
+        (
+            [
+                (OwnerType.LIBRARY, Availability.INDIRECTLY_AVAILABLE),
+                (OwnerType.STORE, Availability.INDIRECTLY_AVAILABLE),
+            ],
+            ResourceAvailability.UNAVAILABLE,
         ),
     ],
 )
 def test_book_availability(
-    owner_availabilities: list[Availability], expected: Availability
+    owners: list[tuple[OwnerType, Availability]],
+    expected: ResourceAvailability,
 ) -> None:
-    """Aggregate owner availability with direct access taking precedence."""
+    """Aggregate availability from each owner's type and access level."""
     book = Book(
         isbn13=9781234567897,
         title='Test Book',
         owner_objs=[
-            Owner(name=str(index), availability=availability)
-            for index, availability in enumerate(owner_availabilities)
+            Owner(
+                name=str(index),
+                owner_type=owner_type,
+                availability=availability,
+            )
+            for index, (owner_type, availability) in enumerate(owners)
         ],
     )
 
     assert book.availability is expected
 
 
-def test_work_edition_availability_uses_book_availability() -> None:
-    """Aggregate book availability with direct access taking precedence."""
+def test_work_availability_uses_book_owners() -> None:
+    """Aggregate availability from owners across the work's books."""
+    work = Work(
+        title='Test Work',
+        authors=[],
+        book_objs=[
+            Book(
+                isbn13=9781234567897,
+                title='Indirect Book',
+                owner_objs=[
+                    Owner(
+                        name='Person',
+                        owner_type=OwnerType.PERSON,
+                        availability=Availability.INDIRECTLY_AVAILABLE,
+                    )
+                ],
+            ),
+        ],
+    )
+
+    assert work.availability is ResourceAvailability.AVAILABLE_INDIRECT
+
+
+def test_work_edition_availability_uses_book_owners() -> None:
+    """Aggregate availability from owners across the edition's books."""
     edition = WorkEdition(
         title='Test Edition',
         work='test_work',
@@ -56,6 +112,7 @@ def test_work_edition_availability_uses_book_availability() -> None:
                 owner_objs=[
                     Owner(
                         name='Library',
+                        owner_type=OwnerType.LIBRARY,
                         availability=Availability.INDIRECTLY_AVAILABLE,
                     )
                 ],
@@ -65,7 +122,8 @@ def test_work_edition_availability_uses_book_availability() -> None:
                 title='Direct Book',
                 owner_objs=[
                     Owner(
-                        name='Shelf',
+                        name='Library',
+                        owner_type=OwnerType.LIBRARY,
                         availability=Availability.DIRECTLY_AVAILABLE,
                     )
                 ],
@@ -73,4 +131,4 @@ def test_work_edition_availability_uses_book_availability() -> None:
         ],
     )
 
-    assert edition.availability is Availability.DIRECTLY_AVAILABLE
+    assert edition.availability is ResourceAvailability.AVAILABLE_TO_LOAN

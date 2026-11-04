@@ -3,17 +3,22 @@ owner.daryl:
   owner_type: person
   availability: directly
 
-owner.example:
-  name: Example owner
+owner.example_indirect:
+  name: Indirect available owner
+  availability: indirectly
+  owner_type: person
+
+owner.example_unavailable:
+  name: Unavailble owner
   availability: not-available
   owner_type: person
 
 owner.library:
   name: Library
   owner_type: library
-  availability: indirectly
+  availability: directly
 
 owner.store:
   name: Book store
   owner_type: store
-  availability: indirectly
+  availability: directly
