@@ -18,34 +18,39 @@
 
     <main class="page-shell">
         <header class="page-header">
-            <div class="page-title-group">
-                <h1>Relac library</h1>
-                <p class="page-subtitle">All books!</p>
+            <div class="page-header-top">
+                <div class="page-title-group">
+                    <h1>Relac library</h1>
+                    <p class="page-subtitle">All books!</p>
+                </div>
+                <div class="utility-tools" role="group" aria-label="Library tools">
+                    <button class="library-search-toggle" type="button" aria-label="Search library" title="Search library">
+                        <span class="library-search-icon" aria-hidden="true"></span>
+                    </button>
+                    <button class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme">
+                        <span class="theme-toggle-icon" aria-hidden="true">&#x263c;</span>
+                    </button>
+                </div>
             </div>
 
             <nav class="tab-nav">
                 <a href="index.html" {% if active_page == "overview" %}class="active" aria-current="page"{% endif %}>Overview</a>
                 <a href="authors.html" {% if active_page == "authors" %}class="active" aria-current="page"{% endif %}>Authors</a>
                 <a href="works.html" {% if active_page in ["works", "lists", "series"] %}class="active"{% if active_page == "works" %} aria-current="page"{% endif %}{% endif %}>Works</a>
+                {% if active_page in ["works", "lists", "series"] %}
+                <div class="nav-submenu" role="group" aria-label="Works">
+                    <a href="series.html" {% if active_page == "series" %}class="active" aria-current="page"{% endif %}>Series</a>
+                    <a href="lists.html" {% if active_page == "lists" %}class="active" aria-current="page"{% endif %}>Reading lists</a>
+                </div>
+                {% endif %}
                 <a href="books.html" {% if active_page in ["books", "owners", "collections"] %}class="active"{% if active_page == "books" %} aria-current="page"{% endif %}{% endif %}>Books</a>
-                <button class="library-search-toggle" type="button" aria-label="Search library" title="Search library">
-                    <span class="library-search-icon" aria-hidden="true"></span>
-                </button>
-                <button class="theme-toggle" type="button" aria-label="Switch to light theme" title="Switch to light theme">
-                    <span class="theme-toggle-icon" aria-hidden="true">&#x263c;</span>
-                </button>
+                {% if active_page in ["books", "owners", "collections"] %}
+                <div class="nav-submenu" role="group" aria-label="Books">
+                    <a href="owners.html" {% if active_page == "owners" %}class="active" aria-current="page"{% endif %}>Owners</a>
+                    <a href="collections.html" {% if active_page == "collections" %}class="active" aria-current="page"{% endif %}>Collections</a>
+                </div>
+                {% endif %}
             </nav>
-            {% if active_page in ["books", "owners", "collections"] %}
-            <nav class="section-subnav" aria-label="Books">
-                <a href="owners.html" {% if active_page == "owners" %}class="active" aria-current="page"{% endif %}>Owners</a>
-                <a href="collections.html" {% if active_page == "collections" %}class="active" aria-current="page"{% endif %}>Collections</a>
-            </nav>
-            {% elif active_page in ["works", "lists", "series"] %}
-            <nav class="section-subnav" aria-label="Works">
-                <a href="series.html" {% if active_page == "series" %}class="active" aria-current="page"{% endif %}>Series</a>
-                <a href="lists.html" {% if active_page == "lists" %}class="active" aria-current="page"{% endif %}>Reading lists</a>
-            </nav>
-            {% endif %}
         </header>
 
         <dialog class="library-search-dialog" aria-labelledby="library-search-title">

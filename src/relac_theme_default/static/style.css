@@ -65,7 +65,6 @@ body
 main.page-shell
 {
     width: 100%;
-    max-width: 1200px;
     margin: 0 auto;
     padding: 44px 32px 64px;
 }
@@ -78,6 +77,17 @@ main.page-shell
     justify-content: space-between;
     gap: 8px 24px;
     margin-bottom: 28px;
+}
+
+.page-header-top
+{
+    display: flex;
+    flex: 1 0 100%;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    min-width: 0;
 }
 
 h1
@@ -127,6 +137,20 @@ h1
     cursor: pointer;
 }
 
+.utility-tools
+{
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    margin-left: auto;
+    padding: 5px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface);
+    box-shadow: 0 4px 16px var(--menu-shadow);
+}
+
 .library-search-toggle
 {
     display: inline-flex;
@@ -162,19 +186,19 @@ h1
 {
     position: relative;
     display: block;
-    width: 16px;
-    height: 16px;
-    border: 1.7px solid currentColor;
+    width: 12px;
+    height: 12px;
+    border: 1.5px solid currentColor;
     border-radius: 50%;
 }
 
 .library-search-icon::after
 {
     position: absolute;
-    right: -5px;
-    bottom: -3px;
-    width: 7px;
-    height: 1.7px;
+    right: -4px;
+    bottom: -2px;
+    width: 5px;
+    height: 1.5px;
     border-radius: 2px;
     background: currentColor;
     content: "";
@@ -775,66 +799,81 @@ a:hover
 nav.tab-nav
 {
     display: flex;
-    flex: 1;
+    flex: 1 0 100%;
     flex-wrap: nowrap;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: flex-start;
     min-width: 0;
-    padding: 4px;
-    gap: 4px;
-}
-
-nav.section-subnav
-{
-    display: flex;
-    flex: 1 0 100%;
-    align-items: center;
-    justify-content: flex-end;
-    min-width: 0;
-    padding: 0 4px;
-    gap: 4px;
+    min-height: 56px;
+    padding: 5px 8px;
+    gap: 6px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--hover-surface);
 }
 
 nav.tab-nav a,
-nav.section-subnav a
+.nav-submenu a
 {
     flex: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-height: 40px;
+    min-height: 36px;
     color: var(--muted);
-    border-radius: 999px;
+    border-radius: 4px;
     border: none;
-    padding: 8px 16px;
+    padding: 7px 14px;
     font: inherit;
     font-size: 13px;
+    font-weight: 600;
     white-space: nowrap;
     text-decoration: none;
     background: var(--transparent);
 }
 
 nav.tab-nav a:hover,
-nav.section-subnav a:hover
+.nav-submenu a:hover
 {
     color: var(--text);
     background: var(--hover-surface);
 }
 
 nav.tab-nav a.active,
-nav.section-subnav a.active
+.nav-submenu a.active
 {
     color: var(--accent-text);
     background: var(--accent);
     font-weight: bold;
+    box-shadow: none;
 }
 
 nav.tab-nav a:focus-visible,
-nav.section-subnav a:focus-visible
+.nav-submenu a:focus-visible
 {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
+}
+
+.nav-submenu
+{
+    display: flex;
+    flex: none;
+    align-items: center;
+    gap: 2px;
+    margin-left: 2px;
+    padding: 3px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--surface);
+}
+
+.nav-submenu a
+{
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 12px;
 }
 
 div.statistics
@@ -947,7 +986,7 @@ nav.breadcrumbs [aria-current="page"]
         justify-content: flex-start;
         width: 100%;
         flex-wrap: nowrap;
-        padding: 4px 0;
+        padding: 5px 8px;
         overflow-x: auto;
         overflow-y: hidden;
         overscroll-behavior-x: contain;
@@ -958,14 +997,6 @@ nav.breadcrumbs [aria-current="page"]
     nav.tab-nav::-webkit-scrollbar
     {
         display: none;
-    }
-
-    nav.section-subnav
-    {
-        justify-content: flex-end;
-        width: 100%;
-        flex-wrap: wrap;
-        padding: 4px 0;
     }
 
     div.statistics
@@ -982,7 +1013,7 @@ nav.breadcrumbs [aria-current="page"]
     }
 
     nav.tab-nav a,
-    nav.section-subnav a
+    .nav-submenu a
     {
         padding: 8px 12px;
         font-size: 12px;

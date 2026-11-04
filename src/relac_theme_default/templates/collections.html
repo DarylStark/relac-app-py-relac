@@ -2,9 +2,11 @@
 {% set active_page = "collections" %}
 
 {% from "_collection_table.html" import collection_table %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% block content %}
     <div class="content">
+        {{ breadcrumbs([("Books", "books.html"), ("Collections", none)]) }}
         {{ collection_table(collections, "Collections") }}
     </div>
 {% endblock %}

@@ -2,9 +2,11 @@
 {% set active_page = "lists" %}
 
 {% from "_list_table.html" import list_table %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% block content %}
     <div class="content">
+        {{ breadcrumbs([("Works", "works.html"), ("Reading lists", none)]) }}
         {{ list_table(lists, "Lists") }}
     </div>
 {% endblock %}
