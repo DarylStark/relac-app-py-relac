@@ -283,6 +283,13 @@ class WorkEdition(ResourceBase):
 
         return ReadingState.NOT_READ
 
+    @property
+    def authors(self) -> list[Author]:
+        """Retrieve the authors for this WorkEdition."""
+        if not self.work_obj:
+            return []
+        return self.work_obj.author_objs
+
 
 class BookCollection(ResourceBase):
     """A collection of books."""
