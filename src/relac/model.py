@@ -7,22 +7,48 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 
-def _aggregate_availability(
-    availabilities: Iterable[Availability],
-) -> Availability:
-    """Return the highest availability, preferring direct access."""
-    indirectly_available = False
-    for availability in availabilities:
-        if availability is Availability.DIRECTLY_AVAILABLE:
-            return Availability.DIRECTLY_AVAILABLE
-        if availability is Availability.INDIRECTLY_AVAILABLE:
-            indirectly_available = True
+class ResourceAvailability(Enum):
+    """Availability for resources."""
 
-    return (
-        Availability.INDIRECTLY_AVAILABLE
-        if indirectly_available
-        else Availability.NOT_AVAILABLE
-    )
+    UNAVAILABLE = 'unavailable'
+    AVAILABLE_DIRECT = 'available-direct'
+    AVAILABLE_INDIRECT = 'available-indirect'
+    AVAILABLE_TO_LOAN = 'available-to-loan'
+    AVAILABLE_TO_BUY = 'available-to-buy'
+
+
+def _aggregate_availability(
+    owners: Iterable[Owner],
+) -> ResourceAvailability:
+    """Aggregate owner availability using owner type and access level."""
+    owner_list = tuple(owners)
+
+    if any(
+        owner.owner_type == OwnerType.PERSON
+        and owner.availability == Availability.DIRECTLY_AVAILABLE
+        for owner in owner_list
+    ):
+        return ResourceAvailability.AVAILABLE_DIRECT
+    if any(
+        owner.owner_type == OwnerType.PERSON
+        and owner.availability == Availability.INDIRECTLY_AVAILABLE
+        for owner in owner_list
+    ):
+        return ResourceAvailability.AVAILABLE_INDIRECT
+    if any(
+        owner.owner_type == OwnerType.LIBRARY
+        and owner.availability == Availability.DIRECTLY_AVAILABLE
+        for owner in owner_list
+    ):
+        return ResourceAvailability.AVAILABLE_TO_LOAN
+    if any(
+        owner.owner_type == OwnerType.STORE
+        and owner.availability == Availability.DIRECTLY_AVAILABLE
+        for owner in owner_list
+    ):
+        return ResourceAvailability.AVAILABLE_TO_BUY
+
+    return ResourceAvailability.UNAVAILABLE
 
 
 class ResourceBase(BaseModel):
@@ -91,10 +117,10 @@ class Work(ResourceBase):
 
     # Properties
     @property
-    def availability(self) -> Availability:
+    def availability(self) -> ResourceAvailability:
         """Get the availability for this edition."""
         return _aggregate_availability(
-            book.availability for book in self.book_objs
+            owner for book in self.book_objs for owner in book.owner_objs
         )
 
 
@@ -125,10 +151,10 @@ class WorkEdition(ResourceBase):
 
     # Properties
     @property
-    def availability(self) -> Availability:
+    def availability(self) -> ResourceAvailability:
         """Get the availability for this edition."""
         return _aggregate_availability(
-            book.availability for book in self.book_objs
+            owner for book in self.book_objs for owner in book.owner_objs
         )
 
 
@@ -195,11 +221,9 @@ class Book(ResourceBase):
 
     # Properties
     @property
-    def availability(self) -> Availability:
+    def availability(self) -> ResourceAvailability:
         """Get the availability for this book."""
-        return _aggregate_availability(
-            owner.availability for owner in self.owner_objs
-        )
+        return _aggregate_availability(self.owner_objs)
 
 
 class ReadingSession(ResourceBase):

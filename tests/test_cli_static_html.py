@@ -2,7 +2,13 @@
 
 from datetime import date
 
-from relac.cli_static_html import _build_search_index, _calculate_age
+import pytest
+
+from relac.cli_static_html import (
+    _build_search_index,
+    _calculate_age,
+    _format_enum_label,
+)
 from relac.database import Database
 from relac.model import (
     Author,
@@ -10,6 +16,7 @@ from relac.model import (
     Book,
     Owner,
     OwnerType,
+    ResourceAvailability,
     Series,
 )
 
@@ -32,6 +39,23 @@ def test_calculate_age_at_death() -> None:
 def test_calculate_age_without_birthdate() -> None:
     """Do not show an age when the birthdate is unknown."""
     assert _calculate_age(None, date(2026, 7, 15)) is None
+
+
+@pytest.mark.parametrize(
+    ('availability', 'expected'),
+    [
+        (ResourceAvailability.UNAVAILABLE, 'Unavailable'),
+        (ResourceAvailability.AVAILABLE_DIRECT, 'Available'),
+        (ResourceAvailability.AVAILABLE_INDIRECT, 'Available (indirect)'),
+        (ResourceAvailability.AVAILABLE_TO_LOAN, 'Available to loan'),
+        (ResourceAvailability.AVAILABLE_TO_BUY, 'Available to buy'),
+    ],
+)
+def test_resource_availability_labels(
+    availability: ResourceAvailability, expected: str
+) -> None:
+    """Format the new resource availability values for display."""
+    assert _format_enum_label(availability.value) == expected
 
 
 def test_build_search_index_includes_book_metadata_and_url() -> None:

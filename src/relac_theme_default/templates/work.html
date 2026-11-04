@@ -19,13 +19,7 @@
           </div>
           <p class="detail-badge">
             <span class="availability-badge availability-{{ work.availability.value }}">
-              {% if work.availability.value == "directly" %}
-                Available
-              {% elif work.availability.value == "indirectly" %}
-                Indirectly available
-              {% else %}
-                Not available
-              {% endif %}
+              {{ work.availability.value | enum_label }}
             </span>
           </p>
         </div>

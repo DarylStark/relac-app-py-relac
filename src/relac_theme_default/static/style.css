@@ -1139,7 +1139,7 @@ table.resources tbody tr.table-empty-state td {
 .availability-counts
 {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-end;
     gap: 5px;
@@ -1165,38 +1165,48 @@ table.resources tbody tr.table-empty-state td {
     font-weight: 700;
 }
 
-.availability-directly
+.availability-directly,
+.availability-available-direct
 {
     border-color: rgb(39 145 83 / 0.45);
     color: rgb(24, 112, 62);
     background: rgb(39 174 96 / 0.14);
 }
 
-.availability-indirectly
+.availability-indirectly,
+.availability-available-indirect,
+.availability-available-to-loan,
+.availability-available-to-buy
 {
     border-color: rgb(202 124 22 / 0.5);
     color: rgb(150, 87, 10);
     background: rgb(243 156 18 / 0.16);
 }
 
-.availability-not-available
+.availability-not-available,
+.availability-unavailable
 {
     border-color: rgb(194 65 65 / 0.5);
     color: rgb(159, 43, 43);
     background: rgb(220 53 69 / 0.14);
 }
 
-.dark .availability-directly
+.dark .availability-directly,
+.dark .availability-available-direct
 {
     color: rgb(127, 224, 161);
 }
 
-.dark .availability-indirectly
+.dark .availability-indirectly,
+.dark .availability-available-indirect,
+.dark .availability-available-to-loan,
+.dark .availability-available-to-buy
 {
     color: rgb(255, 190, 100);
 }
 
-.dark .availability-not-available
+.dark .availability-not-available,
+.dark .availability-unavailable
 {
     color: rgb(255, 145, 145);
 }

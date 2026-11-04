@@ -60,6 +60,7 @@ book.john_williams__stoner__vintage_classic_red_spine:
     - work_edition.john_williams__stoner__original
   owners:
     - owner.library
+    - owner.store
 
 book.john_williams__stoner__epub_drm:
   isbn13: 9781448156023
@@ -70,5 +71,5 @@ book.john_williams__stoner__epub_drm:
   work_editions:
     - work_edition.john_williams__stoner__original
   owners:
-    - owner.store
+    - owner.daryl
 #-------------------------------------------------------------------------------

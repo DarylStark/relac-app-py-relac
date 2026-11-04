@@ -1,25 +1,33 @@
 {% macro availability_cell(items) -%}
-{% set counts = namespace(direct=0, indirect=0, unavailable=0) %}
+{% set counts = namespace(available=0, indirect=0, loan=0, buy=0, unavailable=0) %}
 {% for item in items %}
     {% if item.work_obj %}
-        {% if item.work_obj.availability.value == "directly" %}
-            {% set counts.direct = counts.direct + 1 %}
-        {% elif item.work_obj.availability.value == "indirectly" %}
+        {% if item.work_obj.availability.value == "available-direct" %}
+            {% set counts.available = counts.available + 1 %}
+        {% elif item.work_obj.availability.value == "available-indirect" %}
             {% set counts.indirect = counts.indirect + 1 %}
+        {% elif item.work_obj.availability.value == "available-to-loan" %}
+            {% set counts.loan = counts.loan + 1 %}
+        {% elif item.work_obj.availability.value == "available-to-buy" %}
+            {% set counts.buy = counts.buy + 1 %}
         {% else %}
             {% set counts.unavailable = counts.unavailable + 1 %}
         {% endif %}
     {% endif %}
 {% endfor %}
 {% set filter_values = [] %}
-{% if counts.direct > 0 %}{% set _ = filter_values.append("Directly available") %}{% endif %}
-{% if counts.indirect > 0 %}{% set _ = filter_values.append("Indirectly available") %}{% endif %}
-{% if counts.unavailable > 0 %}{% set _ = filter_values.append("Not available") %}{% endif %}
+{% if counts.available > 0 %}{% set _ = filter_values.append("Available") %}{% endif %}
+{% if counts.indirect > 0 %}{% set _ = filter_values.append("Available (indirect)") %}{% endif %}
+{% if counts.loan > 0 %}{% set _ = filter_values.append("Available to loan") %}{% endif %}
+{% if counts.buy > 0 %}{% set _ = filter_values.append("Available to buy") %}{% endif %}
+{% if counts.unavailable > 0 %}{% set _ = filter_values.append("Unavailable") %}{% endif %}
 <td class="right fit-content availability-cell" data-filter-values='{{ filter_values | tojson }}'>
 <span class="availability-counts" role="group" aria-label="Work availability totals">
-    <span class="availability-count availability-directly" aria-label="Directly available: {{ counts.direct }}" title="Directly available">{{ counts.direct }}</span>
-    <span class="availability-count availability-indirectly" aria-label="Indirectly available: {{ counts.indirect }}" title="Indirectly available">{{ counts.indirect }}</span>
-    <span class="availability-count availability-not-available" aria-label="Not available: {{ counts.unavailable }}" title="Not available">{{ counts.unavailable }}</span>
+    <span class="availability-count availability-directly" aria-label="Available: {{ counts.available }}" title="Available">{{ counts.available }}</span>
+    <span class="availability-count availability-indirectly" aria-label="Available (indirect): {{ counts.indirect }}" title="Available (indirect)">{{ counts.indirect }}</span>
+    <span class="availability-count availability-indirectly" aria-label="Available to loan: {{ counts.loan }}" title="Available to loan">{{ counts.loan }}</span>
+    <span class="availability-count availability-indirectly" aria-label="Available to buy: {{ counts.buy }}" title="Available to buy">{{ counts.buy }}</span>
+    <span class="availability-count availability-not-available" aria-label="Unavailable: {{ counts.unavailable }}" title="Unavailable">{{ counts.unavailable }}</span>
 </span>
 </td>
 {%- endmacro %}
