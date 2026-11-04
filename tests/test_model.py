@@ -5,6 +5,7 @@ from datetime import date, timedelta
 import pytest
 
 from relac.model import (
+    Author,
     Availability,
     Book,
     Owner,
@@ -247,6 +248,51 @@ def test_book_reading_counts_deduplicate_works() -> None:
     assert book.dnf_count == 1
     assert book.not_read_count == 1
     assert book.read_percentage == 20.0
+
+
+def test_author_reading_counts_and_percentage() -> None:
+    """Count author works by reading state and calculate finished percentage."""
+    states = [
+        ReadingState.FINISHED,
+        ReadingState.READING,
+        ReadingState.PAUSED,
+        ReadingState.DID_NOT_FINISH,
+        ReadingState.NOT_READ,
+    ]
+    works = []
+    for index, state in enumerate(states):
+        edition = WorkEdition(
+            title=f'Edition {index}',
+            work=f'work-{index}',
+            reading_session_objs=(
+                []
+                if state is ReadingState.NOT_READ
+                else [
+                    ReadingSession(
+                        work_edition=f'edition-{index}',
+                        book='book',
+                        state=state,
+                    )
+                ]
+            ),
+        )
+        works.append(
+            Work(
+                title=f'Work {index}',
+                authors=[],
+                edition_objs=[edition],
+            )
+        )
+
+    author = Author(name='Test Author', work_objs=works)
+
+    assert author.read_count == 1
+    assert author.reading_count == 1
+    assert author.paused_count == 1
+    assert author.dnf_count == 1
+    assert author.not_read_count == 1
+    assert author.read_percentage == 20.0
+    assert Author(name='Empty Author').read_percentage == 0.0
 
 
 @pytest.mark.parametrize(

@@ -77,6 +77,60 @@ class Author(ResourceBase):
     work_objs: list[Work] = Field(default_factory=list)
     book_objs: list[Book] = Field(default_factory=list)
 
+    def _get_works_with_specific_reading_state(
+        self, reading_state: ReadingState
+    ) -> list[Work]:
+        return [
+            work
+            for work in self.work_objs
+            if work.reading_state == reading_state
+        ]
+
+    @property
+    def read_count(self) -> int:
+        """Get the number of finished works by this author."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.FINISHED)
+        )
+
+    @property
+    def reading_count(self) -> int:
+        """Get the number of works being read by this author."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.READING)
+        )
+
+    @property
+    def paused_count(self) -> int:
+        """Get the number of paused works by this author."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.PAUSED)
+        )
+
+    @property
+    def dnf_count(self) -> int:
+        """Get the number of unfinished works by this author."""
+        return len(
+            self._get_works_with_specific_reading_state(
+                ReadingState.DID_NOT_FINISH
+            )
+        )
+
+    @property
+    def not_read_count(self) -> int:
+        """Get the number of unread works by this author."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.NOT_READ)
+        )
+
+    @property
+    def read_percentage(self) -> float:
+        """Get the percentage of this author's works that are finished."""
+        if not self.work_objs:
+            return 0.0
+
+        return self.read_count / len(self.work_objs) * 100
+
 
 class WorkType(Enum):
     """Work types."""
