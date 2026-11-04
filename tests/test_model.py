@@ -67,6 +67,36 @@ def test_reading_session_uses_today_for_open_reading_session() -> None:
     assert session.duration == timedelta(days=5)
 
 
+def test_work_reading_sessions_aggregate_from_editions() -> None:
+    """Expose reading sessions from every work edition."""
+    sessions = [
+        ReadingSession(
+            work_edition='edition-1',
+            book='book-1',
+            state=ReadingState.READING,
+        ),
+        ReadingSession(
+            work_edition='edition-2',
+            book='book-2',
+            state=ReadingState.FINISHED,
+        ),
+    ]
+    work = Work(
+        title='Test Work',
+        authors=[],
+        edition_objs=[
+            WorkEdition(
+                title=f'Edition {index}',
+                work='test_work',
+                reading_session_objs=[session],
+            )
+            for index, session in enumerate(sessions, start=1)
+        ],
+    )
+
+    assert work.reading_session_objs == sessions
+
+
 @pytest.mark.parametrize(
     ('states', 'expected'),
     [

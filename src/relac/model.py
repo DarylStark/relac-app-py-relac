@@ -156,6 +156,15 @@ class Work(ResourceBase):
 
         return ReadingState.NOT_READ
 
+    @property
+    def reading_session_objs(self) -> list[ReadingSession]:
+        """Get reading sessions from all editions of this work."""
+        return [
+            reading_session
+            for edition in self.edition_objs
+            for reading_session in edition.reading_session_objs
+        ]
+
 
 class WorkEditionType(Enum):
     """Work edition types."""
