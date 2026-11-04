@@ -9,9 +9,13 @@ from relac.model import (
     Book,
     Owner,
     OwnerType,
+    ReadingList,
+    ReadingListItem,
     ReadingSession,
     ReadingState,
     ResourceAvailability,
+    Series,
+    SeriesItem,
     Work,
     WorkEdition,
 )
@@ -61,6 +65,103 @@ def test_reading_session_uses_today_for_open_reading_session() -> None:
 
     assert session.effective_enddate == today
     assert session.duration == timedelta(days=5)
+
+
+@pytest.mark.parametrize(
+    ('states', 'expected'),
+    [
+        ([], 0.0),
+        ([ReadingState.FINISHED, ReadingState.READING], 50.0),
+        ([ReadingState.FINISHED, ReadingState.FINISHED], 100.0),
+    ],
+)
+def test_reading_list_read_percentage(
+    states: list[ReadingState], expected: float
+) -> None:
+    """Calculate the percentage of listed works that have been finished."""
+    works = []
+    for index, state in enumerate(states):
+        edition = WorkEdition(
+            title=f'Edition {index}',
+            work=f'work-{index}',
+            reading_session_objs=(
+                [
+                    ReadingSession(
+                        work_edition=f'edition-{index}',
+                        book='book',
+                        state=state,
+                    )
+                ]
+                if state is not ReadingState.NOT_READ
+                else []
+            ),
+        )
+        work = Work(
+            title=f'Work {index}',
+            authors=[],
+            edition_objs=[edition],
+        )
+        works.append(
+            ReadingListItem(
+                order=index,
+                work=f'work-{index}',
+                work_obj=work,
+            )
+        )
+
+    reading_list = ReadingList(name='Test list', works=works)
+
+    assert reading_list.read_percentage == expected
+
+
+def test_series_reading_counts_and_percentage() -> None:
+    """Count works by reading state and calculate the finished percentage."""
+    states = [
+        ReadingState.FINISHED,
+        ReadingState.READING,
+        ReadingState.PAUSED,
+        ReadingState.DID_NOT_FINISH,
+        ReadingState.NOT_READ,
+    ]
+    works = []
+    for index, state in enumerate(states):
+        edition = WorkEdition(
+            title=f'Edition {index}',
+            work=f'work-{index}',
+            reading_session_objs=(
+                []
+                if state is ReadingState.NOT_READ
+                else [
+                    ReadingSession(
+                        work_edition=f'edition-{index}',
+                        book='book',
+                        state=state,
+                    )
+                ]
+            ),
+        )
+        work = Work(
+            title=f'Work {index}',
+            authors=[],
+            edition_objs=[edition],
+        )
+        works.append(
+            SeriesItem(
+                number=index,
+                work=f'work-{index}',
+                work_obj=work,
+            )
+        )
+
+    series = Series(name='Test series', works=works)
+
+    assert series.read_count == 1
+    assert series.reading_count == 1
+    assert series.paused_count == 1
+    assert series.dnf_count == 1
+    assert series.not_read_count == 1
+    assert series.read_percentage == 20.0
+    assert Series(name='Empty series').read_percentage == 0.0
 
 
 @pytest.mark.parametrize(

@@ -343,6 +343,8 @@ class ReadingListItem(ResourceBase):
 
     order: int
     work: str
+
+    # Relationships (real objects)
     work_obj: Work | None = None
 
 
@@ -351,6 +353,62 @@ class ReadingList(ResourceBase):
 
     name: str
     works: list[ReadingListItem] = Field(default_factory=list)
+
+    def _get_works_with_specific_reading_state(
+        self, reading_state: ReadingState
+    ) -> list[Work]:
+        return [
+            work.work_obj
+            for work in self.works
+            if work.work_obj is not None
+            and work.work_obj.reading_state == reading_state
+        ]
+
+    # Properties
+    @property
+    def read_count(self) -> int:
+        """Get the number of works that are read in this list."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.FINISHED)
+        )
+
+    @property
+    def reading_count(self) -> int:
+        """Get the number of works that are being read in this list."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.READING)
+        )
+
+    @property
+    def dnf_count(self) -> int:
+        """Get the number of works that are are not finished in this list."""
+        return len(
+            self._get_works_with_specific_reading_state(
+                ReadingState.DID_NOT_FINISH
+            )
+        )
+
+    @property
+    def paused_count(self) -> int:
+        """Get the number of works that are are paused in this list."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.PAUSED)
+        )
+
+    @property
+    def not_read_count(self) -> int:
+        """Get the number of works that are are not read in this list."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.NOT_READ)
+        )
+
+    @property
+    def read_percentage(self) -> float:
+        """Get the percentage of works in this list that are finished."""
+        if not self.works:
+            return 0.0
+
+        return self.read_count / len(self.works) * 100
 
 
 class OwnerType(Enum):
@@ -396,3 +454,58 @@ class Series(ResourceBase):
 
     name: str
     works: list[SeriesItem] = Field(default_factory=list)
+
+    def _get_works_with_specific_reading_state(
+        self, reading_state: ReadingState
+    ) -> list[Work]:
+        return [
+            item.work_obj
+            for item in self.works
+            if item.work_obj is not None
+            and item.work_obj.reading_state == reading_state
+        ]
+
+    @property
+    def read_count(self) -> int:
+        """Get the number of finished works in this series."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.FINISHED)
+        )
+
+    @property
+    def reading_count(self) -> int:
+        """Get the number of works being read in this series."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.READING)
+        )
+
+    @property
+    def dnf_count(self) -> int:
+        """Get the number of unfinished works in this series."""
+        return len(
+            self._get_works_with_specific_reading_state(
+                ReadingState.DID_NOT_FINISH
+            )
+        )
+
+    @property
+    def paused_count(self) -> int:
+        """Get the number of paused works in this series."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.PAUSED)
+        )
+
+    @property
+    def not_read_count(self) -> int:
+        """Get the number of unread works in this series."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.NOT_READ)
+        )
+
+    @property
+    def read_percentage(self) -> float:
+        """Get the percentage of works in this series that are finished."""
+        if not self.works:
+            return 0.0
+
+        return self.read_count / len(self.works) * 100
