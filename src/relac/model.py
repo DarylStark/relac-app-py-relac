@@ -123,6 +123,39 @@ class Work(ResourceBase):
             owner for book in self.book_objs for owner in book.owner_objs
         )
 
+    @property
+    def reading_state(self) -> ReadingState:
+        """Property for reading states."""
+        if any(
+            edition.reading_state == ReadingState.FINISHED
+            for edition in self.edition_objs
+            if edition.edition_type != WorkEditionType.ABRIGED
+        ):
+            return ReadingState.FINISHED
+
+        if any(
+            edition.reading_state == ReadingState.READING
+            for edition in self.edition_objs
+            if edition.edition_type != WorkEditionType.ABRIGED
+        ):
+            return ReadingState.READING
+
+        if any(
+            edition.reading_state == ReadingState.PAUSED
+            for edition in self.edition_objs
+            if edition.edition_type != WorkEditionType.ABRIGED
+        ):
+            return ReadingState.PAUSED
+
+        if any(
+            edition.reading_state == ReadingState.DID_NOT_FINISH
+            for edition in self.edition_objs
+            if edition.edition_type != WorkEditionType.ABRIGED
+        ):
+            return ReadingState.DID_NOT_FINISH
+
+        return ReadingState.NOT_READ
+
 
 class WorkEditionType(Enum):
     """Work edition types."""
