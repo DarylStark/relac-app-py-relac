@@ -72,6 +72,7 @@ class Author(ResourceBase):
     state: AuthorState = AuthorState.UNSPECIFIED
     birthdate: date | None = None
     deceased_date: date | None = None
+    countries: list[str] = Field(default_factory=list)
 
     # Relation (real objects)
     work_objs: list[Work] = Field(default_factory=list)

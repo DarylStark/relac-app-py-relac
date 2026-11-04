@@ -27,6 +27,12 @@
                 <span>{{ author.birthdate }}</span>
             </dd>
           </div>
+          {% if author.countries %}
+          <div class="detail-fact">
+            <dt>Countries</dt>
+            <dd>{{ author.countries | map("country") | join(", ") }}</dd>
+          </div>
+          {% endif %}
           {% if author.deceased_date %}
           <div class="detail-fact">
                 <dt>Deceased date</dt>
