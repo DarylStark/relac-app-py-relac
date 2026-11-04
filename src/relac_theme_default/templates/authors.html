@@ -2,9 +2,11 @@
 {% set active_page = "authors" %}
 
 {% from "_author_table.html" import author_table %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% block content %}
     <div class="content">
+        {{ breadcrumbs([("Authors", none)]) }}
         {{ author_table(authors, "Authors") }}
     </div>
 {% endblock %}

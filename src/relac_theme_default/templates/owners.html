@@ -2,9 +2,11 @@
 {% set active_page = "owners" %}
 
 {% from "_owner_table.html" import owner_table %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
 
 {% block content %}
 <div class="content">
+  {{ breadcrumbs([("Books", "books.html"), ("Owners", none)]) }}
   {{ owner_table(owners, "Owners") }}
 </div>
 {% endblock %}
