@@ -148,6 +148,7 @@ class WorkEdition(ResourceBase):
     # Relations (real objects)
     work_obj: Work | None = None
     book_objs: list[Book] = Field(default_factory=list)
+    reading_session_objs: list[ReadingSession] = Field(default_factory=list)
 
     # Properties
     @property
@@ -156,6 +157,35 @@ class WorkEdition(ResourceBase):
         return _aggregate_availability(
             owner for book in self.book_objs for owner in book.owner_objs
         )
+
+    @property
+    def reading_state(self) -> ReadingState:
+        """Property for reading states."""
+        if any(
+            reading_session.state == ReadingState.FINISHED
+            for reading_session in self.reading_session_objs
+        ):
+            return ReadingState.FINISHED
+
+        if any(
+            reading_session.state == ReadingState.READING
+            for reading_session in self.reading_session_objs
+        ):
+            return ReadingState.READING
+
+        if any(
+            reading_session.state == ReadingState.PAUSED
+            for reading_session in self.reading_session_objs
+        ):
+            return ReadingState.PAUSED
+
+        if any(
+            reading_session.state == ReadingState.DID_NOT_FINISH
+            for reading_session in self.reading_session_objs
+        ):
+            return ReadingState.DID_NOT_FINISH
+
+        return ReadingState.NOT_READ
 
 
 class BookCollection(ResourceBase):
@@ -218,6 +248,7 @@ class Book(ResourceBase):
     publisher_obj: BookPublisher = Field(default_factory=list)
     collection_objs: list[BookCollection] = Field(default_factory=list)
     owner_objs: list[Owner] = Field(default_factory=list)
+    reading_session_objs: list[ReadingSession] = Field(default_factory=list)
 
     # Properties
     @property
@@ -226,14 +257,25 @@ class Book(ResourceBase):
         return _aggregate_availability(self.owner_objs)
 
 
+class ReadingState(Enum):
+    """The state of a reading session."""
+
+    NOT_READ = 'not-read'
+    READING = 'reading'
+    PAUSED = 'paused'
+    FINISHED = 'finished'
+    DID_NOT_FINISH = 'did-not-finish'
+
+
 class ReadingSession(ResourceBase):
     """A reading session."""
 
+    work_edition: str
+    book: str
+    state: ReadingState
+
     startdate: date | None = None
     enddate: date | None = None
-    finished: bool = False
-    work_edition: str | None = None
-    book: str | None = None
 
     # Relationships (real objects)
     work_edition_obj: WorkEdition | None = None
