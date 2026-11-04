@@ -8,7 +8,7 @@ from pathlib import Path
 
 from isbnlib import mask
 from jinja2 import Environment, FileSystemLoader
-from pycountry import languages
+from pycountry import countries, languages
 from typer import Context, Option, Typer
 
 from relac.theme import RelacTheme
@@ -54,6 +54,12 @@ def _code_to_language(language_code: str) -> str:
     """Get the name for a language code."""
     lang = languages.get(alpha_2=language_code)
     return lang.name if lang else language_code
+
+
+def _code_to_country(country_code: str) -> str:
+    """Get the name for a country code."""
+    country = countries.get(alpha_2=country_code)
+    return country.name if country else country_code
 
 
 def _build_search_index(
@@ -229,6 +235,7 @@ def create(  # noqa: PLR0912, PLR0915
     env.filters['enum_label'] = _format_enum_label
     env.filters['age'] = _calculate_age
     env.filters['language'] = _code_to_language
+    env.filters['country'] = _code_to_country
 
     # Copy static folder
     if metadata.static_folder:
