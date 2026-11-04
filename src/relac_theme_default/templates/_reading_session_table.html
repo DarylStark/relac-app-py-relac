@@ -10,10 +10,11 @@
         <table class="resources" data-sortable>
             <thead>
                 <tr>
-                    <th scope="col">Work edition</th>
-                    <th scope="col">Book</th>
                     <th scope="col">Start date</th>
                     <th scope="col">End date</th>
+                    <th scope="col">Work edition</th>
+                    <th scope="col">Book</th>
+                    <th scope="col">Authors</th>
                     <th scope="col" class="center fit-content">Reading days</th>
                     <th scope="col" class="right fit-content">State</th>
                 </tr>
@@ -21,6 +22,8 @@
             <tbody>
                 {% for reading_session in reading_sessions %}
                     <tr>
+                        <td>{{ reading_session.startdate or "" }}</td>
+                        <td>{{ reading_session.enddate or "" }}</td>
                         <td>
                             {% if reading_session.work_edition_obj %}
                                 {{ entity_link(reading_session.work_edition_obj, reading_session.work_edition_obj.title) }}
@@ -35,8 +38,13 @@
                                 Unspecified
                             {% endif %}
                         </td>
-                        <td>{{ reading_session.startdate or "" }}</td>
-                        <td>{{ reading_session.enddate or "" }}</td>
+                        <td data-filter-values='{{ (reading_session.work_edition_obj.authors if reading_session.work_edition_obj else []) | map(attribute="name") | list | tojson }}'>
+                            {% if reading_session.work_edition_obj %}
+                                {% for author in reading_session.work_edition_obj.authors %}
+                                    {% if not loop.first %}, {% endif %}{{ entity_link(author, author.name) }}
+                                {% endfor %}
+                            {% endif %}
+                        </td>
                         <td class="center fit-content">
                             {% if reading_session.duration is not none %}
                                 <pre>{{ reading_session.duration.days }}</pre>
