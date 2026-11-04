@@ -21,6 +21,9 @@
             <span class="availability-badge availability-{{ work.availability.value }}">
               {{ work.availability.value | enum_label }}
             </span>
+            <span class="availability-badge reading-state-badge reading-state-{{ work.reading_state.value }}">
+              {{ work.reading_state.value | enum_label }}
+            </span>
           </p>
         </div>
         <dl class="detail-metadata">

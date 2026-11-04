@@ -45,7 +45,12 @@
     </td>
     <td>{{ work_edition.edition_type.value | enum_label }}</td>
     <td class="right fit-content">{{ work_edition.language | language }}</td>
-        <td class="right fit-content">
+    <td class="right fit-content">
+        <span class="availability-badge reading-state-badge reading-state-{{ work_edition.reading_state.value }}">
+            {{ work_edition.reading_state.value | enum_label }}
+        </span>
+    </td>
+    <td class="right fit-content">
         <span class="availability-badge availability-{{ work_edition.availability.value }}">
             {{ work_edition.availability.value | enum_label }}
         </span>

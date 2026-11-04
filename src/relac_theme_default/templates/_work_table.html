@@ -17,6 +17,7 @@
                 <th scope="col" class="fit-content">Category</th>
                 <th scope="col">Series</th>
                 <th scope="col" class="center fit-content">Editions</th>
+                <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Availability</th>
             </tr>
         </thead>
@@ -60,6 +61,11 @@
         <pre>
             {{ work.edition_objs | length }}
         </pre>
+    </td>
+    <td class="right fit-content">
+        <span class="availability-badge reading-state-badge reading-state-{{ work.reading_state.value }}">
+            {{ work.reading_state.value | enum_label }}
+        </span>
     </td>
     <td class="right fit-content">
         <span class="availability-badge availability-{{ work.availability.value }}">
