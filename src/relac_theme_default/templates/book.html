@@ -64,6 +64,10 @@
             <dt>ISBN</dt>
             <dd><code>{{ book.isbn13 | isbn }}</code></dd>
           </div>
+          <div class="detail-fact">
+            <dt>Works read</dt>
+            <dd>{{ book.read_percentage | round | int }}%</dd>
+          </div>
         </dl>
       </section>
   </div>

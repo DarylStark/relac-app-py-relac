@@ -298,6 +298,69 @@ class Book(ResourceBase):
         """Get the availability for this book."""
         return _aggregate_availability(self.owner_objs)
 
+    def _get_unique_works(self) -> list[Work]:
+        works_by_id: dict[str, Work] = {}
+        for edition in self.work_edition_objs:
+            if edition.work_obj is not None:
+                works_by_id.setdefault(edition.work, edition.work_obj)
+
+        return list(works_by_id.values())
+
+    def _get_works_with_specific_reading_state(
+        self, reading_state: ReadingState
+    ) -> list[Work]:
+        return [
+            work
+            for work in self._get_unique_works()
+            if work.reading_state == reading_state
+        ]
+
+    @property
+    def read_count(self) -> int:
+        """Get the number of finished works in this book."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.FINISHED)
+        )
+
+    @property
+    def reading_count(self) -> int:
+        """Get the number of works being read in this book."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.READING)
+        )
+
+    @property
+    def dnf_count(self) -> int:
+        """Get the number of unfinished works in this book."""
+        return len(
+            self._get_works_with_specific_reading_state(
+                ReadingState.DID_NOT_FINISH
+            )
+        )
+
+    @property
+    def paused_count(self) -> int:
+        """Get the number of paused works in this book."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.PAUSED)
+        )
+
+    @property
+    def not_read_count(self) -> int:
+        """Get the number of unread works in this book."""
+        return len(
+            self._get_works_with_specific_reading_state(ReadingState.NOT_READ)
+        )
+
+    @property
+    def read_percentage(self) -> float:
+        """Get the percentage of works for this book that are finished."""
+        works = self._get_unique_works()
+        if not works:
+            return 0.0
+
+        return self.read_count / len(works) * 100
+
 
 class ReadingState(Enum):
     """The state of a reading session."""

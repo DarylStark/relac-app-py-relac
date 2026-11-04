@@ -194,6 +194,61 @@ def test_series_reading_counts_and_percentage() -> None:
     assert Series(name='Empty series').read_percentage == 0.0
 
 
+def test_book_reading_counts_deduplicate_works() -> None:
+    """Count each linked Work once, even when the book has multiple editions."""
+    states = [
+        ReadingState.FINISHED,
+        ReadingState.READING,
+        ReadingState.PAUSED,
+        ReadingState.DID_NOT_FINISH,
+        ReadingState.NOT_READ,
+    ]
+    editions = []
+    for index, state in enumerate(states):
+        edition = WorkEdition(
+            title=f'Edition {index}',
+            work=f'work-{index}',
+            reading_session_objs=(
+                []
+                if state is ReadingState.NOT_READ
+                else [
+                    ReadingSession(
+                        work_edition=f'edition-{index}',
+                        book='test_book',
+                        state=state,
+                    )
+                ]
+            ),
+        )
+        work = Work(
+            title=f'Work {index}',
+            authors=[],
+            edition_objs=[edition],
+        )
+        edition.work_obj = work
+        editions.append(edition)
+
+    editions.append(
+        WorkEdition(
+            title='Another edition of the finished work',
+            work='work-0',
+            work_obj=editions[0].work_obj,
+        )
+    )
+    book = Book(
+        isbn13=9781234567897,
+        title='Test Book',
+        work_edition_objs=editions,
+    )
+
+    assert book.read_count == 1
+    assert book.reading_count == 1
+    assert book.paused_count == 1
+    assert book.dnf_count == 1
+    assert book.not_read_count == 1
+    assert book.read_percentage == 20.0
+
+
 @pytest.mark.parametrize(
     ('owners', 'expected'),
     [
