@@ -1,7 +1,7 @@
 """Module with the models for the application."""
 
 from collections.abc import Iterable
-from datetime import date
+from datetime import date, timedelta
 from enum import Enum
 
 from pydantic import BaseModel, Field
@@ -280,6 +280,23 @@ class ReadingSession(ResourceBase):
     # Relationships (real objects)
     work_edition_obj: WorkEdition | None = None
     book_obj: Book | None = None
+
+    @property
+    def effective_enddate(self) -> date | None:
+        """Get the end date, using today for an active reading session."""
+        if self.enddate is not None:
+            return self.enddate
+        if self.state is ReadingState.READING:
+            return date.today()
+        return None
+
+    @property
+    def duration(self) -> timedelta | None:
+        """Get the elapsed time between the start and effective end dates."""
+        if self.startdate is None or self.effective_enddate is None:
+            return None
+
+        return self.effective_enddate - self.startdate
 
 
 class Label(ResourceBase):

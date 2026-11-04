@@ -14,6 +14,7 @@
                 <th scope="col">Release date</th>
                 <th scope="col">Type</th>
                 <th scope="col" class="right fit-content">Language</th>
+                <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Availability</th>
             </tr>
         </thead>
@@ -32,6 +33,11 @@
     <td>{{ entity_link(work_edition, work_edition.title) }}</td>
     <td>
         {% if work_edition.release_date %}
+    <td class="right fit-content">
+        <span class="availability-badge reading-state-badge reading-state-{{ work_edition.reading_state.value }}">
+            {{ work_edition.reading_state.value | enum_label }}
+        </span>
+    </td>
             {{ work_edition.release_date }}
         {% else %}
             Unspecified

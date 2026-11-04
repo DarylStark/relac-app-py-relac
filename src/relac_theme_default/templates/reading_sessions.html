@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% set active_page = "reading-sessions" %}
+
+{% from "_reading_session_table.html" import reading_session_table %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
+
+{% block content %}
+    <div class="content">
+        {{ breadcrumbs([("Works", "works.html"), ("Reading sessions", none)]) }}
+        {{ reading_session_table(reading_sessions, "Reading sessions") }}
+    </div>
+{% endblock %}

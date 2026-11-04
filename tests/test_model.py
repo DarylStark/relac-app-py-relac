@@ -1,5 +1,7 @@
 """Tests for model-derived properties."""
 
+from datetime import date, timedelta
+
 import pytest
 
 from relac.model import (
@@ -7,10 +9,58 @@ from relac.model import (
     Book,
     Owner,
     OwnerType,
+    ReadingSession,
+    ReadingState,
     ResourceAvailability,
     Work,
     WorkEdition,
 )
+
+
+@pytest.mark.parametrize(
+    ('state', 'startdate', 'enddate', 'expected'),
+    [
+        (
+            ReadingState.READING,
+            date(2025, 1, 1),
+            date(2025, 1, 8),
+            timedelta(days=7),
+        ),
+        (ReadingState.PAUSED, date(2025, 1, 1), None, None),
+        (ReadingState.READING, None, date(2025, 1, 8), None),
+        (ReadingState.PAUSED, None, None, None),
+    ],
+)
+def test_reading_session_duration(
+    state: ReadingState,
+    startdate: date | None,
+    enddate: date | None,
+    expected: timedelta | None,
+) -> None:
+    """Return the date difference only when both session dates are known."""
+    session = ReadingSession(
+        work_edition='test_edition',
+        book='test_book',
+        state=state,
+        startdate=startdate,
+        enddate=enddate,
+    )
+
+    assert session.duration == expected
+
+
+def test_reading_session_uses_today_for_open_reading_session() -> None:
+    """Use today as the end date for an active reading session."""
+    today = date.today()
+    session = ReadingSession(
+        work_edition='test_edition',
+        book='test_book',
+        state=ReadingState.READING,
+        startdate=today - timedelta(days=5),
+    )
+
+    assert session.effective_enddate == today
+    assert session.duration == timedelta(days=5)
 
 
 @pytest.mark.parametrize(

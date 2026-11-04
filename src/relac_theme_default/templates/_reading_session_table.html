@@ -1,0 +1,56 @@
+{% from "_entity_link.html" import entity_link %}
+
+{% macro reading_session_table(reading_sessions, title="Reading sessions") %}
+<div class="card table-card">
+    <header class="table-card-header">
+        <h3 class="table-card-title">{{ title }}</h3>
+        <div class="table-card-actions"></div>
+    </header>
+    <div class="table-scroll">
+        <table class="resources" data-sortable>
+            <thead>
+                <tr>
+                    <th scope="col">Work edition</th>
+                    <th scope="col">Book</th>
+                    <th scope="col">Start date</th>
+                    <th scope="col">End date</th>
+                    <th scope="col" class="center fit-content">Reading days</th>
+                    <th scope="col" class="right fit-content">State</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reading_session in reading_sessions %}
+                    <tr>
+                        <td>
+                            {% if reading_session.work_edition_obj %}
+                                {{ entity_link(reading_session.work_edition_obj, reading_session.work_edition_obj.title) }}
+                            {% else %}
+                                Unspecified
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if reading_session.book_obj %}
+                                {{ entity_link(reading_session.book_obj, reading_session.book_obj.title) }}
+                            {% else %}
+                                Unspecified
+                            {% endif %}
+                        </td>
+                        <td>{{ reading_session.startdate or "" }}</td>
+                        <td>{{ reading_session.enddate or "" }}</td>
+                        <td class="center fit-content">
+                            {% if reading_session.duration is not none %}
+                                <pre>{{ reading_session.duration.days }}</pre>
+                            {% endif %}
+                        </td>
+                        <td class="right fit-content">
+                            <span class="availability-badge reading-state-badge reading-state-{{ reading_session.state.value }}">
+                                {{ reading_session.state.value | enum_label }}
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}
