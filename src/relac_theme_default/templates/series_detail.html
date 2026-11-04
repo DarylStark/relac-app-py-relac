@@ -15,6 +15,12 @@
                     <h3 id="detail-title">{{ series.name }}</h3>
                 </div>
             </div>
+            <dl class="detail-metadata">
+                <div class="detail-fact">
+                    <dt>Works read</dt>
+                    <dd>{{ series.read_percentage | round | int }}%</dd>
+                </div>
+            </dl>
         </section>
     </div>
 

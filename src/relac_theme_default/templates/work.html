@@ -4,6 +4,7 @@
 {% from "_book_table.html" import book_table %}
 {% from "_list_table.html" import list_table %}
 {% from "_work_edition_table.html" import work_edition_table %}
+{% from "_reading_session_table.html" import reading_session_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
 
@@ -20,6 +21,9 @@
           <p class="detail-badge">
             <span class="availability-badge availability-{{ work.availability.value }}">
               {{ work.availability.value | enum_label }}
+            </span>
+            <span class="availability-badge reading-state-badge reading-state-{{ work.reading_state.value }}">
+              {{ work.reading_state.value | enum_label }}
             </span>
           </p>
         </div>
@@ -52,6 +56,10 @@
         </dl>
       </section>
   </div>
+
+  {% if work.reading_session_objs %}
+    {{ reading_session_table(work.reading_session_objs) }}
+  {% endif %}
 
   {{ work_edition_table(work.edition_objs, "Editions of this work") }}
   {{ book_table(work.book_objs, "Books featuring this work") }}

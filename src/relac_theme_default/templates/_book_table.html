@@ -17,6 +17,8 @@
                 <th scope="col" class="center fit-content">Works</th>
                 <th scope="col" class="right fit-content">ISBN</th>
                 <th scope="col" class="right fit-content">Availability</th>
+                <th scope="col" class="right fit-content">Reading state</th>
+                <th scope="col" class="right fit-content">Works read</th>
             </tr>
         </thead>
         <tbody>
@@ -71,6 +73,24 @@
         <span class="availability-badge availability-{{ book.availability.value }}">
             {{ book.availability.value | enum_label }}
         </span>
+    </td>
+    {% set filter_values = [] %}
+    {% if book.read_count > 0 %}{% set _ = filter_values.append("Finished") %}{% endif %}
+    {% if book.reading_count > 0 %}{% set _ = filter_values.append("Reading") %}{% endif %}
+    {% if book.paused_count > 0 %}{% set _ = filter_values.append("Paused") %}{% endif %}
+    {% if book.dnf_count > 0 %}{% set _ = filter_values.append("Did not finish") %}{% endif %}
+    {% if book.not_read_count > 0 %}{% set _ = filter_values.append("Not read") %}{% endif %}
+    <td class="right fit-content" data-filter-values='{{ filter_values | tojson }}'>
+        <span class="availability-counts" role="group" aria-label="Reading state totals">
+            <span class="availability-count reading-state-finished" aria-label="Finished: {{ book.read_count }}" title="Finished">{{ book.read_count }}</span>
+            <span class="availability-count reading-state-reading" aria-label="Reading: {{ book.reading_count }}" title="Reading">{{ book.reading_count }}</span>
+            <span class="availability-count reading-state-paused" aria-label="Paused: {{ book.paused_count }}" title="Paused">{{ book.paused_count }}</span>
+            <span class="availability-count reading-state-did-not-finish" aria-label="Did not finish: {{ book.dnf_count }}" title="Did not finish">{{ book.dnf_count }}</span>
+            <span class="availability-count reading-state-not-read" aria-label="Not read: {{ book.not_read_count }}" title="Not read">{{ book.not_read_count }}</span>
+        </span>
+    </td>
+    <td class="right fit-content">
+        <pre>{{ book.read_percentage | round | int }}%</pre>
     </td>
 </tr>
 {% endmacro %}

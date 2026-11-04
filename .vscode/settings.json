@@ -17,6 +17,7 @@
         "/^python - <<'PY'\nfrom pathlib import Path\nprint\\(Path\\('src/relac_theme_default/templates/_breadcrumbs\\.html'\\)\\.read_text\\(\\)\\)\nprint\\(Path\\('src/relac_theme_default/templates/_base\\.html'\\)\\.read_text\\(\\)\\[:2500\\]\\)\nPY$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "relac": true
     }
 }

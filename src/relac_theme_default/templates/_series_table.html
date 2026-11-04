@@ -13,6 +13,8 @@
                     <th scope="col">Name</th>
                     <th scope="col">Works</th>
                     <th scope="col" class="right fit-content">Availability</th>
+                    <th scope="col" class="right fit-content">Reading state</th>
+                    <th scope="col" class="right fit-content">Works read</th>
                 </tr>
             </thead>
             <tbody>
@@ -23,6 +25,24 @@
                         <pre>{{ series.works | length }}</pre>
                     </td>
                     {{ availability_cell(series.works) }}
+                    {% set filter_values = [] %}
+                    {% if series.read_count > 0 %}{% set _ = filter_values.append("Finished") %}{% endif %}
+                    {% if series.reading_count > 0 %}{% set _ = filter_values.append("Reading") %}{% endif %}
+                    {% if series.paused_count > 0 %}{% set _ = filter_values.append("Paused") %}{% endif %}
+                    {% if series.dnf_count > 0 %}{% set _ = filter_values.append("Did not finish") %}{% endif %}
+                    {% if series.not_read_count > 0 %}{% set _ = filter_values.append("Not read") %}{% endif %}
+                    <td class="right fit-content" data-filter-values='{{ filter_values | tojson }}'>
+                        <span class="availability-counts" role="group" aria-label="Reading state totals">
+                            <span class="availability-count reading-state-finished" aria-label="Finished: {{ series.read_count }}" title="Finished">{{ series.read_count }}</span>
+                            <span class="availability-count reading-state-reading" aria-label="Reading: {{ series.reading_count }}" title="Reading">{{ series.reading_count }}</span>
+                            <span class="availability-count reading-state-paused" aria-label="Paused: {{ series.paused_count }}" title="Paused">{{ series.paused_count }}</span>
+                            <span class="availability-count reading-state-did-not-finish" aria-label="Did not finish: {{ series.dnf_count }}" title="Did not finish">{{ series.dnf_count }}</span>
+                            <span class="availability-count reading-state-not-read" aria-label="Not read: {{ series.not_read_count }}" title="Not read">{{ series.not_read_count }}</span>
+                        </span>
+                    </td>
+                    <td class="right fit-content">
+                        <pre>{{ series.read_percentage | round | int }}%</pre>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

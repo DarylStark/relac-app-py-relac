@@ -298,6 +298,14 @@ def create(  # noqa: PLR0912, PLR0915
         out_path = output / 'lists.html'
         out_path.write_text(html)
 
+    if 'reading_sessions' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['reading_sessions'])
+        html = template.render(
+            reading_sessions=db.get_reading_sessions(),
+        )
+        out_path = output / 'reading-sessions.html'
+        out_path.write_text(html)
+
     # Books
     if 'book' in metadata.resource_pages:
         for book in db.get_books():

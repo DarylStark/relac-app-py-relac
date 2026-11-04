@@ -2,6 +2,7 @@
 {% set active_page = "books" %}
 
 {% from "_work_edition_table.html" import work_edition_table %}
+{% from "_reading_session_table.html" import reading_session_table %}
 {% from "_owner_table.html" import owner_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
@@ -63,9 +64,17 @@
             <dt>ISBN</dt>
             <dd><code>{{ book.isbn13 | isbn }}</code></dd>
           </div>
+          <div class="detail-fact">
+            <dt>Works read</dt>
+            <dd>{{ book.read_percentage | round | int }}%</dd>
+          </div>
         </dl>
       </section>
   </div>
+
+  {% if book.reading_session_objs %}
+    {{ reading_session_table(book.reading_session_objs) }}
+  {% endif %}
 
   {% if book.owner_objs %}
     {{ owner_table(book.owner_objs) }}

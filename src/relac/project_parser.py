@@ -14,6 +14,7 @@ from .model import (
     Label,
     Owner,
     ReadingList,
+    ReadingSession,
     ResourceBase,
     Series,
     Work,
@@ -74,6 +75,7 @@ class ProjectParser:
             'publisher': self._parse_book_publisher_object,
             'owner': self._parse_owner_object,
             'series': self._parse_series_object,
+            'reading_session': self._parse_reading_session_object,
         }
 
         for obj_id, obj in raw_data.items():
@@ -163,4 +165,12 @@ class ProjectParser:
         """Parse an raw series object into a Series object."""
         obj = self._parse_object(Series, data)
         self._database.add_series(obj_id, obj)
+        return obj
+
+    def _parse_reading_session_object(
+        self, obj_id: str, data: dict[str, str]
+    ) -> ReadingSession:
+        """Parse an raw reading session object into a ReadingSession object."""
+        obj = self._parse_object(ReadingSession, data)
+        self._database.add_reading_session(obj_id, obj)
         return obj

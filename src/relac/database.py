@@ -10,6 +10,7 @@ from relac.model import (
     Label,
     Owner,
     ReadingList,
+    ReadingSession,
     ResourceBase,
     Series,
     Work,
@@ -32,6 +33,7 @@ class Database:
         self._reading_lists: dict[str, ReadingList] = {}
         self._owners: dict[str, Owner] = {}
         self._series: dict[str, Series] = {}
+        self._reading_sessions: dict[str, ReadingSession] = {}
 
     def _id_exists[ResourceModel: ResourceBase](
         self, id: str, collection: dict[str, ResourceModel]
@@ -147,6 +149,25 @@ class Database:
                 serie_item.work_obj = work_obj
                 work_obj.series_objs.append(obj)
 
+    def _converge_reading_sessions(self) -> None:
+        """Converge all reading sessions."""
+        for obj in self._reading_sessions.values():
+            book_obj = self._books.get(obj.book)
+            if book_obj is None:
+                raise ValueError(f'Book with id "{obj.book}" doesn\'t exist')
+
+            work_edition_obj = self._work_editions.get(obj.work_edition)
+            if work_edition_obj is None:
+                raise ValueError(
+                    f'Work edition with id "{obj.work_edition}" doesn\'t exist'
+                )
+
+            obj.book_obj = book_obj
+            obj.work_edition_obj = work_edition_obj
+
+            book_obj.reading_session_objs.append(obj)
+            work_edition_obj.reading_session_objs.append(obj)
+
     def converge(self) -> None:
         """Converge all objects."""
         self._converge_works()
@@ -155,6 +176,7 @@ class Database:
         self._converge_book_collections()
         self._converge_reading_lists()
         self._converge_series()
+        self._converge_reading_sessions()
 
     def add_author(self, id: str, obj: Author) -> None:
         """Add a author to the database."""
@@ -235,3 +257,11 @@ class Database:
     def get_series(self) -> list[Series]:
         """Get all series in the database."""
         return list(self._series.values())
+
+    def add_reading_session(self, id: str, obj: ReadingSession) -> None:
+        """Add a reading session to the database."""
+        self._add_object(id, obj, self._reading_sessions)
+
+    def get_reading_sessions(self) -> list[ReadingSession]:
+        """Get all reading sessiosn in the database."""
+        return list(self._reading_sessions.values())
