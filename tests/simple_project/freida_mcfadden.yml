@@ -1,8 +1,8 @@
 ---
 #-------------------------------------------------------------------------------
-# Author
+# Contributor
 #-------------------------------------------------------------------------------
-author.freida_mcfadden:
+contributor.freida_mcfadden:
   name: Freidda McFadden
   state: alive
   birthdate: 1980-05-01
@@ -16,35 +16,35 @@ work.freida_mcfadden__the_housemaid:
   work_structure: novel
   work_type: genre-fiction
   authors:
-    - author.freida_mcfadden
+    - contributor.freida_mcfadden
 
 work.freida_mcfadden__the_housemaid_is_watching:
   title: "The Housemaid is Watching"
   work_structure: novel
   work_type: genre-fiction
   authors:
-    - author.freida_mcfadden
+    - contributor.freida_mcfadden
 
 work.freida_mcfadden__the_housemaid_s_secret:
   title: "The Housemaid's Secret"
   work_structure: novel
   work_type: genre-fiction
   authors:
-    - author.freida_mcfadden
+    - contributor.freida_mcfadden
 
 work.freida_mcfadden__the_housemaid_s_wedding:
   title: "The Housemaid's Wedding"
   work_structure: novel
   work_type: genre-fiction
   authors:
-    - author.freida_mcfadden
+    - contributor.freida_mcfadden
 
 work.freida_mcfadden__the_witch:
   title: "The Witch"
   work_structure: novel
   work_type: genre-fiction
   authors:
-    - author.freida_mcfadden
+    - contributor.freida_mcfadden
 
 work_edition.freida_mcfadden__the_housemaid__original:
   title: "The Housemaid"

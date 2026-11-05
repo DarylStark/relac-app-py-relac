@@ -32,11 +32,20 @@
 
         <dl class="detail-metadata">
           <div class="detail-fact">
-            <dt>Authors</dt>
+            <dt>Contributors</dt>
             <dd>
-              {% if book.author_objs %}
-                {% for author in book.author_objs %}
-                  {{ entity_link(author, author.name) }}
+              {% if book.contributor_objs %}
+                {% for contributor in book.contributor_objs %}
+                  {% set roles = [] %}
+                  {% for work_edition in book.work_edition_objs %}
+                    {% if contributor in work_edition.illustrator_objs and "Illustrator" not in roles %}
+                      {% set _ = roles.append("Illustrator") %}
+                    {% endif %}
+                    {% if contributor in work_edition.translator_objs and "Translator" not in roles %}
+                      {% set _ = roles.append("Translator") %}
+                    {% endif %}
+                  {% endfor %}
+                  <span>{{ entity_link(contributor, contributor.name) }}{% if roles %} ({{ roles | join(" and ") }}){% endif %}</span>
                 {% endfor %}
               {% else %}
                 <span class="detail-unspecified">Unspecified</span>

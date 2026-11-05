@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% set active_page = "contributors" %}
+
+{% from "_contributor_table.html" import contributor_table %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
+
+{% block content %}
+    <div class="content">
+        {{ breadcrumbs([("Contributors", none)]) }}
+        {{ contributor_table(contributors, "Contributors") }}
+    </div>
+{% endblock %}

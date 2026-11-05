@@ -1,0 +1,78 @@
+{% from "_entity_link.html" import entity_link %}
+
+{% macro contributor_table(contributors, title="Contributors") %}
+<div class="card table-card">
+    <header class="table-card-header">
+        <h3 class="table-card-title">{{ title }}</h3>
+        <div class="table-card-actions"></div>
+    </header>
+<div class="table-scroll">
+    <table id="contributors-table" class="resources" data-sortable>
+        <thead>
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">State</th>
+                <th scope="col" class="right fit-content" data-sort-type="date" data-filter-type="date">Birthdate</th>
+                <th scope="col" class="right fit-content" data-sort-type="date" data-filter-type="date">Deceased date</th>
+                <th scope="col">Countries</th>
+                <th scope="col" class="right fit-content">Age</th>
+                <th scope="col" class="center fit-content">Works</th>
+                <th scope="col" class="right fit-content">Reading state</th>
+                <th scope="col" class="right fit-content">Works read</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for contributor in contributors %}
+                {{ contributor_row(contributor) }}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+{% endmacro %}
+
+{% macro contributor_row(contributor) %}
+<tr data-href="{{ contributor.id }}.html">
+    <td>{{ entity_link(contributor, contributor.name) }}</td>
+    <td>{{ contributor.state.value | enum_label }}</td>
+    <td class="center fit-content" data-sort-value="{{ contributor.birthdate.isoformat() if contributor.birthdate else '' }}" data-filter-values='{{ ([contributor.birthdate.isoformat()] if contributor.birthdate else [""]) | tojson }}'>
+        {% if contributor.birthdate %}
+            <time datetime="{{ contributor.birthdate.isoformat() }}" data-local-date>{{ contributor.birthdate }}</time>
+        {% endif %}
+    </td>
+    <td class="center fit-content" data-sort-value="{{ contributor.deceased_date.isoformat() if contributor.deceased_date else '' }}" data-filter-values='{{ ([contributor.deceased_date.isoformat()] if contributor.deceased_date else [""]) | tojson }}'>
+        {% if contributor.deceased_date %}
+            <time datetime="{{ contributor.deceased_date.isoformat() }}" data-local-date>{{ contributor.deceased_date }}</time>
+        {% endif %}
+    </td>
+    <td data-filter-values='{{ contributor.countries | map("country") | list | tojson }}'>
+        {{ contributor.countries | map("country") | join(", ") }}
+    </td>
+    <td class="center fit-content">
+        {% if contributor.birthdate %}
+            <pre>{{ contributor.birthdate | age(contributor.deceased_date) }}</pre>
+        {% endif %}
+    </td>
+    <td class="center fit-content">
+        <pre>{{ contributor.work_objs | length }}</pre>
+    </td>
+    {% set filter_values = [] %}
+    {% if contributor.read_count > 0 %}{% set _ = filter_values.append("Finished") %}{% endif %}
+    {% if contributor.reading_count > 0 %}{% set _ = filter_values.append("Reading") %}{% endif %}
+    {% if contributor.paused_count > 0 %}{% set _ = filter_values.append("Paused") %}{% endif %}
+    {% if contributor.dnf_count > 0 %}{% set _ = filter_values.append("Did not finish") %}{% endif %}
+    {% if contributor.not_read_count > 0 %}{% set _ = filter_values.append("Not read") %}{% endif %}
+    <td class="right fit-content" data-filter-values='{{ filter_values | tojson }}'>
+        <span class="availability-counts" role="group" aria-label="Reading state totals">
+            <span class="availability-count reading-state-finished" aria-label="Finished: {{ contributor.read_count }}" title="Finished">{{ contributor.read_count }}</span>
+            <span class="availability-count reading-state-reading" aria-label="Reading: {{ contributor.reading_count }}" title="Reading">{{ contributor.reading_count }}</span>
+            <span class="availability-count reading-state-paused" aria-label="Paused: {{ contributor.paused_count }}" title="Paused">{{ contributor.paused_count }}</span>
+            <span class="availability-count reading-state-did-not-finish" aria-label="Did not finish: {{ contributor.dnf_count }}" title="Did not finish">{{ contributor.dnf_count }}</span>
+            <span class="availability-count reading-state-not-read" aria-label="Not read: {{ contributor.not_read_count }}" title="Not read">{{ contributor.not_read_count }}</span>
+        </span>
+    </td>
+    <td class="right fit-content">
+        <pre>{{ contributor.read_percentage | round | int }}%</pre>
+    </td>
+</tr>
+{% endmacro %}

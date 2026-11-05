@@ -1,17 +1,19 @@
 {% from "_entity_link.html" import entity_link %}
 
-{% macro work_edition_table(work_editions, title="Editions") %}
+{% macro work_edition_table(work_editions, title="Editions", table_id="work-editions-table") %}
 <div class="card table-card">
     <header class="table-card-header">
         <h3 class="table-card-title">{{ title }}</h3>
         <div class="table-card-actions"></div>
     </header>
 <div class="table-scroll">
-    <table id="work-editions-table" class="resources" data-sortable>
+    <table id="{{ table_id }}" class="resources" data-sortable>
         <thead>
             <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Authors</th>
+                <th scope="col">Illustrators</th>
+                <th scope="col">Translators</th>
                 <th scope="col" data-sort-type="date" data-filter-type="date">Release date</th>
                 <th scope="col">Type</th>
                 <th scope="col" class="right fit-content">Language</th>
@@ -36,6 +38,24 @@
         {% for author in work_edition.authors %}
             {% if not loop.first %}, {% endif %}{{ entity_link(author, author.name) }}
         {% endfor %}
+    </td>
+    <td data-filter-values='{{ (work_edition.illustrator_objs | map(attribute="name") | list or ["Unspecified"]) | tojson }}'>
+        {% if work_edition.illustrator_objs %}
+            {% for illustrator in work_edition.illustrator_objs %}
+                {% if not loop.first %}, {% endif %}{{ entity_link(illustrator, illustrator.name) }}
+            {% endfor %}
+        {% else %}
+            Unspecified
+        {% endif %}
+    </td>
+    <td data-filter-values='{{ (work_edition.translator_objs | map(attribute="name") | list or ["Unspecified"]) | tojson }}'>
+        {% if work_edition.translator_objs %}
+            {% for translator in work_edition.translator_objs %}
+                {% if not loop.first %}, {% endif %}{{ entity_link(translator, translator.name) }}
+            {% endfor %}
+        {% else %}
+            Unspecified
+        {% endif %}
     </td>
     <td class="right fit-content" data-sort-value="{{ work_edition.release_date.isoformat() if work_edition.release_date else '' }}" data-filter-values='{{ ([work_edition.release_date.isoformat()] if work_edition.release_date else ["Unspecified"]) | tojson }}'>
         {% if work_edition.release_date %}

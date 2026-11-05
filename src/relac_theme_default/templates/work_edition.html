@@ -48,6 +48,30 @@
             </dd>
           </div>
           <div class="detail-fact">
+            <dt>Illustrators</dt>
+            <dd>
+              {% if work_edition.illustrator_objs %}
+                {% for illustrator in work_edition.illustrator_objs %}
+                  {% if not loop.first %}, {% endif %}{{ entity_link(illustrator, illustrator.name) }}
+                {% endfor %}
+              {% else %}
+                Unspecified
+              {% endif %}
+            </dd>
+          </div>
+          <div class="detail-fact">
+            <dt>Translators</dt>
+            <dd>
+              {% if work_edition.translator_objs %}
+                {% for translator in work_edition.translator_objs %}
+                  {% if not loop.first %}, {% endif %}{{ entity_link(translator, translator.name) }}
+                {% endfor %}
+              {% else %}
+                Unspecified
+              {% endif %}
+            </dd>
+          </div>
+          <div class="detail-fact">
             <dt>Language</dt>
             <dd>
               {{ work_edition.language | language }}

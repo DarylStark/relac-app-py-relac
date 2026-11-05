@@ -4,7 +4,7 @@
 #-------------------------------------------------------------------------------
 _template_work: &template_work
   authors:
-    - author.stephen_king
+    - contributor.stephen_king
   work_type: genre-fiction
   work_structure: short-story
 

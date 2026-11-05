@@ -1,0 +1,81 @@
+{% extends "_base.html" %}
+{% set active_page = "contributors" %}
+
+{% from "_work_table.html" import work_table %}
+{% from "_work_edition_table.html" import work_edition_table %}
+{% from "_book_table.html" import book_table %}
+{% from "_entity_link.html" import entity_link %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([("Contributors", "contributors.html"), (contributor.name, none)]) }}
+  <div class="card">
+      <section class="detail-summary" aria-labelledby="detail-title">
+        <div class="detail-summary-header">
+          <div>
+            <p class="detail-kind">Contributor</p>
+            <h3 id="detail-title">{{ entity_link(contributor, contributor.name) }}</h3>
+          </div>
+          <p class="detail-badge">
+            <code>{{ contributor.state.value | enum_label }}</code>
+          </p>
+        </div>
+        <dl class="detail-metadata">
+          <div class="detail-fact">
+            <dt>Birthdate</dt>
+            <dd>
+                <span>{{ contributor.birthdate }}</span>
+            </dd>
+          </div>
+          {% if contributor.countries %}
+          <div class="detail-fact">
+            <dt>Countries</dt>
+            <dd>{{ contributor.countries | map("country") | join(", ") }}</dd>
+          </div>
+          {% endif %}
+          {% if contributor.deceased_date %}
+          <div class="detail-fact">
+                <dt>Deceased date</dt>
+                <dd>
+                  <span>{{ contributor.deceased_date }}</span>
+                </dd>
+          </div>
+          {% endif %}
+          {% if contributor.birthdate %}
+          <div class="detail-fact">
+            <dt>{{ "Aged" if contributor.deceased_date else "Age" }}</dt>
+            <dd>
+              <span>{{ contributor.birthdate | age(contributor.deceased_date) }} years</span>
+            </dd>
+          </div>
+            {% endif %}
+          <div class="detail-fact">
+            <dt>Works read</dt>
+            <dd>{{ contributor.read_percentage | round | int }}%</dd>
+          </div>
+        </dl>
+      </section>
+  </div>
+
+  {% if contributor.work_objs %}
+    {{ work_table(contributor.work_objs, title="Works for this contributor") }}
+  {% endif %}
+  {% if contributor.illustrator_work_edition_objs %}
+    {{ work_edition_table(
+        contributor.illustrator_work_edition_objs,
+        title="Work Editions illustrated by this contributor",
+        table_id="illustrator-work-editions-table"
+    ) }}
+  {% endif %}
+  {% if contributor.translator_work_edition_objs %}
+    {{ work_edition_table(
+        contributor.translator_work_edition_objs,
+        title="Work Editions translated by this contributor",
+        table_id="translator-work-editions-table"
+    ) }}
+  {% endif %}
+  {{ book_table(contributor.book_objs, "Books with this contributor") }}
+
+</div>
+{% endblock %}
