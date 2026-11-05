@@ -23,6 +23,7 @@ relac_theme = RelacTheme(
     index_pages={
         'books': 'books.html',
         'works': 'works.html',
+        'work_editions': 'work_editions.html',
         'series': 'series.html',
         'contributors': 'contributors.html',
         'collections': 'collections.html',

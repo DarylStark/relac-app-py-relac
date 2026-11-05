@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% set active_page = "work-editions" %}
+
+{% from "_work_edition_table.html" import work_edition_table %}
+{% from "_breadcrumbs.html" import breadcrumbs %}
+
+{% block content %}
+    <div class="content">
+        {{ breadcrumbs([("Works", "works.html"), ("Work Editions", none)]) }}
+        {{ work_edition_table(work_editions, title="Work Editions") }}
+    </div>
+{% endblock %}
