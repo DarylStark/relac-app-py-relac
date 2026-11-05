@@ -476,6 +476,16 @@ class Book(ResourceBase):
 
         return self.read_count / len(works) * 100
 
+    @property
+    def rating(self) -> float | None:
+        """Get the average rating for this book."""
+        ratings = [
+            rs_obj.rating for rs_obj in self.work_edition_objs if rs_obj.rating
+        ]
+        if not ratings:
+            return None
+        return statistics.mean(ratings)
+
     # Data retrievals
     def is_owned_by_owner(self, owner: Owner | None) -> bool:
         """Check if this book is owned by a specific owner."""

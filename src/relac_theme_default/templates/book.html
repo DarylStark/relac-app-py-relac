@@ -77,6 +77,10 @@
             <dd><code>{{ book.isbn13 | isbn }}</code></dd>
           </div>
           <div class="detail-fact">
+            <dt>Rating</dt>
+            <dd>{{ book.rating if book.rating is not none else "Unrated" }}</dd>
+          </div>
+          <div class="detail-fact">
             <dt>Works read</dt>
             <dd>{{ book.read_percentage | round | int }}%</dd>
           </div>

@@ -53,6 +53,10 @@
                 <span class="detail-small">{{ work.work_type.value | enum_label }}</span>
             </dd>
           </div>
+          <div class="detail-fact">
+            <dt>Rating</dt>
+            <dd>{{ work.rating if work.rating is not none else "Unrated" }}</dd>
+          </div>
         </dl>
       </section>
   </div>
