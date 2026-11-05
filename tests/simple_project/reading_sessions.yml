@@ -2,4 +2,12 @@ reading_session.nineteen_eighty_four:
   work_edition: work_edition.george_orwell__nineteen_eighty_four__original
   book: book.george_orwell__nineteen_eighty_four__clothbound_classic
   state: reading
+  startdate: 2026-01-26
+  rating: 7.0
+
+reading_session.nineteen_eighty_four_second_time:
+  work_edition: work_edition.george_orwell__nineteen_eighty_four__original
+  book: book.george_orwell__nineteen_eighty_four__clothbound_classic
+  state: reading
   startdate: 2026-10-26
+  rating: 6.0
