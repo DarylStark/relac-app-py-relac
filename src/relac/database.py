@@ -170,12 +170,24 @@ class Database:
             book_obj.reading_session_objs.append(obj)
             work_edition_obj.reading_session_objs.append(obj)
 
-    def converge(self) -> None:
-        """Converge all objects."""
+    def _converge_relac_config(self) -> None:
+        """Converge the RelacConfig object."""
         if self._relac_config is None:
             # TODO: Custom error
             raise ValueError('Relac config is not set.')
 
+        if self._relac_config.owner:
+            owner_obj = self._owners.get(self._relac_config.owner)
+            if not owner_obj:
+                # TODO: Custom error
+                raise ValueError(
+                    f'Owner "{self._relac_config.owner}" doesn\'t exists'
+                )
+            self._relac_config.owner_obj = owner_obj
+
+    def converge(self) -> None:
+        """Converge all objects."""
+        self._converge_relac_config()
         self._converge_works()
         self._converge_works_editions()
         self._converge_books()

@@ -61,6 +61,10 @@ class RelacConfig(BaseModel):
     """Model for Relac configuration."""
 
     title: str
+    owner: str | None = None
+
+    # Relation (real objects)
+    owner_obj: Owner | None = None
 
 
 class AuthorState(Enum):
@@ -428,6 +432,11 @@ class Book(ResourceBase):
             return 0.0
 
         return self.read_count / len(works) * 100
+
+    # Data retrievals
+    def is_owned_by_owner(self, owner: Owner | None) -> bool:
+        """Check if this book is owned by a specific owner."""
+        return owner in self.owner_objs
 
 
 class ReadingState(Enum):
