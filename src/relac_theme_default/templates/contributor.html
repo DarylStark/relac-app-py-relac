@@ -75,7 +75,9 @@
         table_id="translator-work-editions-table"
     ) }}
   {% endif %}
-  {{ book_table(contributor.book_objs, "Books with this contributor") }}
+  {% if contributor.book_objs %}
+    {{ book_table(contributor.book_objs, "Books with this contributor") }}
+  {% endif %}
 
 </div>
 {% endblock %}

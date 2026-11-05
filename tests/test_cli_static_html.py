@@ -219,6 +219,7 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         'Work Editions translated by this contributor'
         not in empty_contributor_html
     )
+    assert 'Books with this contributor' not in empty_contributor_html
 
     edition_without_credits = WorkEdition(
         id='no_credits',
