@@ -1,7 +1,7 @@
 <html class="dark">
 
 <head>
-    <title>Relac library</title>
+    <title>{% if active_page == "overview" %}Overview{% elif active_page == "authors" %}{% if author is defined %}Author: {{ author.name }}{% else %}Authors{% endif %}{% elif active_page == "books" %}{% if book is defined %}Book: {{ book.title }}{% else %}Books{% endif %}{% elif active_page == "collections" %}{% if collection is defined %}Collection: {{ collection.name }}{% else %}Collections{% endif %}{% elif active_page == "owners" %}{% if owner is defined %}Owner: {{ owner.name }}{% else %}Owners{% endif %}{% elif active_page == "works" %}{% if work_edition is defined %}Edition: {{ work_edition.title }}{% elif work is defined %}Work: {{ work.title }}{% else %}Works{% endif %}{% elif active_page == "lists" %}{% if list is defined %}Reading list: {{ list.name }}{% else %}Reading lists{% endif %}{% elif active_page == "series" %}{% if series is defined %}Series: {{ series.name }}{% else %}Series{% endif %}{% elif active_page == "reading-sessions" %}Reading sessions{% else %}Relac library{% endif %} | {{ config.title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script>
         try {

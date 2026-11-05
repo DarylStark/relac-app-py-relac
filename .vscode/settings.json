@@ -18,6 +18,7 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "relac": true
+        "relac": true,
+        "./.venv/bin/python": true
     }
 }
