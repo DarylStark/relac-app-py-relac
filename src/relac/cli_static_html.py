@@ -96,11 +96,13 @@ def _build_search_index(
         )
 
     for book in db.get_books():
-        authors = ', '.join(author.name for author in book.author_objs)
+        contributors = ', '.join(
+            contributor.name for contributor in book.contributor_objs
+        )
         publisher = getattr(book.publisher_obj, 'name', '')
         imprint = getattr(book.publisher_obj, 'imprint', '')
         details = [
-            f'Authors: {authors}' if authors else '',
+            f'Contributors: {contributors}' if contributors else '',
             f'Publisher: {publisher}' if publisher else '',
             f'Imprint: {imprint}' if imprint else '',
             f'ISBN: {mask(str(book.isbn13))}',

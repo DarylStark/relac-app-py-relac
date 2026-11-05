@@ -87,6 +87,12 @@ class Contributor(ResourceBase):
     # Relation (real objects)
     work_objs: list[Work] = Field(default_factory=list)
     book_objs: list[Book] = Field(default_factory=list)
+    illustrator_work_edition_objs: list[WorkEdition] = Field(
+        default_factory=list
+    )
+    translator_work_edition_objs: list[WorkEdition] = Field(
+        default_factory=list
+    )
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -251,11 +257,15 @@ class WorkEdition(ResourceBase):
     release_date: date | None = None
     edition_type: WorkEditionType = WorkEditionType.UNSPECIFIED
     language: str | None = None
+    illustrators: list[str] | None = None
+    translators: list[str] | None = None
 
     # Relations (real objects)
     work_obj: Work | None = None
     book_objs: list[Book] = Field(default_factory=list)
     reading_session_objs: list[ReadingSession] = Field(default_factory=list)
+    illustrator_objs: list[Contributor] = Field(default_factory=list)
+    translator_objs: list[Contributor] = Field(default_factory=list)
 
     # Properties
     @property
@@ -368,7 +378,7 @@ class Book(ResourceBase):
 
     # Relationships (real objects)
     work_edition_objs: list[WorkEdition] = Field(default_factory=list)
-    author_objs: list[Contributor] = Field(default_factory=list)
+    contributor_objs: list[Contributor] = Field(default_factory=list)
     publisher_obj: BookPublisher = Field(default_factory=list)
     collection_objs: list[BookCollection] = Field(default_factory=list)
     owner_objs: list[Owner] = Field(default_factory=list)

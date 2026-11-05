@@ -20,6 +20,10 @@
         },
         "relac": true,
         "./.venv/bin/python": true,
-        "./.venv/bin/ruff": true
+        "./.venv/bin/ruff": true,
+        "/^python3 -m http\\.server 8766 --directory /workspaces/relac-app-py-relac$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }

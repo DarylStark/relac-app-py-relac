@@ -61,6 +61,23 @@ class Database:
             obj.work_obj = work_obj
             work_obj.edition_objs.append(obj)
 
+            for contributor_ids, contributor_objs, is_illustrator in (
+                (obj.illustrators, obj.illustrator_objs, True),
+                (obj.translators, obj.translator_objs, False),
+            ):
+                for contributor_id in contributor_ids or []:
+                    contributor = self._contributors.get(contributor_id)
+                    if contributor is None:
+                        raise ValueError(
+                            f'Contributor with id "{contributor_id}" '
+                            "doesn't exist"
+                        )
+                    contributor_objs.append(contributor)
+                    if is_illustrator:
+                        contributor.illustrator_work_edition_objs.append(obj)
+                    else:
+                        contributor.translator_work_edition_objs.append(obj)
+
     def _converge_works(self) -> None:
         """Converge all works."""
         for obj in self._works.values():
@@ -101,16 +118,25 @@ class Database:
                         book.id == obj.id for book in work_obj.book_objs
                     ):
                         work_obj.book_objs.append(obj)
-                    for author in work_edition_obj.work_obj.author_objs:
-                        if not any(
-                            book_author.id == author.id
-                            for book_author in obj.author_objs
-                        ):
-                            obj.author_objs.append(author)
-                        if not any(
-                            book.id == obj.id for book in author.book_objs
-                        ):
-                            author.book_objs.append(obj)
+                edition_contributors = [
+                    *(
+                        work_edition_obj.work_obj.author_objs
+                        if work_edition_obj.work_obj
+                        else []
+                    ),
+                    *work_edition_obj.illustrator_objs,
+                    *work_edition_obj.translator_objs,
+                ]
+                for contributor in edition_contributors:
+                    if not any(
+                        book_contributor.id == contributor.id
+                        for book_contributor in obj.contributor_objs
+                    ):
+                        obj.contributor_objs.append(contributor)
+                    if not any(
+                        book.id == obj.id for book in contributor.book_objs
+                    ):
+                        contributor.book_objs.append(obj)
 
             for owner in obj.owners or []:
                 owner_obj = self._owners.get(owner)

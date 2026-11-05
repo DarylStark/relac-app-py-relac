@@ -4,6 +4,7 @@ from datetime import date, timedelta
 
 import pytest
 
+from relac.database import Database
 from relac.model import (
     Availability,
     Book,
@@ -15,6 +16,7 @@ from relac.model import (
     ReadingListItem,
     ReadingSession,
     ReadingState,
+    RelacConfig,
     ResourceAvailability,
     Series,
     SeriesItem,
@@ -124,6 +126,55 @@ def test_work_reading_sessions_aggregate_from_editions() -> None:
     )
 
     assert work.reading_session_objs == sessions
+
+
+def test_work_edition_resolves_illustrators_and_translators() -> None:
+    """Resolve optional edition contributor IDs to Contributor objects."""
+    database = Database()
+    database.set_relac_config(RelacConfig(title='Test Library'))
+    author = Contributor(id='author', name='Author')
+    illustrator = Contributor(id='illustrator', name='Illustrator')
+    translator = Contributor(id='translator', name='Translator')
+    work = Work(id='work', title='Test Work', authors=['author'])
+    edition = WorkEdition(
+        id='edition',
+        title='Test Edition',
+        work='work',
+        illustrators=['illustrator'],
+        translators=['translator'],
+    )
+    book = Book(
+        id='book',
+        isbn13=9781234567897,
+        title='Test Book',
+        work_editions=['edition'],
+    )
+
+    database.add_contributor('author', author)
+    database.add_contributor('illustrator', illustrator)
+    database.add_contributor('translator', translator)
+    database.add_work('work', work)
+    database.add_work_edition('edition', edition)
+    database.add_book('book', book)
+    database.converge()
+
+    assert edition.illustrator_objs == [illustrator]
+    assert edition.translator_objs == [translator]
+    assert work.author_objs == [author]
+    assert illustrator.illustrator_work_edition_objs == [edition]
+    assert translator.translator_work_edition_objs == [edition]
+    assert author.book_objs == [book]
+    assert illustrator.book_objs == [book]
+    assert translator.book_objs == [book]
+    assert book.contributor_objs == [author, illustrator, translator]
+
+
+def test_work_edition_contributors_are_optional() -> None:
+    """Allow editions without illustrator or translator lists."""
+    edition = WorkEdition(title='Test Edition', work='test_work')
+
+    assert edition.illustrators is None
+    assert edition.translators is None
 
 
 @pytest.mark.parametrize(

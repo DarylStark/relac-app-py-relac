@@ -1,8 +1,10 @@
 """Tests for static HTML template helpers."""
 
 from datetime import date
+from pathlib import Path
 
 import pytest
+from jinja2 import Environment, FileSystemLoader
 
 from relac.cli_static_html import (
     _build_search_index,
@@ -16,8 +18,11 @@ from relac.model import (
     Contributor,
     Owner,
     OwnerType,
+    RelacConfig,
     ResourceAvailability,
     Series,
+    Work,
+    WorkEdition,
 )
 
 
@@ -59,14 +64,14 @@ def test_resource_availability_labels(
 
 
 def test_build_search_index_includes_book_metadata_and_url() -> None:
-    """Include a book's ID, related author, ISBN, and generated page URL."""
+    """Include a book's ID, related contributor, ISBN, and page URL."""
     database = Database()
     contributor = Contributor(id='jane_doe', name='Jane Doe')
     book = Book(
         id='glass_hotel',
         isbn13=9781982137984,
         title='The Glass Hotel',
-        author_objs=[contributor],
+        contributor_objs=[contributor],
     )
     database.add_contributor('jane_doe', contributor)
     database.add_book('glass_hotel', book)
@@ -90,6 +95,126 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     )
     assert contributor_entry['href'] == 'jane_doe.html'
     assert contributor_entry['title'] == 'Jane Doe'
+
+
+def test_work_edition_credits_render_in_table_and_detail() -> None:
+    """Render optional illustrators and translators as linked contributors."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['enum_label'] = _format_enum_label
+    environment.filters['language'] = lambda language: language or ''
+    environment.filters['age'] = _calculate_age
+    environment.filters['country'] = lambda country: country
+    environment.filters['isbn'] = str
+    config = RelacConfig(title='Test Library')
+
+    work = Work(id='test_work', title='Test Work', authors=[])
+    illustrator = Contributor(id='illustrator', name='Test Illustrator')
+    translator = Contributor(id='translator', name='Test Translator')
+    edition = WorkEdition(
+        id='test_edition',
+        title='Test Edition',
+        work='test_work',
+        work_obj=work,
+        language='en',
+        illustrator_objs=[illustrator],
+        translator_objs=[translator],
+    )
+    edition.illustrator_objs.append(translator)
+
+    table_template = environment.get_template('_work_edition_table.html')
+    table_macro = table_template.module.work_edition_table  # ty: ignore[unresolved-attribute]
+    table_html = table_macro([edition])
+    detail_html = environment.get_template('work_edition.html').render(
+        work_edition=edition,
+        config=config,
+    )
+
+    for html in (table_html, detail_html):
+        assert 'Test Illustrator' in html
+        assert 'href="illustrator.html"' in html
+        assert 'Test Translator' in html
+        assert 'href="translator.html"' in html
+
+    contributor = Contributor(
+        id='test_contributor',
+        name='Test Contributor',
+        work_objs=[work],
+        illustrator_work_edition_objs=[edition],
+        translator_work_edition_objs=[edition],
+    )
+    work.author_objs.append(contributor)
+    work.edition_objs.append(edition)
+    book = Book(
+        id='test_book',
+        isbn13=9781234567897,
+        title='Test Book',
+        contributor_objs=[contributor, illustrator, translator],
+        work_edition_objs=[edition],
+    )
+    book_html = environment.get_template('book.html').render(
+        book=book,
+        config=config,
+    )
+    assert 'href="test_contributor.html">Test Contributor</a>' in book_html
+    assert (
+        'href="illustrator.html">Test Illustrator</a> (Illustrator)</span>'
+        in book_html
+    )
+    assert (
+        'href="translator.html">Test Translator</a> '
+        '(Illustrator and Translator)</span>' in book_html
+    )
+    assert 'Test Contributor</a>, <a' not in book_html
+
+    contributor_page = environment.get_template('contributor.html')
+    contributor_html = contributor_page.render(
+        contributor=contributor,
+        config=config,
+    )
+
+    assert 'Works for this contributor' in contributor_html
+    assert 'Work Editions illustrated by this contributor' in contributor_html
+    assert 'Work Editions translated by this contributor' in contributor_html
+    assert 'id="illustrator-work-editions-table"' in contributor_html
+    assert 'id="translator-work-editions-table"' in contributor_html
+
+    contributor_without_credits = Contributor(
+        id='empty_contributor',
+        name='Empty Contributor',
+    )
+    empty_contributor_html = contributor_page.render(
+        contributor=contributor_without_credits,
+        config=config,
+    )
+
+    assert 'Works for this contributor' not in empty_contributor_html
+    assert (
+        'Work Editions illustrated by this contributor'
+        not in empty_contributor_html
+    )
+    assert (
+        'Work Editions translated by this contributor'
+        not in empty_contributor_html
+    )
+
+    edition_without_credits = WorkEdition(
+        id='no_credits',
+        title='No Credits',
+        work='test_work',
+        work_obj=work,
+        language='en',
+    )
+    empty_table_html = table_macro([edition_without_credits])
+    empty_detail_html = environment.get_template('work_edition.html').render(
+        work_edition=edition_without_credits,
+        config=config,
+    )
+
+    assert empty_table_html.count('Unspecified') >= 2
+    assert empty_detail_html.count('Unspecified') >= 2
 
 
 def test_build_search_index_includes_owner_metadata_and_url() -> None:

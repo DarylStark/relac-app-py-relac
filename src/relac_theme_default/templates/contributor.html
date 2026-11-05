@@ -2,6 +2,7 @@
 {% set active_page = "contributors" %}
 
 {% from "_work_table.html" import work_table %}
+{% from "_work_edition_table.html" import work_edition_table %}
 {% from "_book_table.html" import book_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
@@ -57,7 +58,23 @@
       </section>
   </div>
 
-  {{ work_table(contributor.work_objs, title="Works for this contributor") }}
+  {% if contributor.work_objs %}
+    {{ work_table(contributor.work_objs, title="Works for this contributor") }}
+  {% endif %}
+  {% if contributor.illustrator_work_edition_objs %}
+    {{ work_edition_table(
+        contributor.illustrator_work_edition_objs,
+        title="Work Editions illustrated by this contributor",
+        table_id="illustrator-work-editions-table"
+    ) }}
+  {% endif %}
+  {% if contributor.translator_work_edition_objs %}
+    {{ work_edition_table(
+        contributor.translator_work_edition_objs,
+        title="Work Editions translated by this contributor",
+        table_id="translator-work-editions-table"
+    ) }}
+  {% endif %}
   {{ book_table(contributor.book_objs, "Books with this contributor") }}
 
 </div>
