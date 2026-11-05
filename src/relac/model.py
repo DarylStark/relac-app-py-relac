@@ -57,6 +57,12 @@ class ResourceBase(BaseModel):
     id: str | None = Field(default=None)
 
 
+class RelacConfig(BaseModel):
+    """Model for Relac configuration."""
+
+    title: str
+
+
 class AuthorState(Enum):
     """States for authors."""
 

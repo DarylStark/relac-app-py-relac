@@ -11,6 +11,7 @@ from relac.model import (
     Owner,
     ReadingList,
     ReadingSession,
+    RelacConfig,
     ResourceBase,
     Series,
     Work,
@@ -23,6 +24,7 @@ class Database:
 
     def __init__(self) -> None:
         """Create empty data."""
+        self._relac_config: RelacConfig | None = None
         self._authors: dict[str, Author] = {}
         self._works: dict[str, Work] = {}
         self._work_editions: dict[str, WorkEdition] = {}
@@ -170,6 +172,10 @@ class Database:
 
     def converge(self) -> None:
         """Converge all objects."""
+        if self._relac_config is None:
+            # TODO: Custom error
+            raise ValueError('Relac config is not set.')
+
         self._converge_works()
         self._converge_works_editions()
         self._converge_books()
@@ -265,3 +271,14 @@ class Database:
     def get_reading_sessions(self) -> list[ReadingSession]:
         """Get all reading sessiosn in the database."""
         return list(self._reading_sessions.values())
+
+    def set_relac_config(self, config: RelacConfig) -> None:
+        """Set the Relac config for the database."""
+        self._relac_config = config
+
+    def get_relac_config(self) -> RelacConfig:
+        """Get the Relac config."""
+        if self._relac_config is None:
+            # TODO: Custom error
+            raise ValueError('Relac config is not set.')
+        return self._relac_config

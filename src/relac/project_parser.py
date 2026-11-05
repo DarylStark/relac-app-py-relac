@@ -15,6 +15,7 @@ from .model import (
     Owner,
     ReadingList,
     ReadingSession,
+    RelacConfig,
     ResourceBase,
     Series,
     Work,
@@ -80,6 +81,10 @@ class ProjectParser:
 
         for obj_id, obj in raw_data.items():
             if not isinstance(obj_id, str) or obj_id.startswith('_'):
+                continue
+
+            if obj_id == 'relac':
+                self._parse_relac_object(obj)
                 continue
 
             obj_type = obj_id.split('.')[0]
@@ -173,4 +178,10 @@ class ProjectParser:
         """Parse an raw reading session object into a ReadingSession object."""
         obj = self._parse_object(ReadingSession, data)
         self._database.add_reading_session(obj_id, obj)
+        return obj
+
+    def _parse_relac_object(self, data: dict[str, str]) -> RelacConfig:
+        """Parse an raw relac object into a RelacConfig object."""
+        obj = RelacConfig.model_validate(data, extra='forbid')
+        self._database.set_relac_config(obj)
         return obj

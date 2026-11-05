@@ -236,6 +236,7 @@ def create(  # noqa: PLR0912, PLR0915
     env.filters['age'] = _calculate_age
     env.filters['language'] = _code_to_language
     env.filters['country'] = _code_to_country
+    env.globals['config'] = db.get_relac_config()
 
     # Copy static folder
     if metadata.static_folder:
