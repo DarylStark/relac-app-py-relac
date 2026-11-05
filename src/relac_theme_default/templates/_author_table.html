@@ -12,8 +12,8 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">State</th>
-                <th scope="col" class="right fit-content">Birthdate</th>
-                <th scope="col" class="right fit-content">Deceased date</th>
+                <th scope="col" class="right fit-content" data-sort-type="date" data-filter-type="date">Birthdate</th>
+                <th scope="col" class="right fit-content" data-sort-type="date" data-filter-type="date">Deceased date</th>
                 <th scope="col">Countries</th>
                 <th scope="col" class="right fit-content">Age</th>
                 <th scope="col" class="center fit-content">Works</th>
@@ -35,14 +35,14 @@
 <tr data-href="{{ author.id }}.html">
     <td>{{ entity_link(author, author.name) }}</td>
     <td>{{ author.state.value | enum_label }}</td>
-    <td class="center fit-content">
+    <td class="center fit-content" data-sort-value="{{ author.birthdate.isoformat() if author.birthdate else '' }}" data-filter-values='{{ ([author.birthdate.isoformat()] if author.birthdate else [""]) | tojson }}'>
         {% if author.birthdate %}
-            {{ author.birthdate }}
+            <time datetime="{{ author.birthdate.isoformat() }}" data-local-date>{{ author.birthdate }}</time>
         {% endif %}
     </td>
-    <td class="center fit-content">
+    <td class="center fit-content" data-sort-value="{{ author.deceased_date.isoformat() if author.deceased_date else '' }}" data-filter-values='{{ ([author.deceased_date.isoformat()] if author.deceased_date else [""]) | tojson }}'>
         {% if author.deceased_date %}
-            {{ author.deceased_date }}
+            <time datetime="{{ author.deceased_date.isoformat() }}" data-local-date>{{ author.deceased_date }}</time>
         {% endif %}
     </td>
     <td data-filter-values='{{ author.countries | map("country") | list | tojson }}'>

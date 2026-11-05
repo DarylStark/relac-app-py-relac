@@ -10,8 +10,8 @@
         <table class="resources" data-sortable>
             <thead>
                 <tr>
-                    <th scope="col">Start date</th>
-                    <th scope="col">End date</th>
+                    <th scope="col" data-sort-type="date" data-filter-type="date">Start date</th>
+                    <th scope="col" data-sort-type="date" data-filter-type="date">End date</th>
                     <th scope="col">Work edition</th>
                     <th scope="col">Book</th>
                     <th scope="col">Authors</th>
@@ -22,8 +22,16 @@
             <tbody>
                 {% for reading_session in reading_sessions %}
                     <tr>
-                        <td>{{ reading_session.startdate or "" }}</td>
-                        <td>{{ reading_session.enddate or "" }}</td>
+                        <td data-sort-value="{{ reading_session.startdate.isoformat() if reading_session.startdate else '' }}" data-filter-values='{{ ([reading_session.startdate.isoformat()] if reading_session.startdate else [""]) | tojson }}'>
+                            {% if reading_session.startdate %}
+                                <time datetime="{{ reading_session.startdate.isoformat() }}" data-local-date>{{ reading_session.startdate }}</time>
+                            {% endif %}
+                        </td>
+                        <td data-sort-value="{{ reading_session.enddate.isoformat() if reading_session.enddate else '' }}" data-filter-values='{{ ([reading_session.enddate.isoformat()] if reading_session.enddate else [""]) | tojson }}'>
+                            {% if reading_session.enddate %}
+                                <time datetime="{{ reading_session.enddate.isoformat() }}" data-local-date>{{ reading_session.enddate }}</time>
+                            {% endif %}
+                        </td>
                         <td>
                             {% if reading_session.work_edition_obj %}
                                 {{ entity_link(reading_session.work_edition_obj, reading_session.work_edition_obj.title) }}
