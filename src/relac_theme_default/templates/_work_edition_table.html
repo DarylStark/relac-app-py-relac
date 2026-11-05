@@ -12,7 +12,7 @@
             <tr>
                 <th scope="col">Title</th>
                 <th scope="col">Authors</th>
-                <th scope="col">Release date</th>
+                <th scope="col" data-sort-type="date" data-filter-type="date">Release date</th>
                 <th scope="col">Type</th>
                 <th scope="col" class="right fit-content">Language</th>
                 <th scope="col" class="right fit-content">Reading state</th>
@@ -37,14 +37,9 @@
             {% if not loop.first %}, {% endif %}{{ entity_link(author, author.name) }}
         {% endfor %}
     </td>
-    <td>
+    <td class="right fit-content" data-sort-value="{{ work_edition.release_date.isoformat() if work_edition.release_date else '' }}" data-filter-values='{{ ([work_edition.release_date.isoformat()] if work_edition.release_date else ["Unspecified"]) | tojson }}'>
         {% if work_edition.release_date %}
-    <td class="right fit-content">
-        <span class="availability-badge reading-state-badge reading-state-{{ work_edition.reading_state.value }}">
-            {{ work_edition.reading_state.value | enum_label }}
-        </span>
-    </td>
-            {{ work_edition.release_date }}
+            <time datetime="{{ work_edition.release_date.isoformat() }}" data-local-date>{{ work_edition.release_date }}</time>
         {% else %}
             Unspecified
         {% endif %}

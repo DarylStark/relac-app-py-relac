@@ -35,6 +35,99 @@
     });
     const pageUrl = new URL(window.location.href);
 
+    const dateFilterLabelFormatter = new Intl.DateTimeFormat(undefined, {
+        dateStyle: "medium",
+        timeZone: "UTC"
+    });
+    const dateFilterMonthYearFormatter = new Intl.DateTimeFormat(undefined, {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC"
+    });
+    const dateFilterSearchFormatters = [
+        ...["short", "medium", "long", "full"].map((dateStyle) => {
+            return new Intl.DateTimeFormat(undefined, { dateStyle, timeZone: "UTC" });
+        }),
+        ...["numeric", "short", "long"].map((month) => {
+            return new Intl.DateTimeFormat(undefined, {
+                month,
+                year: "numeric",
+                timeZone: "UTC"
+            });
+        })
+    ];
+
+    const getDateFilterDate = (value) => {
+        const date = new Date(`${value}T00:00:00Z`);
+        return Number.isNaN(date.valueOf()) ? null : date;
+    };
+
+    const getDateFilterGroups = (cell) => {
+        const value = (cell?.dataset.sortValue ?? "").trim();
+        if (!getDateFilterDate(value)) {
+            return { "": getFilterValues(cell) };
+        }
+
+        return {
+            Years: [`year:${value.slice(0, 4)}`],
+            Months: [`month:${value.slice(0, 7)}`],
+            Dates: [`date:${value}`]
+        };
+    };
+
+    const getDateFilterOptionLabel = (value) => {
+        const [precision, dateValue] = value.split(":", 2);
+        if (precision === "year") {
+            return dateValue;
+        }
+
+        const date = getDateFilterDate(
+            precision === "month" ? `${dateValue}-01` : dateValue
+        );
+        if (!date) {
+            return value || "No value";
+        }
+
+        return precision === "month"
+            ? dateFilterMonthYearFormatter.format(date)
+            : dateFilterLabelFormatter.format(date);
+    };
+
+    const matchesDateFilter = (value, query) => {
+        const normalizedQuery = query.toLocaleLowerCase();
+        const [precision, dateValue] = value.split(":", 2);
+
+        if (precision === "year") {
+            return dateValue.toLocaleLowerCase().includes(normalizedQuery);
+        }
+
+        const date = getDateFilterDate(
+            precision === "month" ? `${dateValue}-01` : dateValue
+        );
+
+        if (!date) {
+            return value.toLocaleLowerCase().includes(normalizedQuery);
+        }
+
+        const yearMonth = dateValue.slice(0, 7);
+        const yearMonthQuery = normalizedQuery.match(/^(\d{4})[-/.](\d{1,2})$/);
+        if (yearMonthQuery && yearMonth === `${yearMonthQuery[1]}-${yearMonthQuery[2].padStart(2, "0")}`) {
+            return true;
+        }
+
+        const monthYearQuery = normalizedQuery.match(/^(\d{1,2})[-/.](\d{4})$/);
+        if (monthYearQuery && yearMonth === `${monthYearQuery[2]}-${monthYearQuery[1].padStart(2, "0")}`) {
+            return true;
+        }
+
+        return [
+            dateValue,
+            dateValue.slice(0, 7),
+            dateValue.slice(0, 4),
+            ...dateFilterSearchFormatters.map((formatter) => formatter.format(date))
+        ].some((formattedValue) => formattedValue.toLocaleLowerCase().includes(normalizedQuery));
+    };
+
     const updateQueryValues = (key, values) => {
         pageUrl.searchParams.delete(key);
         values.forEach((value) => pageUrl.searchParams.append(key, value));
@@ -75,6 +168,14 @@
         return groups && typeof groups === "object" && !Array.isArray(groups)
             ? groups
             : {};
+    };
+
+    const getColumnFilterValues = (cell, isDateFilter) => {
+        if (!isDateFilter) {
+            return getFilterValues(cell);
+        }
+
+        return Object.values(getDateFilterGroups(cell)).flat();
     };
 
     const isNumeric = (value) => {
@@ -133,6 +234,7 @@
         const columnKeyCounts = new Map();
         const columnKeys = headers.map((header) => {
             const label = header.textContent.trim();
+            const isDateFilter = header.dataset.filterType === "date";
             const occurrence = (columnKeyCounts.get(label) ?? 0) + 1;
             columnKeyCounts.set(label, occurrence);
             return `${label}:${occurrence}`;
@@ -401,7 +503,9 @@
             let visibleCount = 0;
             rows.forEach((row) => {
                 row.hidden = Array.from(selectedValuesByColumn).some(([columnIndex, selectedValues]) => {
-                    return selectedValues.size > 0 && !getFilterValues(rowCells.get(row)[columnIndex])
+                    const cell = rowCells.get(row)[columnIndex];
+                    const isDateFilter = headers[columnIndex].dataset.filterType === "date";
+                    return selectedValues.size > 0 && !getColumnFilterValues(cell, isDateFilter)
                         .some((value) => selectedValues.has(value));
                 });
                 if (!row.hidden) {
@@ -422,6 +526,7 @@
             }
 
             const label = header.textContent.trim();
+            const isDateFilter = header.dataset.filterType === "date";
             const columnLabel = document.createElement("span");
             columnLabel.className = "table-column-label";
             columnLabel.setAttribute("tabindex", "0");
@@ -549,7 +654,7 @@
             const selectAllButton = document.createElement("button");
             selectAllButton.type = "button";
             selectAllButton.className = "table-column-filter-clear";
-            selectAllButton.textContent = "Select all";
+            selectAllButton.textContent = isDateFilter ? "Select matching" : "Select all";
             selectAllButton.disabled = true;
 
             const selectNoneButton = document.createElement("button");
@@ -599,12 +704,18 @@
             const filterValues = new Set();
             selectedValuesByColumn.set(columnIndex, selectedValues);
             const filterParameter = `relac.filter.${tableKey}.${columnIndex}`;
-            const savedValues = new Set(pageUrl.searchParams.getAll(filterParameter));
+            const savedValues = new Set(pageUrl.searchParams.getAll(filterParameter).map((value) => {
+                return isDateFilter && /^\d{4}-\d{2}-\d{2}$/.test(value)
+                    ? `date:${value}`
+                    : value;
+            }));
 
             const valuesByGroup = new Map();
             rows.forEach((row) => {
                 const cell = rowCells.get(row)[columnIndex];
-                const groups = getFilterGroups(cell);
+                const groups = isDateFilter
+                    ? getDateFilterGroups(cell)
+                    : getFilterGroups(cell);
                 let hasGroupedValues = false;
                 Object.entries(groups).forEach(([groupLabel, groupValues]) => {
                     if (!Array.isArray(groupValues) || groupValues.length === 0) {
@@ -622,7 +733,7 @@
                     if (!valuesByGroup.has("")) {
                         valuesByGroup.set("", new Set());
                     }
-                    getFilterValues(cell).forEach((value) => valuesByGroup.get("").add(value));
+                    getColumnFilterValues(cell, isDateFilter).forEach((value) => valuesByGroup.get("").add(value));
                 }
             });
 
@@ -658,7 +769,9 @@
                     checkbox.value = value;
 
                     const optionLabel = document.createElement("span");
-                    optionLabel.textContent = value || "No value";
+                    optionLabel.textContent = isDateFilter
+                        ? getDateFilterOptionLabel(value)
+                        : value || "No value";
 
                     option.append(checkbox, optionLabel);
                     groupOptions.append(option);
@@ -699,7 +812,10 @@
                         ? `Column settings for ${label}`
                         : `Column settings for ${label}, ${count} selected`
                 );
-                    selectAllButton.disabled = count === filterValues.size;
+                    selectAllButton.disabled = isDateFilter
+                        ? checkboxes.filter(({ option }) => !option.hidden)
+                            .every(({ value }) => selectedValues.has(value))
+                        : count === filterValues.size;
                     selectNoneButton.disabled = count === 0;
             };
 
@@ -713,18 +829,26 @@
 
             search.addEventListener("input", () => {
                 const query = search.value.trim().toLocaleLowerCase();
-                checkboxes.forEach(({ option }) => {
-                    option.hidden = !option.textContent.toLocaleLowerCase().includes(query);
+                checkboxes.forEach(({ option, value }) => {
+                    option.hidden = isDateFilter
+                        ? !matchesDateFilter(value, query)
+                        : !option.textContent.toLocaleLowerCase().includes(query);
                 });
                 options.querySelectorAll(".table-column-filter-group").forEach((group) => {
                     group.hidden = !group.querySelector(".table-column-filter-option:not([hidden])");
                 });
+                updateSummary();
             });
 
             selectAllButton.addEventListener("click", () => {
-                filterValues.forEach((value) => selectedValues.add(value));
-                checkboxes.forEach(({ checkbox }) => {
-                    checkbox.checked = true;
+                const valuesToSelect = isDateFilter
+                    ? checkboxes.filter(({ option }) => !option.hidden).map(({ value }) => value)
+                    : Array.from(filterValues);
+                valuesToSelect.forEach((value) => {
+                    selectedValues.add(value);
+                    checkboxesByValue.get(value).forEach(({ checkbox }) => {
+                        checkbox.checked = true;
+                    });
                 });
 
                 updateSummary();
