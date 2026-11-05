@@ -11,6 +11,7 @@
         <thead>
             <tr>
                 <th scope="col">Title</th>
+                <th scope="col">Work</th>
                 <th scope="col">Authors</th>
                 <th scope="col">Illustrators</th>
                 <th scope="col">Translators</th>
@@ -34,6 +35,13 @@
 {% macro work_edition_row(work_edition) %}
 <tr data-href="{{ work_edition.id }}.html">
     <td>{{ entity_link(work_edition, work_edition.title) }}</td>
+    <td data-filter-values='{{ ([work_edition.work_obj.title] if work_edition.work_obj else ["Unspecified"]) | tojson }}'>
+        {% if work_edition.work_obj %}
+            {{ entity_link(work_edition.work_obj, work_edition.work_obj.title) }}
+        {% else %}
+            Unspecified
+        {% endif %}
+    </td>
     <td data-filter-values='{{ work_edition.authors | map(attribute="name") | list | tojson }}'>
         {% for author in work_edition.authors %}
             {% if not loop.first %}, {% endif %}{{ entity_link(author, author.name) }}

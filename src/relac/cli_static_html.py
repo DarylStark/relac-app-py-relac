@@ -268,6 +268,14 @@ def create(  # noqa: PLR0912, PLR0915
         out_path = output / 'works.html'
         out_path.write_text(html)
 
+    if 'work_editions' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['work_editions'])
+        html = template.render(
+            work_editions=db.get_work_editions(),
+        )
+        out_path = output / 'work-editions.html'
+        out_path.write_text(html)
+
     if 'series' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['series'])
         html = template.render(

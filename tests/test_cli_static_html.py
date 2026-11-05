@@ -97,7 +97,7 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     assert contributor_entry['title'] == 'Jane Doe'
 
 
-def test_work_edition_credits_render_in_table_and_detail() -> None:
+def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR0915
     """Render optional illustrators and translators as linked contributors."""
     template_directory = (
         Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
@@ -127,10 +127,30 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:
     table_template = environment.get_template('_work_edition_table.html')
     table_macro = table_template.module.work_edition_table  # ty: ignore[unresolved-attribute]
     table_html = table_macro([edition])
+    work_editions_html = environment.get_template('work_editions.html').render(
+        work_editions=[edition],
+        config=config,
+    )
     detail_html = environment.get_template('work_edition.html').render(
         work_edition=edition,
         config=config,
     )
+
+    assert 'Work Editions' in work_editions_html
+    assert 'Test Edition' in work_editions_html
+    assert (
+        'href="work-editions.html" class="active" aria-current="page"'
+        in detail_html
+    )
+    assert '<th scope="col">Work</th>' in table_html
+    assert 'href="test_work.html">Test Work</a>' in table_html
+    assert '<title>Work Editions | Test Library</title>' in work_editions_html
+    assert 'href="works.html" class="active"' in work_editions_html
+    assert (
+        'href="work-editions.html" class="active" aria-current="page"'
+        in work_editions_html
+    )
+    assert 'href="works.html">Works</a>' in work_editions_html
 
     for html in (table_html, detail_html):
         assert 'Test Illustrator' in html
