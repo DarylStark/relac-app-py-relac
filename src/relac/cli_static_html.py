@@ -131,15 +131,15 @@ def _build_search_index(
             [detail for detail in details if detail],
         )
 
-    for author in db.get_authors():
+    for contributor in db.get_contributors():
         details = [
-            f'Works: {", ".join(work.title for work in author.work_objs)}',
-            f'Books: {", ".join(book.title for book in author.book_objs)}',
+            f'Works: {", ".join(work.title for work in contributor.work_objs)}',
+            f'Books: {", ".join(book.title for book in contributor.book_objs)}',
         ]
         add_entry(
-            'Author',
-            author.id,
-            author.name,
+            'Contributor',
+            contributor.id,
+            contributor.name,
             [detail for detail in details if detail],
         )
 
@@ -274,12 +274,12 @@ def create(  # noqa: PLR0912, PLR0915
         out_path = output / 'series.html'
         out_path.write_text(html)
 
-    if 'authors' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['authors'])
+    if 'contributors' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['contributors'])
         html = template.render(
-            authors=db.get_authors(),
+            contributors=db.get_contributors(),
         )
-        out_path = output / 'authors.html'
+        out_path = output / 'contributors.html'
         out_path.write_text(html)
 
     if 'owners' in metadata.index_pages:
@@ -322,12 +322,12 @@ def create(  # noqa: PLR0912, PLR0915
             out_path = output / f'{book.id}.html'
             out_path.write_text(html)
 
-    # Authors
-    if 'author' in metadata.resource_pages:
-        for work_edition in db.get_authors():
-            template = env.get_template(metadata.resource_pages['author'])
-            html = template.render(author=work_edition)
-            out_path = output / f'{work_edition.id}.html'
+    # Contributors
+    if 'contributor' in metadata.resource_pages:
+        for contributor in db.get_contributors():
+            template = env.get_template(metadata.resource_pages['contributor'])
+            html = template.render(contributor=contributor)
+            out_path = output / f'{contributor.id}.html'
             out_path.write_text(html)
 
     # Owners

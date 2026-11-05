@@ -12,7 +12,7 @@ relac_theme = RelacTheme(
     index_template='index.html',
     resource_pages={
         'book': 'book.html',
-        'author': 'author.html',
+        'contributor': 'contributor.html',
         'work': 'work.html',
         'work_edition': 'work_edition.html',
         'collection': 'collection.html',
@@ -24,7 +24,7 @@ relac_theme = RelacTheme(
         'books': 'books.html',
         'works': 'works.html',
         'series': 'series.html',
-        'authors': 'authors.html',
+        'contributors': 'contributors.html',
         'collections': 'collections.html',
         'lists': 'lists.html',
         'reading_sessions': 'reading_sessions.html',

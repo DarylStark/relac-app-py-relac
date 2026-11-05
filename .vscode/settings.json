@@ -19,6 +19,7 @@
             "matchCommandLine": true
         },
         "relac": true,
-        "./.venv/bin/python": true
+        "./.venv/bin/python": true,
+        "./.venv/bin/ruff": true
     }
 }

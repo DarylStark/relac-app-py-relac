@@ -1,5 +1,5 @@
 {% extends "_base.html" %}
-{% set active_page = "authors" %}
+{% set active_page = "contributors" %}
 
 {% from "_work_table.html" import work_table %}
 {% from "_book_table.html" import book_table %}
@@ -8,57 +8,57 @@
 
 {% block content %}
 <div class="content">
-  {{ breadcrumbs([("Authors", "authors.html"), (author.name, none)]) }}
+  {{ breadcrumbs([("Contributors", "contributors.html"), (contributor.name, none)]) }}
   <div class="card">
       <section class="detail-summary" aria-labelledby="detail-title">
         <div class="detail-summary-header">
           <div>
-            <p class="detail-kind">Author</p>
-            <h3 id="detail-title">{{ entity_link(author, author.name) }}</h2>
+            <p class="detail-kind">Contributor</p>
+            <h3 id="detail-title">{{ entity_link(contributor, contributor.name) }}</h3>
           </div>
           <p class="detail-badge">
-            <code>{{ author.state.value | enum_label }}</code>
+            <code>{{ contributor.state.value | enum_label }}</code>
           </p>
         </div>
         <dl class="detail-metadata">
           <div class="detail-fact">
             <dt>Birthdate</dt>
             <dd>
-                <span>{{ author.birthdate }}</span>
+                <span>{{ contributor.birthdate }}</span>
             </dd>
           </div>
-          {% if author.countries %}
+          {% if contributor.countries %}
           <div class="detail-fact">
             <dt>Countries</dt>
-            <dd>{{ author.countries | map("country") | join(", ") }}</dd>
+            <dd>{{ contributor.countries | map("country") | join(", ") }}</dd>
           </div>
           {% endif %}
-          {% if author.deceased_date %}
+          {% if contributor.deceased_date %}
           <div class="detail-fact">
                 <dt>Deceased date</dt>
                 <dd>
-                  <span>{{ author.deceased_date }}</span>
+                  <span>{{ contributor.deceased_date }}</span>
                 </dd>
           </div>
           {% endif %}
-          {% if author.birthdate %}
+          {% if contributor.birthdate %}
           <div class="detail-fact">
-            <dt>{{ "Aged" if author.deceased_date else "Age" }}</dt>
+            <dt>{{ "Aged" if contributor.deceased_date else "Age" }}</dt>
             <dd>
-              <span>{{ author.birthdate | age(author.deceased_date) }} years</span>
+              <span>{{ contributor.birthdate | age(contributor.deceased_date) }} years</span>
             </dd>
           </div>
             {% endif %}
           <div class="detail-fact">
             <dt>Works read</dt>
-            <dd>{{ author.read_percentage | round | int }}%</dd>
+            <dd>{{ contributor.read_percentage | round | int }}%</dd>
           </div>
         </dl>
       </section>
   </div>
 
-  {{ work_table(author.work_objs, title="Works for this author") }}
-  {{ book_table(author.book_objs, "Books with this author") }}
+  {{ work_table(contributor.work_objs, title="Works for this contributor") }}
+  {{ book_table(contributor.book_objs, "Books with this contributor") }}
 
 </div>
 {% endblock %}

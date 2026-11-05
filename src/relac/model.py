@@ -67,19 +67,19 @@ class RelacConfig(BaseModel):
     owner_obj: Owner | None = None
 
 
-class AuthorState(Enum):
-    """States for authors."""
+class ContributorState(Enum):
+    """States for contributors."""
 
     UNSPECIFIED = 'unspecified'
     ALIVE = 'alive'
     DECEASED = 'deceased'
 
 
-class Author(ResourceBase):
-    """Model for a author."""
+class Contributor(ResourceBase):
+    """Model for a contributor."""
 
     name: str
-    state: AuthorState = AuthorState.UNSPECIFIED
+    state: ContributorState = ContributorState.UNSPECIFIED
     birthdate: date | None = None
     deceased_date: date | None = None
     countries: list[str] = Field(default_factory=list)
@@ -99,28 +99,28 @@ class Author(ResourceBase):
 
     @property
     def read_count(self) -> int:
-        """Get the number of finished works by this author."""
+        """Get the number of finished works by this contributor."""
         return len(
             self._get_works_with_specific_reading_state(ReadingState.FINISHED)
         )
 
     @property
     def reading_count(self) -> int:
-        """Get the number of works being read by this author."""
+        """Get the number of works being read by this contributor."""
         return len(
             self._get_works_with_specific_reading_state(ReadingState.READING)
         )
 
     @property
     def paused_count(self) -> int:
-        """Get the number of paused works by this author."""
+        """Get the number of paused works by this contributor."""
         return len(
             self._get_works_with_specific_reading_state(ReadingState.PAUSED)
         )
 
     @property
     def dnf_count(self) -> int:
-        """Get the number of unfinished works by this author."""
+        """Get the number of unfinished works by this contributor."""
         return len(
             self._get_works_with_specific_reading_state(
                 ReadingState.DID_NOT_FINISH
@@ -129,14 +129,14 @@ class Author(ResourceBase):
 
     @property
     def not_read_count(self) -> int:
-        """Get the number of unread works by this author."""
+        """Get the number of unread works by this contributor."""
         return len(
             self._get_works_with_specific_reading_state(ReadingState.NOT_READ)
         )
 
     @property
     def read_percentage(self) -> float:
-        """Get the percentage of this author's works that are finished."""
+        """Get the percentage of this contributor's works that are finished."""
         if not self.work_objs:
             return 0.0
 
@@ -175,7 +175,7 @@ class Work(ResourceBase):
     work_structure: WorkStructure | None = None
 
     # Relation (real objects)
-    author_objs: list[Author] = Field(default_factory=list)
+    author_objs: list[Contributor] = Field(default_factory=list)
     edition_objs: list[WorkEdition] = Field(default_factory=list)
     book_objs: list[Book] = Field(default_factory=list)
     series_objs: list[Series] = Field(default_factory=list)
@@ -295,7 +295,7 @@ class WorkEdition(ResourceBase):
         return ReadingState.NOT_READ
 
     @property
-    def authors(self) -> list[Author]:
+    def authors(self) -> list[Contributor]:
         """Retrieve the authors for this WorkEdition."""
         if not self.work_obj:
             return []
@@ -368,7 +368,7 @@ class Book(ResourceBase):
 
     # Relationships (real objects)
     work_edition_objs: list[WorkEdition] = Field(default_factory=list)
-    author_objs: list[Author] = Field(default_factory=list)
+    author_objs: list[Contributor] = Field(default_factory=list)
     publisher_obj: BookPublisher = Field(default_factory=list)
     collection_objs: list[BookCollection] = Field(default_factory=list)
     owner_objs: list[Owner] = Field(default_factory=list)

@@ -3,10 +3,10 @@
 from collections.abc import Sequence
 
 from relac.model import (
-    Author,
     Book,
     BookCollection,
     BookPublisher,
+    Contributor,
     Label,
     Owner,
     ReadingList,
@@ -25,7 +25,7 @@ class Database:
     def __init__(self) -> None:
         """Create empty data."""
         self._relac_config: RelacConfig | None = None
-        self._authors: dict[str, Author] = {}
+        self._contributors: dict[str, Contributor] = {}
         self._works: dict[str, Work] = {}
         self._work_editions: dict[str, WorkEdition] = {}
         self._books: dict[str, Book] = {}
@@ -64,15 +64,15 @@ class Database:
     def _converge_works(self) -> None:
         """Converge all works."""
         for obj in self._works.values():
-            for author in obj.authors:
-                author_obj = self._authors.get(author)
-                if not author_obj:
+            for contributor_id in obj.authors:
+                contributor = self._contributors.get(contributor_id)
+                if not contributor:
                     # TODO: Custom error
                     raise ValueError(
-                        f'Author with id "{author}" doesn\'t exist'
+                        f'Contributor with id "{contributor_id}" doesn\'t exist'
                     )
-                obj.author_objs.append(author_obj)
-                author_obj.work_objs.append(obj)
+                obj.author_objs.append(contributor)
+                contributor.work_objs.append(obj)
 
     def _converge_books(self) -> None:
         """Converge all books."""
@@ -196,13 +196,13 @@ class Database:
         self._converge_series()
         self._converge_reading_sessions()
 
-    def add_author(self, id: str, obj: Author) -> None:
-        """Add a author to the database."""
-        self._add_object(id, obj, self._authors)
+    def add_contributor(self, id: str, obj: Contributor) -> None:
+        """Add a contributor to the database."""
+        self._add_object(id, obj, self._contributors)
 
-    def get_authors(self) -> Sequence[Author]:
-        """Get all authors in the database."""
-        return list(self._authors.values())
+    def get_contributors(self) -> Sequence[Contributor]:
+        """Get all contributors in the database."""
+        return list(self._contributors.values())
 
     def add_work(self, id: str, obj: Work) -> None:
         """Add a work to the database."""

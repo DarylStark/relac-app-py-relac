@@ -1,8 +1,8 @@
 ---
 #-------------------------------------------------------------------------------
-# Author
+# Contributor
 #-------------------------------------------------------------------------------
-author.stephen_king:
+contributor.stephen_king:
   name: Stephen King
   state: alive
   birthdate: 1947-09-21

@@ -1,8 +1,8 @@
 ---
 #-------------------------------------------------------------------------------
-# Author
+# Contributor
 #-------------------------------------------------------------------------------
-author.george_orwell:
+contributor.george_orwell:
   name: George Orwell
   state: deceased
   birthdate: 1903-06-25
@@ -19,7 +19,7 @@ work.george_orwell__nineteen_eighty_four:
   work_structure: novel
   work_type: literary-fiction
   authors:
-    - author.george_orwell
+    - contributor.george_orwell
 
 work_edition.george_orwell__nineteen_eighty_four__original:
   title: Nineteen Eighty-Four

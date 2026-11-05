@@ -5,10 +5,10 @@ from datetime import date, timedelta
 import pytest
 
 from relac.model import (
-    Author,
     Availability,
     Book,
     BookCollection,
+    Contributor,
     Owner,
     OwnerType,
     ReadingList,
@@ -278,8 +278,8 @@ def test_book_reading_counts_deduplicate_works() -> None:
     assert book.read_percentage == 20.0
 
 
-def test_author_reading_counts_and_percentage() -> None:
-    """Count author works by reading state and calculate finished percentage."""
+def test_contributor_reading_counts_and_percentage() -> None:
+    """Count contributor works by reading state and calculate percentage."""
     states = [
         ReadingState.FINISHED,
         ReadingState.READING,
@@ -312,15 +312,15 @@ def test_author_reading_counts_and_percentage() -> None:
             )
         )
 
-    author = Author(name='Test Author', work_objs=works)
+    contributor = Contributor(name='Test Contributor', work_objs=works)
 
-    assert author.read_count == 1
-    assert author.reading_count == 1
-    assert author.paused_count == 1
-    assert author.dnf_count == 1
-    assert author.not_read_count == 1
-    assert author.read_percentage == 20.0
-    assert Author(name='Empty Author').read_percentage == 0.0
+    assert contributor.read_count == 1
+    assert contributor.reading_count == 1
+    assert contributor.paused_count == 1
+    assert contributor.dnf_count == 1
+    assert contributor.not_read_count == 1
+    assert contributor.read_percentage == 20.0
+    assert Contributor(name='Empty Contributor').read_percentage == 0.0
 
 
 @pytest.mark.parametrize(

@@ -1,7 +1,28 @@
 <html class="dark">
 
 <head>
-    <title>{% if active_page == "overview" %}Overview{% elif active_page == "authors" %}{% if author is defined %}Author: {{ author.name }}{% else %}Authors{% endif %}{% elif active_page == "books" %}{% if book is defined %}Book: {{ book.title }}{% else %}Books{% endif %}{% elif active_page == "collections" %}{% if collection is defined %}Collection: {{ collection.name }}{% else %}Collections{% endif %}{% elif active_page == "owners" %}{% if owner is defined %}Owner: {{ owner.name }}{% else %}Owners{% endif %}{% elif active_page == "works" %}{% if work_edition is defined %}Edition: {{ work_edition.title }}{% elif work is defined %}Work: {{ work.title }}{% else %}Works{% endif %}{% elif active_page == "lists" %}{% if list is defined %}Reading list: {{ list.name }}{% else %}Reading lists{% endif %}{% elif active_page == "series" %}{% if series is defined %}Series: {{ series.name }}{% else %}Series{% endif %}{% elif active_page == "reading-sessions" %}Reading sessions{% else %}Relac library{% endif %} | {{ config.title }}</title>
+    {% if active_page == "overview" %}
+        {% set page_title = "Overview" %}
+    {% elif active_page == "contributors" %}
+        {% set page_title = ("Contributor: " ~ contributor.name) if contributor is defined else "Contributors" %}
+    {% elif active_page == "books" %}
+        {% set page_title = ("Book: " ~ book.title) if book is defined else "Books" %}
+    {% elif active_page == "collections" %}
+        {% set page_title = ("Collection: " ~ collection.name) if collection is defined else "Collections" %}
+    {% elif active_page == "owners" %}
+        {% set page_title = ("Owner: " ~ owner.name) if owner is defined else "Owners" %}
+    {% elif active_page == "works" %}
+        {% set page_title = ("Edition: " ~ work_edition.title) if work_edition is defined else ("Work: " ~ work.title) if work is defined else "Works" %}
+    {% elif active_page == "lists" %}
+        {% set page_title = ("Reading list: " ~ list.name) if list is defined else "Reading lists" %}
+    {% elif active_page == "series" %}
+        {% set page_title = ("Series: " ~ series.name) if series is defined else "Series" %}
+    {% elif active_page == "reading-sessions" %}
+        {% set page_title = "Reading sessions" %}
+    {% else %}
+        {% set page_title = "Relac library" %}
+    {% endif %}
+    <title>{{ page_title }} | {{ config.title }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script>
         try {
@@ -35,7 +56,7 @@
 
             <nav class="tab-nav">
                 <a href="index.html" {% if active_page == "overview" %}class="active" aria-current="page"{% endif %}>Overview</a>
-                <a href="authors.html" {% if active_page == "authors" %}class="active" aria-current="page"{% endif %}>Authors</a>
+                <a href="contributors.html" {% if active_page == "contributors" %}class="active" aria-current="page"{% endif %}>Contributors</a>
                 <a href="works.html" {% if active_page in ["works", "lists", "series", "reading-sessions"] %}class="active"{% if active_page == "works" %} aria-current="page"{% endif %}{% endif %}>Works</a>
                 {% if active_page in ["works", "lists", "series", "reading-sessions"] %}
                 <div class="nav-submenu" role="group" aria-label="Works">
@@ -62,7 +83,7 @@
                 </header>
                 <label class="library-search-field">
                     <span class="visually-hidden">Search titles and metadata</span>
-                    <input class="library-search-input" type="search" placeholder="Search titles, authors, ISBN..." autocomplete="off">
+                    <input class="library-search-input" type="search" placeholder="Search titles, contributors, ISBN..." autocomplete="off">
                 </label>
                 <p class="library-search-status" role="status" aria-live="polite"></p>
                 <ul class="library-search-results"></ul>

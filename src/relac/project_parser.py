@@ -7,10 +7,10 @@ from ruamel.yaml import YAML
 
 from .database import Database
 from .model import (
-    Author,
     Book,
     BookCollection,
     BookPublisher,
+    Contributor,
     Label,
     Owner,
     ReadingList,
@@ -66,7 +66,7 @@ class ProjectParser:
         object_parsers: dict[
             str, Callable[[str, dict[str, str]], ResourceBase]
         ] = {
-            'author': self._parse_author_object,
+            'contributor': self._parse_contributor_object,
             'work': self._parse_work_object,
             'work_edition': self._parse_work_edition_object,
             'book': self._parse_book_object,
@@ -104,10 +104,12 @@ class ProjectParser:
         """Generic method to parse data."""
         return model.model_validate(obj, extra='forbid')
 
-    def _parse_author_object(self, obj_id: str, data: dict[str, str]) -> Author:
-        """Parse an raw author object into a Author object."""
-        obj = self._parse_object(Author, data)
-        self._database.add_author(obj_id, obj)
+    def _parse_contributor_object(
+        self, obj_id: str, data: dict[str, str]
+    ) -> Contributor:
+        """Parse a raw contributor object."""
+        obj = self._parse_object(Contributor, data)
+        self._database.add_contributor(obj_id, obj)
         return obj
 
     def _parse_work_object(self, obj_id: str, data: dict[str, str]) -> Work:

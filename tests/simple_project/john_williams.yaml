@@ -1,8 +1,8 @@
 ---
 #-------------------------------------------------------------------------------
-# Author
+# Contributor
 #-------------------------------------------------------------------------------
-author.john_williams:
+contributor.john_williams:
   name: John Willams
   state: deceased
   birthdate: 1922-08-29
@@ -14,7 +14,7 @@ work.john_williams__stoner:
   title: Stoner
   <<: *template_work
   authors:
-    - author.john_williams
+    - contributor.john_williams
   work_structure: novel
   work_type: literary-fiction
 
@@ -29,7 +29,7 @@ work.john_williams__augustus:
   title: Augustus
   <<: *template_work
   authors:
-    - author.john_williams
+    - contributor.john_williams
   work_structure: novel
   work_type: literary-fiction
 
@@ -37,7 +37,7 @@ work.john_williams__butchers_crossing:
   title: Butcher's Crossing
   <<: *template_work
   authors:
-    - author.john_williams
+    - contributor.john_williams
   work_structure: novel
   work_type: literary-fiction
 
@@ -45,7 +45,7 @@ work.john_williams__nothing_but_the_night:
   title: Nothing but the night
   <<: *template_work
   authors:
-    - author.john_williams
+    - contributor.john_williams
   work_structure: novel
   work_type: literary-fiction
 #-------------------------------------------------------------------------------

@@ -17,7 +17,7 @@ class RelacTheme:
         Literal[
             'books',
             'works',
-            'authors',
+            'contributors',
             'collections',
             'lists',
             'owners',
@@ -30,7 +30,7 @@ class RelacTheme:
         Literal[
             'book',
             'work',
-            'author',
+            'contributor',
             'work_edition',
             'collection',
             'list',
