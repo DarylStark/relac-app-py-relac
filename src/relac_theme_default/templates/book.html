@@ -24,6 +24,9 @@
             <span class="availability-badge availability-{{ book.availability.value }}">
               {{ book.availability.value | enum_label }}
             </span>
+            {% if book.is_owned_by_owner(config.owner_obj) %}
+              <span class="availability-badge availability-owned">Owned</span>
+            {% endif %}
           </p>
         </div>
 

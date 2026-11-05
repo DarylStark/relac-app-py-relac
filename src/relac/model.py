@@ -311,6 +311,16 @@ class BookCollection(ResourceBase):
     # Relations (real objects)
     book_objs: list[Book] = Field(default_factory=list)
 
+    def owned_percentage(self, owner: Owner | None) -> float:
+        """Get the percentage of books owned by the specified owner."""
+        if not self.book_objs:
+            return 0.0
+
+        owned_count = sum(
+            book.is_owned_by_owner(owner) for book in self.book_objs
+        )
+        return owned_count / len(self.book_objs) * 100
+
 
 class BookPublisher(ResourceBase):
     """Model for a publisher."""

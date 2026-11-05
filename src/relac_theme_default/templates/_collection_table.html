@@ -10,6 +10,7 @@
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col" class="center fit-content">Books</th>
+                <th scope="col" class="right fit-content">Owned</th>
             </tr>
         </thead>
         <tbody>
@@ -29,6 +30,9 @@
         <pre>
             {{ collection.book_objs | length }} 
         </pre>
+    </td>
+    <td class="right fit-content">
+        <pre>{{ collection.owned_percentage(config.owner_obj) | round | int }}%</pre>
     </td>
 </tr>
 {% endmacro %}

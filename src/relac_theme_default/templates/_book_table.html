@@ -17,6 +17,7 @@
                 <th scope="col" class="center fit-content">Works</th>
                 <th scope="col" class="right fit-content">ISBN</th>
                 <th scope="col" class="right fit-content">Availability</th>
+                <th scope="col" class="right fit-content">Owned</th>
                 <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Works read</th>
             </tr>
@@ -73,6 +74,13 @@
         <span class="availability-badge availability-{{ book.availability.value }}">
             {{ book.availability.value | enum_label }}
         </span>
+    </td>
+    <td class="right fit-content">
+        {% if book.is_owned_by_owner(config.owner_obj) %}
+            <span class="availability-badge availability-owned">Yes</span>
+        {% else %}
+            <span class="availability-badge availability-not-owned">No</span>
+        {% endif %}
     </td>
     {% set filter_values = [] %}
     {% if book.read_count > 0 %}{% set _ = filter_values.append("Finished") %}{% endif %}

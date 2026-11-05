@@ -8,6 +8,7 @@ from relac.model import (
     Author,
     Availability,
     Book,
+    BookCollection,
     Owner,
     OwnerType,
     ReadingList,
@@ -20,6 +21,33 @@ from relac.model import (
     Work,
     WorkEdition,
 )
+
+
+def test_book_collection_owned_percentage() -> None:
+    """Calculate the share of collection books owned by a given owner."""
+    library_owner = Owner(id='library', name='Library')
+    owned_book = Book(
+        id='owned_book',
+        isbn13=9780000000001,
+        title='Owned',
+        owner_objs=[library_owner],
+    )
+    other_book = Book(
+        id='other_book',
+        isbn13=9780000000002,
+        title='Other',
+    )
+    collection = BookCollection(
+        id='collection',
+        name='Collection',
+        book_objs=[owned_book, other_book],
+    )
+
+    assert collection.owned_percentage(library_owner) == 50.0
+    assert (
+        BookCollection(id='empty', name='Empty').owned_percentage(library_owner)
+        == 0.0
+    )
 
 
 @pytest.mark.parametrize(

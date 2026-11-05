@@ -1197,7 +1197,8 @@ table.resources tbody tr.table-empty-state td {
 }
 
 .availability-directly,
-.availability-available-direct
+.availability-available-direct,
+.availability-owned
 {
     border-color: rgb(39 145 83 / 0.45);
     color: rgb(24, 112, 62);
@@ -1215,7 +1216,8 @@ table.resources tbody tr.table-empty-state td {
 }
 
 .availability-not-available,
-.availability-unavailable
+.availability-unavailable,
+.availability-not-owned
 {
     border-color: rgb(194 65 65 / 0.5);
     color: rgb(159, 43, 43);
@@ -1252,7 +1254,8 @@ table.resources tbody tr.table-empty-state td {
 }
 
 .dark .availability-directly,
-.dark .availability-available-direct
+.dark .availability-available-direct,
+.dark .availability-owned
 {
     color: rgb(127, 224, 161);
 }
@@ -1266,7 +1269,8 @@ table.resources tbody tr.table-empty-state td {
 }
 
 .dark .availability-not-available,
-.dark .availability-unavailable
+.dark .availability-unavailable,
+.dark .availability-not-owned
 {
     color: rgb(255, 145, 145);
 }

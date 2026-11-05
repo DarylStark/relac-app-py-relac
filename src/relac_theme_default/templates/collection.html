@@ -15,6 +15,12 @@
             <h3 id="detail-title">{{ collection.name }}</h2>
           </div>
         </div>
+        <dl class="detail-metadata">
+          <div class="detail-fact">
+            <dt>Books owned</dt>
+            <dd>{{ collection.owned_percentage(config.owner_obj) | round | int }}%</dd>
+          </div>
+        </dl>
       </section>
   </div>
 
