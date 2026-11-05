@@ -18,11 +18,15 @@ from relac.model import (
     Contributor,
     Owner,
     OwnerType,
+    ReadingSession,
+    ReadingState,
     RelacConfig,
     ResourceAvailability,
     Series,
     Work,
     WorkEdition,
+    WorkStructure,
+    WorkType,
 )
 
 
@@ -109,8 +113,15 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     environment.filters['country'] = lambda country: country
     environment.filters['isbn'] = str
     config = RelacConfig(title='Test Library')
+    environment.globals['config'] = config  # ty: ignore[invalid-assignment]
 
-    work = Work(id='test_work', title='Test Work', authors=[])
+    work = Work(
+        id='test_work',
+        title='Test Work',
+        authors=[],
+        work_structure=WorkStructure.UNSPECIFIED,
+        work_type=WorkType.UNSPECIFIED,
+    )
     illustrator = Contributor(id='illustrator', name='Test Illustrator')
     translator = Contributor(id='translator', name='Test Translator')
     edition = WorkEdition(
@@ -122,11 +133,24 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         illustrator_objs=[illustrator],
         translator_objs=[translator],
     )
+    session = ReadingSession(
+        id='test_session',
+        work_edition='test_edition',
+        book='test_book',
+        state=ReadingState.FINISHED,
+        rating=8.5,
+        work_edition_obj=edition,
+    )
+    edition.reading_session_objs.append(session)
     edition.illustrator_objs.append(translator)
+    work.edition_objs.append(edition)
 
     table_template = environment.get_template('_work_edition_table.html')
     table_macro = table_template.module.work_edition_table  # ty: ignore[unresolved-attribute]
     table_html = table_macro([edition])
+    reading_session_html = environment.get_template(
+        '_reading_session_table.html'
+    ).module.reading_session_table([session])  # ty: ignore[unresolved-attribute]
     work_editions_html = environment.get_template('work_editions.html').render(
         work_editions=[edition],
         config=config,
@@ -144,6 +168,10 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     )
     assert '<th scope="col">Work</th>' in table_html
     assert 'href="test_work.html">Test Work</a>' in table_html
+    assert 'data-sort-value="8.5"' in table_html
+    assert 'data-sort-value="8.5"' in reading_session_html
+    assert 'Rating' in reading_session_html
+    assert '8.5' in detail_html
     assert '<title>Work Editions | Test Library</title>' in work_editions_html
     assert 'href="works.html" class="active"' in work_editions_html
     assert (
@@ -166,7 +194,17 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         translator_work_edition_objs=[edition],
     )
     work.author_objs.append(contributor)
-    work.edition_objs.append(edition)
+    work_table_html = environment.get_template(
+        '_work_table.html'
+    ).module.work_table([work])  # ty: ignore[unresolved-attribute]
+    work_detail_html = environment.get_template('work.html').render(
+        work=work,
+        reading_lists=[],
+        config=config,
+    )
+    assert 'data-sort-value="8.5"' in work_table_html
+    assert '<dt>Rating</dt>' in work_detail_html
+    assert '8.5' in work_detail_html
     book = Book(
         id='test_book',
         isbn13=9781234567897,
@@ -178,6 +216,17 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         book=book,
         config=config,
     )
+    books_html = environment.get_template('books.html').render(
+        books=[book],
+        config=config,
+    )
+    assert (
+        '<th scope="col" class="right fit-content"'
+        ' data-sort-type="number">Rating</th>' in books_html
+    )
+    assert 'data-sort-value="8.5"' in books_html
+    assert '<dt>Rating</dt>' in book_html
+    assert '8.5' in book_html
     assert 'href="test_contributor.html">Test Contributor</a>' in book_html
     assert (
         'href="illustrator.html">Test Illustrator</a> (Illustrator)</span>'
@@ -235,7 +284,9 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     )
 
     assert empty_table_html.count('Unspecified') >= 2
+    assert 'Unrated' in empty_table_html
     assert empty_detail_html.count('Unspecified') >= 2
+    assert 'Unrated' in empty_detail_html
 
 
 def test_build_search_index_includes_owner_metadata_and_url() -> None:

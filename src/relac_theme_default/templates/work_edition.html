@@ -77,6 +77,10 @@
               {{ work_edition.language | language }}
             </dd>
           </div>
+          <div class="detail-fact">
+            <dt>Rating</dt>
+            <dd>{{ work_edition.rating if work_edition.rating is not none else "Unrated" }}</dd>
+          </div>
         </dl>
       </section>
   </div>

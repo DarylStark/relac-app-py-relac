@@ -18,6 +18,7 @@
                 <th scope="col" data-sort-type="date" data-filter-type="date">Release date</th>
                 <th scope="col">Type</th>
                 <th scope="col" class="right fit-content">Language</th>
+                <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
                 <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Availability</th>
             </tr>
@@ -74,6 +75,9 @@
     </td>
     <td>{{ work_edition.edition_type.value | enum_label }}</td>
     <td class="right fit-content">{{ work_edition.language | language }}</td>
+    <td class="right fit-content" data-sort-value="{{ work_edition.rating if work_edition.rating is not none else '' }}" data-filter-values='{{ ([work_edition.rating] if work_edition.rating is not none else ["Unrated"]) | tojson }}'>
+        {{ work_edition.rating if work_edition.rating is not none else "Unrated" }}
+    </td>
     <td class="right fit-content">
         <span class="availability-badge reading-state-badge reading-state-{{ work_edition.reading_state.value }}">
             {{ work_edition.reading_state.value | enum_label }}

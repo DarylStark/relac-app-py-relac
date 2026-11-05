@@ -20,6 +20,7 @@
                 <th scope="col" class="right fit-content">Owned</th>
                 <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Works read</th>
+                <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
             </tr>
         </thead>
         <tbody>
@@ -99,6 +100,9 @@
     </td>
     <td class="right fit-content">
         <pre>{{ book.read_percentage | round | int }}%</pre>
+    </td>
+    <td class="right fit-content" data-sort-value="{{ book.rating if book.rating is not none else '' }}" data-filter-values='{{ ([book.rating] if book.rating is not none else ["Unrated"]) | tojson }}'>
+        {{ book.rating if book.rating is not none else "Unrated" }}
     </td>
 </tr>
 {% endmacro %}

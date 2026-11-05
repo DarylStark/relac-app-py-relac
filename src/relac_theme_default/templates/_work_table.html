@@ -17,6 +17,7 @@
                 <th scope="col" class="fit-content">Category</th>
                 <th scope="col">Series</th>
                 <th scope="col" class="center fit-content">Editions</th>
+                <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
                 <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Availability</th>
             </tr>
@@ -61,6 +62,9 @@
         <pre>
             {{ work.edition_objs | length }}
         </pre>
+    </td>
+    <td class="right fit-content" data-sort-value="{{ work.rating if work.rating is not none else '' }}" data-filter-values='{{ ([work.rating] if work.rating is not none else ["Unrated"]) | tojson }}'>
+        {{ work.rating if work.rating is not none else "Unrated" }}
     </td>
     <td class="right fit-content">
         <span class="availability-badge reading-state-badge reading-state-{{ work.reading_state.value }}">

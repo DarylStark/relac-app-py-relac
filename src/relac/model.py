@@ -1,5 +1,6 @@
 """Module with the models for the application."""
 
+import statistics
 from collections.abc import Iterable
 from datetime import date, timedelta
 from enum import Enum
@@ -236,6 +237,16 @@ class Work(ResourceBase):
             for reading_session in edition.reading_session_objs
         ]
 
+    @property
+    def rating(self) -> float | None:
+        """Get the average rating for this work."""
+        ratings = [
+            rs_obj.rating for rs_obj in self.edition_objs if rs_obj.rating
+        ]
+        if not ratings:
+            return None
+        return statistics.mean(ratings)
+
 
 class WorkEditionType(Enum):
     """Work edition types."""
@@ -310,6 +321,18 @@ class WorkEdition(ResourceBase):
         if not self.work_obj:
             return []
         return self.work_obj.author_objs
+
+    @property
+    def rating(self) -> float | None:
+        """Get the average rating for this work edition."""
+        ratings = [
+            rs_obj.rating
+            for rs_obj in self.reading_session_objs
+            if rs_obj.rating
+        ]
+        if not ratings:
+            return None
+        return statistics.mean(ratings)
 
 
 class BookCollection(ResourceBase):
@@ -453,6 +476,16 @@ class Book(ResourceBase):
 
         return self.read_count / len(works) * 100
 
+    @property
+    def rating(self) -> float | None:
+        """Get the average rating for this book."""
+        ratings = [
+            rs_obj.rating for rs_obj in self.work_edition_objs if rs_obj.rating
+        ]
+        if not ratings:
+            return None
+        return statistics.mean(ratings)
+
     # Data retrievals
     def is_owned_by_owner(self, owner: Owner | None) -> bool:
         """Check if this book is owned by a specific owner."""
@@ -478,6 +511,8 @@ class ReadingSession(ResourceBase):
 
     startdate: date | None = None
     enddate: date | None = None
+
+    rating: float | None = None
 
     # Relationships (real objects)
     work_edition_obj: WorkEdition | None = None
