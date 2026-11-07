@@ -20,6 +20,9 @@
     --code-bg: rgb(37, 46, 43);
     --menu-shadow: rgb(0, 0, 0, 0.35);
     --focus: rgb(49, 134, 255);
+    --rating-low: rgb(255, 120, 120);
+    --rating-medium: rgb(255, 183, 77);
+    --rating-high: rgb(129, 199, 132);
     --transparent: transparent;
 }
 
@@ -43,6 +46,9 @@
     --code-bg: rgb(233, 241, 237);
     --menu-shadow: rgb(18, 33, 26, 0.16);
     --focus: rgb(31, 113, 196);
+    --rating-low: rgb(183, 28, 28);
+    --rating-medium: rgb(173, 98, 0);
+    --rating-high: rgb(27, 116, 49);
     --transparent: transparent;
 }
 
@@ -1052,6 +1058,40 @@ pre {
     margin: 0;
 }
 
+.rating-value {
+    font-family: "Google Sans Code", monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 400;
+}
+
+.rating-value--low {
+    border-color: color-mix(in srgb, var(--rating-low) 45%, transparent);
+    color: var(--rating-low);
+    background: color-mix(in srgb, var(--rating-low) 14%, transparent);
+}
+
+.rating-value--medium {
+    border-color: color-mix(in srgb, var(--rating-medium) 45%, transparent);
+    color: var(--rating-medium);
+    background: color-mix(in srgb, var(--rating-medium) 14%, transparent);
+}
+
+.rating-value--high {
+    border-color: color-mix(in srgb, var(--rating-high) 45%, transparent);
+    color: var(--rating-high);
+    background: color-mix(in srgb, var(--rating-high) 14%, transparent);
+}
+
+.rating-value--excellent {
+    border-color: var(--rating-high);
+    color: #000;
+    background: var(--rating-high);
+}
+
+.light .rating-value--excellent {
+    color: #fff;
+}
+
 div.table-scroll {
     max-width: 100%;
     overflow-x: auto;
@@ -1165,6 +1205,11 @@ table.resources tbody tr.table-empty-state td {
     font-weight: 550;
     line-height: 1.2;
     white-space: nowrap;
+}
+
+.availability-badge.rating-value
+{
+    font-weight: 400;
 }
 
 .availability-counts

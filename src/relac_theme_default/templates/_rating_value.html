@@ -1,0 +1,4 @@
+{% macro rating_value(rating) -%}
+    {%- set rating_class = 'rating-value--unrated' if rating is none else 'rating-value--low' if rating < 5 else 'rating-value--medium' if rating < 7 else 'rating-value--high' if rating < 9 else 'rating-value--excellent' -%}
+    <span class="availability-badge rating-value {{ rating_class }}">{{ rating if rating is not none else "Unrated" }}</span>
+{%- endmacro %}

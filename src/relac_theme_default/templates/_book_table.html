@@ -1,4 +1,5 @@
 {% from "_entity_link.html" import entity_link %}
+{% from "_rating_value.html" import rating_value %}
 
 {% macro book_table(books, title="Books") %}
 <div class="card table-card">
@@ -102,7 +103,7 @@
         <pre>{{ book.read_percentage | round | int }}%</pre>
     </td>
     <td class="right fit-content" data-sort-value="{{ book.rating if book.rating is not none else '' }}" data-filter-values='{{ ([book.rating] if book.rating is not none else ["Unrated"]) | tojson }}'>
-        {{ book.rating if book.rating is not none else "Unrated" }}
+        {{ rating_value(book.rating) }}
     </td>
 </tr>
 {% endmacro %}

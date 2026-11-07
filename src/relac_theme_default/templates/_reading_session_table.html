@@ -1,4 +1,5 @@
 {% from "_entity_link.html" import entity_link %}
+{% from "_rating_value.html" import rating_value %}
 
 {% macro reading_session_table(reading_sessions, title="Reading sessions") %}
 <div class="card table-card">
@@ -68,11 +69,11 @@
                             </span>
                         </td>
                         <td class="right fit-content" data-sort-value="{{ reading_session.work_rating.rating if reading_session.work_rating else '' }}" data-filter-values='{{ ([reading_session.work_rating.rating] if reading_session.work_rating else ["Unrated"]) | tojson }}'>
-                            {{ reading_session.work_rating.rating if reading_session.work_rating else "Unrated" }}
+                            {{ rating_value(reading_session.work_rating.rating if reading_session.work_rating else none) }}
                         </td>
                         <td>{{ reading_session.work_rating.note if reading_session.work_rating else '' }}</td>
                         <td class="right fit-content" data-sort-value="{{ reading_session.book_rating.rating if reading_session.book_rating else '' }}" data-filter-values='{{ ([reading_session.book_rating.rating] if reading_session.book_rating else ["Unrated"]) | tojson }}'>
-                            {{ reading_session.book_rating.rating if reading_session.book_rating else "Unrated" }}
+                            {{ rating_value(reading_session.book_rating.rating if reading_session.book_rating else none) }}
                         </td>
                         <td>{{ reading_session.book_rating.note if reading_session.book_rating else '' }}</td>
                     </tr>

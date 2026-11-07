@@ -52,6 +52,34 @@ def test_calculate_age_without_birthdate() -> None:
 
 
 @pytest.mark.parametrize(
+    ('rating', 'expected_class'),
+    [
+        (4.9, 'rating-value--low'),
+        (5.0, 'rating-value--medium'),
+        (6.9, 'rating-value--medium'),
+        (7.0, 'rating-value--high'),
+        (8.9, 'rating-value--high'),
+        (9.0, 'rating-value--excellent'),
+    ],
+)
+def test_rating_values_use_expected_color_category(
+    rating: float, expected_class: str
+) -> None:
+    """Apply rating colors at each threshold."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    template = Environment(
+        loader=FileSystemLoader(template_directory)
+    ).get_template('_rating_value.html')
+    rendered = template.module.rating_value(rating)  # ty: ignore[unresolved-attribute]
+
+    assert (
+        f'class="availability-badge rating-value {expected_class}"' in rendered
+    )
+
+
+@pytest.mark.parametrize(
     ('availability', 'expected'),
     [
         (ResourceAvailability.UNAVAILABLE, 'Unavailable'),
