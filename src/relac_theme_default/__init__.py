@@ -19,6 +19,7 @@ relac_theme = RelacTheme(
         'list': 'list.html',
         'series': 'series_detail.html',
         'owner': 'owner.html',
+        'reading_session': 'reading_session.html',
     },
     index_pages={
         'books': 'books.html',

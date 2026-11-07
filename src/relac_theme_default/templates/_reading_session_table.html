@@ -26,15 +26,17 @@
             </thead>
             <tbody>
                 {% for reading_session in reading_sessions %}
-                    <tr>
+                    <tr data-href="{{ reading_session.id }}.html">
                         <td data-sort-value="{{ reading_session.startdate.isoformat() if reading_session.startdate else '' }}" data-filter-values='{{ ([reading_session.startdate.isoformat()] if reading_session.startdate else [""]) | tojson }}'>
                             {% if reading_session.startdate %}
                                 <time datetime="{{ reading_session.startdate.isoformat() }}" data-local-date>{{ reading_session.startdate }}</time>
                             {% endif %}
                         </td>
-                        <td data-sort-value="{{ reading_session.enddate.isoformat() if reading_session.enddate else '' }}" data-filter-values='{{ ([reading_session.enddate.isoformat()] if reading_session.enddate else [""]) | tojson }}'>
+                        <td data-sort-value="{{ reading_session.enddate.isoformat() if reading_session.enddate else '' }}" data-filter-values='{{ ([reading_session.enddate.isoformat()] if reading_session.enddate else (["Ongoing"] if reading_session.state.value == "reading" else [""])) | tojson }}'>
                             {% if reading_session.enddate %}
                                 <time datetime="{{ reading_session.enddate.isoformat() }}" data-local-date>{{ reading_session.enddate }}</time>
+                            {% elif reading_session.state.value == "reading" %}
+                                Ongoing
                             {% endif %}
                         </td>
                         <td>

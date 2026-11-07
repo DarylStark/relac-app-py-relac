@@ -33,3 +33,26 @@ reading_session.nineteen_eighty_four_third_time:
   work_rating:
     rating: 9.5
     note: "Yeah, lovely book"
+
+reading_session.nineteen_eighty_four_no_start_date:
+  work_edition: work_edition.george_orwell__nineteen_eighty_four__original
+  book: book.george_orwell__nineteen_eighty_four__clothbound_classic
+  state: reading
+  book_rating:
+    rating: 6
+    note: "Book is doing not good"
+  work_rating:
+    rating: 9.5
+    note: "Yeah, lovely book"
+
+reading_session.nineteen_eighty_four_no_end_date__finished:
+  work_edition: work_edition.george_orwell__nineteen_eighty_four__original
+  book: book.george_orwell__nineteen_eighty_four__clothbound_classic
+  state: finished
+  startdate: 2026-09-09
+  book_rating:
+    rating: 6
+    note: "Book is doing not good"
+  work_rating:
+    rating: 9.5
+    note: "Yeah, lovely book"

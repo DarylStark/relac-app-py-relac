@@ -1383,6 +1383,18 @@ table.resources tbody tr.table-empty-state td {
     overflow-wrap: anywhere;
 }
 
+.detail-fact dd > .availability-badge,
+.detail-fact dd > time,
+.detail-fact dd > pre
+{
+    align-self: flex-start;
+}
+
+.detail-fact dd > .rating-value
+{
+    margin: 5px 0;
+}
+
 .detail-small,
 .detail-unspecified
 {

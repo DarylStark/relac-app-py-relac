@@ -37,6 +37,7 @@ class RelacTheme:
             'list',
             'owner',
             'series',
+            'reading_session',
         ],
         str,
     ] = field(default_factory=dict)
