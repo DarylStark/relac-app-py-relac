@@ -149,6 +149,15 @@ class Contributor(ResourceBase):
 
         return self.read_count / len(self.work_objs) * 100
 
+    @property
+    def rating(self) -> float | None:
+        """Get the rating for this Contributor based on its works."""
+        """Get the average rating for this book."""
+        ratings = [rs_obj.rating for rs_obj in self.work_objs if rs_obj.rating]
+        if not ratings:
+            return None
+        return statistics.mean(ratings)
+
 
 class WorkType(Enum):
     """Work types."""

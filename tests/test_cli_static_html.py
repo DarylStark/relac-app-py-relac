@@ -394,8 +394,14 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         contributor=contributor,
         config=config,
     )
+    contributor_table_html = environment.get_template(
+        '_contributor_table.html'
+    ).module.contributor_table([contributor])  # ty: ignore[unresolved-attribute]
 
     assert 'Works for this contributor' in contributor_html
+    assert 'rating-value--high' in contributor_html
+    assert 'data-sort-value="8.5"' in contributor_table_html
+    assert 'rating-value--high' in contributor_table_html
     assert 'Work Editions illustrated by this contributor' in contributor_html
     assert 'Work Editions translated by this contributor' in contributor_html
     assert 'id="illustrator-work-editions-table"' in contributor_html
