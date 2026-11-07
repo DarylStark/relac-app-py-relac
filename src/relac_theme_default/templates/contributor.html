@@ -6,6 +6,7 @@
 {% from "_book_table.html" import book_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_rating_value.html" import rating_value %}
 
 {% block content %}
 <div class="content">
@@ -53,6 +54,10 @@
           <div class="detail-fact">
             <dt>Works read</dt>
             <dd>{{ contributor.read_percentage | round | int }}%</dd>
+          </div>
+          <div class="detail-fact">
+            <dt>Rating</dt>
+            <dd>{{ rating_value(contributor.rating) }}</dd>
           </div>
         </dl>
       </section>

@@ -1,0 +1,109 @@
+{% extends "_base.html" %}
+{% set active_page = "reading-sessions" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_entity_link.html" import entity_link %}
+{% from "_rating_value.html" import rating_value %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([
+      ("Works", "works.html"),
+      ("Reading sessions", "reading-sessions.html"),
+      ("Reading session", none)
+  ]) }}
+  <div class="card">
+    <section class="detail-summary" aria-labelledby="detail-title">
+      <div class="detail-summary-header">
+        <div>
+          <p class="detail-kind">Reading session</p>
+          <h3 id="detail-title">
+            {% if reading_session.work_edition_obj %}
+              Reading session: {{ reading_session.work_edition_obj.title }}
+            {% else %}
+              Reading session
+            {% endif %}
+          </h3>
+        </div>
+        <p class="detail-badge">
+          <span class="availability-badge reading-state-badge reading-state-{{ reading_session.state.value }}">
+            {{ reading_session.state.value | enum_label }}
+          </span>
+        </p>
+      </div>
+      <dl class="detail-metadata">
+        <div class="detail-fact">
+          <dt>Work</dt>
+          <dd>
+            {% if reading_session.work_edition_obj and reading_session.work_edition_obj.work_obj %}
+              {{ entity_link(reading_session.work_edition_obj.work_obj, reading_session.work_edition_obj.work_obj.title) }}
+            {% else %}
+              <span class="detail-unspecified">Unspecified</span>
+            {% endif %}
+            {{ rating_value(reading_session.work_rating.rating if reading_session.work_rating else none) }}
+            {% if reading_session.work_rating and reading_session.work_rating.note %}
+              <span class="detail-small">{{ reading_session.work_rating.note }}</span>
+            {% endif %}
+          </dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Work edition</dt>
+          <dd>
+            {% if reading_session.work_edition_obj %}
+              {{ entity_link(reading_session.work_edition_obj, reading_session.work_edition_obj.title) }}
+            {% else %}
+              <span class="detail-unspecified">Unspecified</span>
+            {% endif %}
+          </dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Book</dt>
+          <dd>
+            {% if reading_session.book_obj %}
+              {{ entity_link(reading_session.book_obj, reading_session.book_obj.title) }}
+            {% else %}
+              <span class="detail-unspecified">Unspecified</span>
+            {% endif %}
+            {{ rating_value(reading_session.book_rating.rating if reading_session.book_rating else none) }}
+            {% if reading_session.book_rating and reading_session.book_rating.note %}
+              <span class="detail-small">{{ reading_session.book_rating.note }}</span>
+            {% endif %}
+          </dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Start date</dt>
+          <dd>
+            {% if reading_session.startdate %}
+              <time datetime="{{ reading_session.startdate.isoformat() }}" data-local-date>{{ reading_session.startdate }}</time>
+            {% else %}
+              <span class="detail-unspecified">Unspecified</span>
+            {% endif %}
+          </dd>
+        </div>
+        <div class="detail-fact">
+          <dt>End date</dt>
+          <dd>
+            {% if reading_session.enddate %}
+              <time datetime="{{ reading_session.enddate.isoformat() }}" data-local-date>{{ reading_session.enddate }}</time>
+            {% elif reading_session.state.value == "reading" %}
+              Ongoing
+            {% else %}
+              <span class="detail-unspecified">Unspecified</span>
+            {% endif %}
+          </dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Reading days</dt>
+          <dd>
+            {% if reading_session.duration is not none %}
+              <pre>{{ reading_session.duration.days }}</pre>
+            {% else %}
+              <span class="detail-unspecified">Unspecified</span>
+            {% endif %}
+          </dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+</div>
+{% endblock %}

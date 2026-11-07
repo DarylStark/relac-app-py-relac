@@ -1,4 +1,5 @@
 {% from "_entity_link.html" import entity_link %}
+{% from "_rating_value.html" import rating_value %}
 
 {% macro work_table(works, show_order=false, title="Works", order_attribute="order") %}
 <div class="card table-card">
@@ -64,7 +65,7 @@
         </pre>
     </td>
     <td class="right fit-content" data-sort-value="{{ work.rating if work.rating is not none else '' }}" data-filter-values='{{ ([work.rating] if work.rating is not none else ["Unrated"]) | tojson }}'>
-        {{ work.rating if work.rating is not none else "Unrated" }}
+        {{ rating_value(work.rating) }}
     </td>
     <td class="right fit-content">
         <span class="availability-badge reading-state-badge reading-state-{{ work.reading_state.value }}">

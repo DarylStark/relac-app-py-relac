@@ -202,6 +202,48 @@ def _build_search_index(
         details = [f'Works: {", ".join(work_titles)}'] if work_titles else []
         add_entry('Series', series.id, series.name, details)
 
+    for reading_session in db.get_reading_sessions():
+        work_edition_title = (
+            reading_session.work_edition_obj.title
+            if reading_session.work_edition_obj
+            else ''
+        )
+        book_title = (
+            reading_session.book_obj.title if reading_session.book_obj else ''
+        )
+        details = [
+            f'Work edition: {work_edition_title}' if work_edition_title else '',
+            f'Book: {book_title}' if book_title else '',
+            f'State: {_format_enum_label(reading_session.state.value)}',
+            f'Start date: {reading_session.startdate}'
+            if reading_session.startdate
+            else '',
+            f'End date: {reading_session.enddate}'
+            if reading_session.enddate
+            else '',
+            f'Work rating: {reading_session.work_rating.rating}'
+            if reading_session.work_rating
+            else '',
+            f'Work rating note: {reading_session.work_rating.note}'
+            if reading_session.work_rating and reading_session.work_rating.note
+            else '',
+            f'Book rating: {reading_session.book_rating.rating}'
+            if reading_session.book_rating
+            else '',
+            f'Book rating note: {reading_session.book_rating.note}'
+            if reading_session.book_rating and reading_session.book_rating.note
+            else '',
+        ]
+        add_entry(
+            'Reading session',
+            reading_session.id,
+            work_edition_title
+            or book_title
+            or reading_session.id
+            or 'Reading session',
+            [detail for detail in details if detail],
+        )
+
     return {'items': entries}
 
 
@@ -394,4 +436,14 @@ def create(  # noqa: PLR0912, PLR0915
             template = env.get_template(metadata.resource_pages['series'])
             html = template.render(series=series)
             out_path = output / f'{series.id}.html'
+            out_path.write_text(html)
+
+    # Reading sessions
+    if 'reading_session' in metadata.resource_pages:
+        for reading_session in db.get_reading_sessions():
+            template = env.get_template(
+                metadata.resource_pages['reading_session']
+            )
+            html = template.render(reading_session=reading_session)
+            out_path = output / f'{reading_session.id}.html'
             out_path.write_text(html)

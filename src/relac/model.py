@@ -149,6 +149,15 @@ class Contributor(ResourceBase):
 
         return self.read_count / len(self.work_objs) * 100
 
+    @property
+    def rating(self) -> float | None:
+        """Get the rating for this Contributor based on its works."""
+        """Get the average rating for this book."""
+        ratings = [rs_obj.rating for rs_obj in self.work_objs if rs_obj.rating]
+        if not ratings:
+            return None
+        return statistics.mean(ratings)
+
 
 class WorkType(Enum):
     """Work types."""
@@ -326,9 +335,9 @@ class WorkEdition(ResourceBase):
     def rating(self) -> float | None:
         """Get the average rating for this work edition."""
         ratings = [
-            rs_obj.rating
+            rs_obj.work_rating.rating
             for rs_obj in self.reading_session_objs
-            if rs_obj.rating
+            if rs_obj.work_rating
         ]
         if not ratings:
             return None
@@ -480,7 +489,9 @@ class Book(ResourceBase):
     def rating(self) -> float | None:
         """Get the average rating for this book."""
         ratings = [
-            rs_obj.rating for rs_obj in self.work_edition_objs if rs_obj.rating
+            rs_obj.book_rating.rating
+            for rs_obj in self.reading_session_objs
+            if rs_obj.book_rating
         ]
         if not ratings:
             return None
@@ -502,6 +513,13 @@ class ReadingState(Enum):
     DID_NOT_FINISH = 'did-not-finish'
 
 
+class Rating(BaseModel):
+    """A object for a rating."""
+
+    rating: float
+    note: str | None = None
+
+
 class ReadingSession(ResourceBase):
     """A reading session."""
 
@@ -511,8 +529,8 @@ class ReadingSession(ResourceBase):
 
     startdate: date | None = None
     enddate: date | None = None
-
-    rating: float | None = None
+    work_rating: Rating | None = None
+    book_rating: Rating | None = None
 
     # Relationships (real objects)
     work_edition_obj: WorkEdition | None = None
@@ -534,6 +552,16 @@ class ReadingSession(ResourceBase):
             return None
 
         return self.effective_enddate - self.startdate
+
+    @property
+    def rating(self) -> float | None:
+        """Get the average rating for this Reading Session."""
+        ratings: list[float] = []
+        if self.work_rating:
+            ratings.append(self.work_rating.rating)
+        if self.book_rating:
+            ratings.append(self.book_rating.rating)
+        return None if len(ratings) == 0 else statistics.mean(ratings)
 
 
 class Label(ResourceBase):

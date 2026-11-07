@@ -1,4 +1,5 @@
 {% from "_entity_link.html" import entity_link %}
+{% from "_rating_value.html" import rating_value %}
 
 {% macro contributor_table(contributors, title="Contributors") %}
 <div class="card table-card">
@@ -11,6 +12,7 @@
         <thead>
             <tr>
                 <th scope="col">Name</th>
+                <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
                 <th scope="col">State</th>
                 <th scope="col" class="right fit-content" data-sort-type="date" data-filter-type="date">Birthdate</th>
                 <th scope="col" class="right fit-content" data-sort-type="date" data-filter-type="date">Deceased date</th>
@@ -34,6 +36,9 @@
 {% macro contributor_row(contributor) %}
 <tr data-href="{{ contributor.id }}.html">
     <td>{{ entity_link(contributor, contributor.name) }}</td>
+    <td class="right fit-content" data-sort-value="{{ contributor.rating if contributor.rating is not none else '' }}" data-filter-values='{{ ([contributor.rating] if contributor.rating is not none else ["Unrated"]) | tojson }}'>
+        {{ rating_value(contributor.rating) }}
+    </td>
     <td>{{ contributor.state.value | enum_label }}</td>
     <td class="center fit-content" data-sort-value="{{ contributor.birthdate.isoformat() if contributor.birthdate else '' }}" data-filter-values='{{ ([contributor.birthdate.isoformat()] if contributor.birthdate else [""]) | tojson }}'>
         {% if contributor.birthdate %}

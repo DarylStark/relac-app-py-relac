@@ -20,7 +20,7 @@
     {% elif active_page == "series" %}
         {% set page_title = ("Series: " ~ series.name) if series is defined else "Series" %}
     {% elif active_page == "reading-sessions" %}
-        {% set page_title = "Reading sessions" %}
+        {% set page_title = ("Reading session: " ~ reading_session.work_edition_obj.title) if reading_session is defined and reading_session.work_edition_obj else "Reading sessions" %}
     {% else %}
         {% set page_title = "Relac library" %}
     {% endif %}
