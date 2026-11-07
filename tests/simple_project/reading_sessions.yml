@@ -3,11 +3,21 @@ reading_session.nineteen_eighty_four:
   book: book.george_orwell__nineteen_eighty_four__clothbound_classic
   state: reading
   startdate: 2026-01-26
-  rating: 7.0
+  work_rating:
+    rating: 7
+    note: "Good story"
+  book_rating:
+    rating: 7
+    note: "Good looking book but hard to hold open"
 
 reading_session.nineteen_eighty_four_second_time:
   work_edition: work_edition.george_orwell__nineteen_eighty_four__original
   book: book.george_orwell__nineteen_eighty_four__clothbound_classic
   state: reading
   startdate: 2026-10-26
-  rating: 6.0
+  book_rating:
+    rating: 6
+    note: "Book is wearing off"
+  work_rating:
+    rating: 8
+    note: "I appreciate it more now"

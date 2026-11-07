@@ -18,6 +18,7 @@ from relac.model import (
     Contributor,
     Owner,
     OwnerType,
+    Rating,
     ReadingSession,
     ReadingState,
     RelacConfig,
@@ -138,7 +139,8 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         work_edition='test_edition',
         book='test_book',
         state=ReadingState.FINISHED,
-        rating=8.5,
+        work_rating=Rating(rating=8.5),
+        book_rating=Rating(rating=6.5),
         work_edition_obj=edition,
     )
     edition.reading_session_objs.append(session)
@@ -170,7 +172,9 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'href="test_work.html">Test Work</a>' in table_html
     assert 'data-sort-value="8.5"' in table_html
     assert 'data-sort-value="8.5"' in reading_session_html
-    assert 'Rating' in reading_session_html
+    assert 'data-sort-value="6.5"' in reading_session_html
+    assert 'Work rating' in reading_session_html
+    assert 'Book rating' in reading_session_html
     assert '8.5' in detail_html
     assert '<title>Work Editions | Test Library</title>' in work_editions_html
     assert 'href="works.html" class="active"' in work_editions_html
@@ -211,6 +215,7 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         title='Test Book',
         contributor_objs=[contributor, illustrator, translator],
         work_edition_objs=[edition],
+        reading_session_objs=[session],
     )
     book_html = environment.get_template('book.html').render(
         book=book,
@@ -224,7 +229,7 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         '<th scope="col" class="right fit-content"'
         ' data-sort-type="number">Rating</th>' in books_html
     )
-    assert 'data-sort-value="8.5"' in books_html
+    assert 'data-sort-value="6.5"' in books_html
     assert '<dt>Rating</dt>' in book_html
     assert '8.5' in book_html
     assert 'href="test_contributor.html">Test Contributor</a>' in book_html

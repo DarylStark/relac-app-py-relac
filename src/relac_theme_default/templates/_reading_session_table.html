@@ -17,7 +17,8 @@
                     <th scope="col">Authors</th>
                     <th scope="col" class="center fit-content">Reading days</th>
                     <th scope="col" class="right fit-content">State</th>
-                    <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Work rating</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Book rating</th>
                 </tr>
             </thead>
             <tbody>
@@ -64,8 +65,11 @@
                                 {{ reading_session.state.value | enum_label }}
                             </span>
                         </td>
-                        <td class="right fit-content" data-sort-value="{{ reading_session.rating if reading_session.rating is not none else '' }}" data-filter-values='{{ ([reading_session.rating] if reading_session.rating is not none else ["Unrated"]) | tojson }}'>
-                            {{ reading_session.rating if reading_session.rating is not none else "Unrated" }}
+                        <td class="right fit-content" data-sort-value="{{ reading_session.work_rating.rating if reading_session.work_rating else '' }}" data-filter-values='{{ ([reading_session.work_rating.rating] if reading_session.work_rating else ["Unrated"]) | tojson }}'>
+                            {{ reading_session.work_rating.rating if reading_session.work_rating else "Unrated" }}
+                        </td>
+                        <td class="right fit-content" data-sort-value="{{ reading_session.book_rating.rating if reading_session.book_rating else '' }}" data-filter-values='{{ ([reading_session.book_rating.rating] if reading_session.book_rating else ["Unrated"]) | tojson }}'>
+                            {{ reading_session.book_rating.rating if reading_session.book_rating else "Unrated" }}
                         </td>
                     </tr>
                 {% endfor %}
