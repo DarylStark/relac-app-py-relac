@@ -18,7 +18,9 @@
                     <th scope="col" class="center fit-content">Reading days</th>
                     <th scope="col" class="right fit-content">State</th>
                     <th scope="col" class="right fit-content" data-sort-type="number">Work rating</th>
+                    <th scope="col">Work rating note</th>
                     <th scope="col" class="right fit-content" data-sort-type="number">Book rating</th>
+                    <th scope="col">Book rating note</th>
                 </tr>
             </thead>
             <tbody>
@@ -68,9 +70,11 @@
                         <td class="right fit-content" data-sort-value="{{ reading_session.work_rating.rating if reading_session.work_rating else '' }}" data-filter-values='{{ ([reading_session.work_rating.rating] if reading_session.work_rating else ["Unrated"]) | tojson }}'>
                             {{ reading_session.work_rating.rating if reading_session.work_rating else "Unrated" }}
                         </td>
+                        <td>{{ reading_session.work_rating.note if reading_session.work_rating else '' }}</td>
                         <td class="right fit-content" data-sort-value="{{ reading_session.book_rating.rating if reading_session.book_rating else '' }}" data-filter-values='{{ ([reading_session.book_rating.rating] if reading_session.book_rating else ["Unrated"]) | tojson }}'>
                             {{ reading_session.book_rating.rating if reading_session.book_rating else "Unrated" }}
                         </td>
+                        <td>{{ reading_session.book_rating.note if reading_session.book_rating else '' }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

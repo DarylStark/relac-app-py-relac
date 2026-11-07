@@ -139,8 +139,8 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         work_edition='test_edition',
         book='test_book',
         state=ReadingState.FINISHED,
-        work_rating=Rating(rating=8.5),
-        book_rating=Rating(rating=6.5),
+        work_rating=Rating(rating=8.5, note='Great characterization'),
+        book_rating=Rating(rating=6.5, note='Comfortable binding'),
         work_edition_obj=edition,
     )
     edition.reading_session_objs.append(session)
@@ -175,6 +175,10 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'data-sort-value="6.5"' in reading_session_html
     assert 'Work rating' in reading_session_html
     assert 'Book rating' in reading_session_html
+    assert 'Work rating note' in reading_session_html
+    assert 'Book rating note' in reading_session_html
+    assert 'Great characterization' in reading_session_html
+    assert 'Comfortable binding' in reading_session_html
     assert '8.5' in detail_html
     assert '<title>Work Editions | Test Library</title>' in work_editions_html
     assert 'href="works.html" class="active"' in work_editions_html
