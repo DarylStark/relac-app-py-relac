@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% set active_page = "labels" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_label_table.html" import label_table %}
+
+{% block content %}
+<div class="content">
+    {{ breadcrumbs([("Labels", none)]) }}
+    {{ label_table(labels) }}
+</div>
+{% endblock %}

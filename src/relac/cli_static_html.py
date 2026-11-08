@@ -334,6 +334,14 @@ def create(  # noqa: PLR0912, PLR0915
         out_path = output / 'contributors.html'
         out_path.write_text(html)
 
+    if 'labels' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['labels'])
+        html = template.render(
+            labels=db.get_labels(),
+        )
+        out_path = output / 'labels.html'
+        out_path.write_text(html)
+
     if 'owners' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['owners'])
         html = template.render(
@@ -380,6 +388,14 @@ def create(  # noqa: PLR0912, PLR0915
             template = env.get_template(metadata.resource_pages['contributor'])
             html = template.render(contributor=contributor)
             out_path = output / f'{contributor.id}.html'
+            out_path.write_text(html)
+
+    # Labels
+    if 'label' in metadata.resource_pages:
+        for label in db.get_labels():
+            template = env.get_template(metadata.resource_pages['label'])
+            html = template.render(label=label)
+            out_path = output / f'{label.id}.html'
             out_path.write_text(html)
 
     # Owners

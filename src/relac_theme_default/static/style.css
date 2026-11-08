@@ -1429,6 +1429,7 @@ table.resources tbody tr.table-empty-state td {
     background: var(--transparent);
     font-size: 12px;
     line-height: 1.2;
+    text-decoration: none;
     overflow-wrap: anywhere;
 }
 

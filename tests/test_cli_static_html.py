@@ -448,6 +448,26 @@ def test_static_html_create_generates_reading_session_detail(
     session_pages = list(tmp_path.glob('reading_session.*.html'))
     assert session_pages
     assert '<title>Reading session:' in session_pages[0].read_text()
+    labels_page = tmp_path / 'labels.html'
+    assert labels_page.exists()
+    labels_html = labels_page.read_text()
+    assert 'Contributor count' in labels_html
+    assert (
+        'href="labels.html" class="active" aria-current="page">Labels</a>'
+        in labels_html
+    )
+    label_row = labels_html.split('<tr data-href="label.test_label.html">', 1)[
+        1
+    ].split('</tr>', 1)[0]
+    assert 'href="label.test_label.html">testlabel</a>' in label_row
+    assert '<pre>1</pre>' in label_row
+    label_page = tmp_path / 'label.test_label.html'
+    assert label_page.exists()
+    label_html = label_page.read_text()
+    assert 'Contributors with this label' in label_html
+    assert (
+        'href="contributor.john_williams.html">John Willams</a>' in label_html
+    )
 
 
 def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR0915
@@ -675,8 +695,14 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         1
     ].split('</section>', 1)[0]
     assert labels_html.index('Author') < labels_html.index('Zebra')
-    assert '<li class="detail-label-pill">Author</li>' in labels_html
-    assert '<li class="detail-label-pill">Zebra</li>' in labels_html
+    assert (
+        '<a class="detail-label-pill" href="label_author.html">Author</a>'
+        in labels_html
+    )
+    assert (
+        '<a class="detail-label-pill" href="label_zebra.html">Zebra</a>'
+        in labels_html
+    )
     assert 'data-sort-value="8.5"' in contributor_table_html
     assert contributor_table_html.index(
         '>Works read</th>'

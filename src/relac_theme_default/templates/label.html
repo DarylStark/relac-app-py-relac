@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% set active_page = "labels" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_contributor_table.html" import contributor_table %}
+
+{% block content %}
+<div class="content">
+    {{ breadcrumbs([("Labels", "labels.html"), (label.name, none)]) }}
+    {{ contributor_table(label.contributor_objs, "Contributors with this label") }}
+</div>
+{% endblock %}
