@@ -29,6 +29,7 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "command": true
+        "command": true,
+        "./.venv/bin/pytest": true
     }
 }

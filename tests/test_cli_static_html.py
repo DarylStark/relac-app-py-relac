@@ -296,6 +296,7 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'Great characterization' in reading_session_html
     assert 'Comfortable binding' in reading_session_html
     assert 'data-href="test_session.html"' in reading_session_html
+
     assert '8.5' in detail_html
     assert '<title>Work Editions | Test Library</title>' in work_editions_html
     assert 'href="works.html" class="active"' in work_editions_html
@@ -359,6 +360,14 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'Great characterization' in reading_session_detail_html
     assert 'Comfortable binding' in reading_session_detail_html
     assert 'datetime="2026-01-01"' in reading_session_detail_html
+
+    session.work_rating = Rating(rating=8.5)
+    session.book_rating = Rating(rating=6.5)
+    reading_session_html = environment.get_template(
+        '_reading_session_table.html'
+    ).module.reading_session_table([session])  # ty: ignore[unresolved-attribute]
+    assert '<td>None</td>' not in reading_session_html
+
     assert (
         reading_session_detail_html.index('href="test_work.html">Test Work</a>')
         < reading_session_detail_html.index('8.5')
