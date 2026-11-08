@@ -363,6 +363,15 @@ class BookCollection(ResourceBase):
         )
         return owned_count / len(self.book_objs) * 100
 
+    @property
+    def rating(self) -> float | None:
+        """Get the average rating for this work."""
+        ratings = [rs_obj.rating for rs_obj in self.book_objs if rs_obj.rating]
+        rated_ratings = [rating for rating in ratings if rating is not None]
+        if not rated_ratings:
+            return None
+        return statistics.mean(rated_ratings)
+
 
 class BookPublisher(ResourceBase):
     """Model for a publisher."""

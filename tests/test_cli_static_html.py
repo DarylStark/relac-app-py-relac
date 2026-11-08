@@ -17,6 +17,7 @@ from relac.main import app
 from relac.model import (
     Availability,
     Book,
+    BookCollection,
     Contributor,
     Owner,
     OwnerType,
@@ -286,6 +287,77 @@ def test_reading_list_rating_renders_in_table_and_detail() -> None:
         config=config,
     )
 
+    assert 'data-filter-values=\'["Unrated"]\'' in unrated_table
+    assert 'rating-value--unrated">Unrated</span>' in unrated_table
+    assert 'rating-value--unrated">Unrated</span>' in unrated_detail
+
+
+def test_book_collection_rating_renders_in_table_and_detail() -> None:
+    """Show BookCollection ratings in the table and detail metadata."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['enum_label'] = _format_enum_label
+    environment.filters['language'] = lambda language: language or ''
+    environment.filters['age'] = _calculate_age
+    environment.filters['country'] = lambda country: country
+    environment.filters['isbn'] = str
+    config = RelacConfig(title='Test Library')
+    environment.globals['config'] = config  # ty: ignore[invalid-assignment]
+
+    session = ReadingSession(
+        id='rated_book_session',
+        work_edition='rated_book_edition',
+        book='rated_book',
+        state=ReadingState.FINISHED,
+        book_rating=Rating(rating=8.5),
+    )
+    book = Book(
+        id='rated_book',
+        isbn13=9781234567897,
+        title='Rated Book',
+        reading_session_objs=[session],
+    )
+    collection = BookCollection(
+        id='rated_collection',
+        name='Rated Collection',
+        book_objs=[book],
+    )
+    collection_table = environment.get_template(
+        '_collection_table.html'
+    ).module.collection_table([collection])  # ty: ignore[unresolved-attribute]
+    collection_detail = environment.get_template('collection.html').render(
+        collection=collection,
+        config=config,
+    )
+
+    assert collection_table.index('>Owned</th>') < collection_table.index(
+        '>Rating</th>'
+    )
+    collection_row = collection_table.split(
+        '<tr data-href="rated_collection.html">', 1
+    )[1].split('</tr>', 1)[0]
+    assert collection_row.index(
+        'data-sort-value="8.5"'
+    ) > collection_row.rindex('<td')
+    assert 'rating-value--high">8.5</span>' in collection_row
+    rating_fact = collection_detail.split('<dt>Rating</dt>', 1)[1].split(
+        '</div>', 1
+    )[0]
+    assert 'rating-value--high">8.5</span>' in rating_fact
+
+    unrated_collection = BookCollection(
+        id='unrated_collection',
+        name='Unrated Collection',
+    )
+    unrated_table = environment.get_template(
+        '_collection_table.html'
+    ).module.collection_table([unrated_collection])  # ty: ignore[unresolved-attribute]
+    unrated_detail = environment.get_template('collection.html').render(
+        collection=unrated_collection,
+        config=config,
+    )
     assert 'data-filter-values=\'["Unrated"]\'' in unrated_table
     assert 'rating-value--unrated">Unrated</span>' in unrated_table
     assert 'rating-value--unrated">Unrated</span>' in unrated_detail

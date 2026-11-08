@@ -1,3 +1,5 @@
+{% from "_rating_value.html" import rating_value %}
+
 {% macro collection_table(collections, title="Collections") %}
 <div class="card table-card">
     <header class="table-card-header">
@@ -11,6 +13,7 @@
                 <th scope="col">Name</th>
                 <th scope="col" class="center fit-content">Books</th>
                 <th scope="col" class="right fit-content">Owned</th>
+                <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
             </tr>
         </thead>
         <tbody>
@@ -33,6 +36,9 @@
     </td>
     <td class="right fit-content">
         <pre>{{ collection.owned_percentage(config.owner_obj) | round | int }}%</pre>
+    </td>
+    <td class="right fit-content" data-sort-value="{{ collection.rating if collection.rating is not none else '' }}" data-filter-values='{{ ([collection.rating] if collection.rating is not none else ["Unrated"]) | tojson }}'>
+        {{ rating_value(collection.rating) }}
     </td>
 </tr>
 {% endmacro %}
