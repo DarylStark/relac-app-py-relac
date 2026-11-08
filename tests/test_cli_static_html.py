@@ -21,6 +21,8 @@ from relac.model import (
     Owner,
     OwnerType,
     Rating,
+    ReadingList,
+    ReadingListItem,
     ReadingSession,
     ReadingState,
     RelacConfig,
@@ -192,6 +194,101 @@ def test_reading_session_table_shows_ongoing_end_date() -> None:
 
     assert 'Ongoing' in reading_sessions
     assert 'data-filter-values=\'["Ongoing"]\'' in reading_sessions
+
+
+def test_reading_list_rating_renders_in_table_and_detail() -> None:
+    """Show reading-list ratings with one decimal, including unrated lists."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['enum_label'] = _format_enum_label
+    environment.filters['language'] = lambda language: language or ''
+    environment.filters['age'] = _calculate_age
+    environment.filters['country'] = lambda country: country
+    environment.filters['isbn'] = str
+    config = RelacConfig(title='Test Library')
+
+    session = ReadingSession(
+        id='rated_session',
+        work_edition='rated_edition',
+        book='rated_book',
+        state=ReadingState.FINISHED,
+        work_rating=Rating(rating=8.5),
+    )
+    edition = WorkEdition(
+        id='rated_edition',
+        title='Rated Edition',
+        work='rated_work',
+        language='en',
+        reading_session_objs=[session],
+    )
+    work = Work(
+        id='rated_work',
+        title='Rated Work',
+        authors=[],
+        work_structure=WorkStructure.UNSPECIFIED,
+        work_type=WorkType.UNSPECIFIED,
+        edition_objs=[edition],
+    )
+    rated_list = ReadingList(
+        id='rated_list',
+        name='Rated List',
+        works=[ReadingListItem(order=1, work='rated_work', work_obj=work)],
+    )
+    list_table = environment.get_template('_list_table.html').module.list_table(  # ty: ignore[unresolved-attribute]
+        [rated_list]
+    )
+    list_detail = environment.get_template('list.html').render(
+        list=rated_list,
+        config=config,
+    )
+
+    assert list_table.index('>Works read</th>') < list_table.index(
+        '>Rating</th>'
+    )
+    rated_row = list_table.split('<tr data-href="rated_list.html">', 1)[
+        1
+    ].split('</tr>', 1)[0]
+    assert rated_row.index('data-sort-value="8.5"') > rated_row.rindex('<td')
+    assert (
+        'class="availability-badge rating-value rating-value--high">8.5</span>'
+        in rated_row
+    )
+    rating_fact = list_detail.split('<dt>Rating</dt>', 1)[1].split('</div>', 1)[
+        0
+    ]
+    assert 'rating-value--high">8.5</span>' in rating_fact
+
+    unrated_work = Work(
+        id='unrated_work',
+        title='Unrated Work',
+        authors=[],
+        work_structure=WorkStructure.UNSPECIFIED,
+        work_type=WorkType.UNSPECIFIED,
+    )
+    unrated_list = ReadingList(
+        id='unrated_list',
+        name='Unrated List',
+        works=[
+            ReadingListItem(
+                order=1,
+                work='unrated_work',
+                work_obj=unrated_work,
+            )
+        ],
+    )
+    unrated_table = environment.get_template(
+        '_list_table.html'
+    ).module.list_table([unrated_list])  # ty: ignore[unresolved-attribute]
+    unrated_detail = environment.get_template('list.html').render(
+        list=unrated_list,
+        config=config,
+    )
+
+    assert 'data-filter-values=\'["Unrated"]\'' in unrated_table
+    assert 'rating-value--unrated">Unrated</span>' in unrated_table
+    assert 'rating-value--unrated">Unrated</span>' in unrated_detail
 
 
 def test_static_html_create_generates_reading_session_detail(

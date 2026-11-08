@@ -3,6 +3,7 @@
 
 {% from "_work_table.html" import work_table %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_rating_value.html" import rating_value %}
 
 {% block content %}
 <div class="content">
@@ -16,6 +17,10 @@
           </div>
         </div>
         <dl class="detail-metadata">
+          <div class="detail-fact">
+            <dt>Rating</dt>
+            <dd>{{ rating_value(list.rating) }}</dd>
+          </div>
           <div class="detail-fact">
             <dt>Works read</dt>
             <dd>

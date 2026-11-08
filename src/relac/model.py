@@ -642,6 +642,17 @@ class ReadingList(ResourceBase):
 
         return self.read_count / len(self.works) * 100
 
+    @property
+    def rating(self) -> float | None:
+        """Get the average rating for this work."""
+        ratings = [
+            rs_obj.work_obj.rating for rs_obj in self.works if rs_obj.work_obj
+        ]
+        rated_ratings = [rating for rating in ratings if rating is not None]
+        if not rated_ratings:
+            return None
+        return statistics.mean(rated_ratings)
+
 
 class OwnerType(Enum):
     """Type for a owner."""
