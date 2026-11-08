@@ -73,11 +73,11 @@
                         <td class="right fit-content" data-sort-value="{{ reading_session.work_rating.rating if reading_session.work_rating else '' }}" data-filter-values='{{ ([reading_session.work_rating.rating] if reading_session.work_rating else ["Unrated"]) | tojson }}'>
                             {{ rating_value(reading_session.work_rating.rating if reading_session.work_rating else none) }}
                         </td>
-                        <td>{{ reading_session.work_rating.note if reading_session.work_rating else '' }}</td>
+                        <td>{{ reading_session.work_rating.note if reading_session.work_rating and reading_session.work_rating.note is not none else '' }}</td>
                         <td class="right fit-content" data-sort-value="{{ reading_session.book_rating.rating if reading_session.book_rating else '' }}" data-filter-values='{{ ([reading_session.book_rating.rating] if reading_session.book_rating else ["Unrated"]) | tojson }}'>
                             {{ rating_value(reading_session.book_rating.rating if reading_session.book_rating else none) }}
                         </td>
-                        <td>{{ reading_session.book_rating.note if reading_session.book_rating else '' }}</td>
+                        <td>{{ reading_session.book_rating.note if reading_session.book_rating and reading_session.book_rating.note is not none else '' }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

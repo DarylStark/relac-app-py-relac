@@ -3,6 +3,7 @@
 
 {% from "_book_table.html" import book_table %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_rating_value.html" import rating_value %}
 
 {% block content %}
 <div class="content">
@@ -16,6 +17,10 @@
           </div>
         </div>
         <dl class="detail-metadata">
+          <div class="detail-fact">
+            <dt>Rating</dt>
+            <dd>{{ rating_value(collection.rating) }}</dd>
+          </div>
           <div class="detail-fact">
             <dt>Books owned</dt>
             <dd>{{ collection.owned_percentage(config.owner_obj) | round | int }}%</dd>

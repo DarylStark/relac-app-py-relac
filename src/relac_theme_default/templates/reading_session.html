@@ -51,6 +51,29 @@
           <dd>
             {% if reading_session.work_edition_obj %}
               {{ entity_link(reading_session.work_edition_obj, reading_session.work_edition_obj.title) }}
+              {% if reading_session.work_edition_obj.authors %}
+                <span class="detail-small">Authors:
+                  {% for author in reading_session.work_edition_obj.authors %}
+                    {% if not loop.first %}, {% endif %}{{ entity_link(author, author.name) }}
+                  {% endfor %}
+                </span>
+              {% else %}
+                <span class="detail-small">Authors: Unspecified</span>
+              {% endif %}
+              {% if reading_session.work_edition_obj.translator_objs %}
+                <span class="detail-small">Translators:
+                  {% for translator in reading_session.work_edition_obj.translator_objs %}
+                    {% if not loop.first %}, {% endif %}{{ entity_link(translator, translator.name) }}
+                  {% endfor %}
+                </span>
+              {% endif %}
+              {% if reading_session.work_edition_obj.illustrator_objs %}
+                <span class="detail-small">Illustrators:
+                  {% for illustrator in reading_session.work_edition_obj.illustrator_objs %}
+                    {% if not loop.first %}, {% endif %}{{ entity_link(illustrator, illustrator.name) }}
+                  {% endfor %}
+                </span>
+              {% endif %}
             {% else %}
               <span class="detail-unspecified">Unspecified</span>
             {% endif %}

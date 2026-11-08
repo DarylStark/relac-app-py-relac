@@ -17,10 +17,13 @@ from relac.main import app
 from relac.model import (
     Availability,
     Book,
+    BookCollection,
     Contributor,
     Owner,
     OwnerType,
     Rating,
+    ReadingList,
+    ReadingListItem,
     ReadingSession,
     ReadingState,
     RelacConfig,
@@ -54,18 +57,18 @@ def test_calculate_age_without_birthdate() -> None:
 
 
 @pytest.mark.parametrize(
-    ('rating', 'expected_class'),
+    ('rating', 'expected_class', 'expected_display'),
     [
-        (4.9, 'rating-value--low'),
-        (5.0, 'rating-value--medium'),
-        (6.9, 'rating-value--medium'),
-        (7.0, 'rating-value--high'),
-        (8.9, 'rating-value--high'),
-        (9.0, 'rating-value--excellent'),
+        (4.9, 'rating-value--low', '4.9'),
+        (5.0, 'rating-value--medium', '5.0'),
+        (6.9, 'rating-value--medium', '6.9'),
+        (7.0, 'rating-value--high', '7.0'),
+        (8.9, 'rating-value--high', '8.9'),
+        (9.0, 'rating-value--excellent', '9.0'),
     ],
 )
 def test_rating_values_use_expected_color_category(
-    rating: float, expected_class: str
+    rating: float, expected_class: str, expected_display: str
 ) -> None:
     """Apply rating colors at each threshold."""
     template_directory = (
@@ -79,6 +82,7 @@ def test_rating_values_use_expected_color_category(
     assert (
         f'class="availability-badge rating-value {expected_class}"' in rendered
     )
+    assert f'>{expected_display}</span>' in rendered
 
 
 @pytest.mark.parametrize(
@@ -193,6 +197,172 @@ def test_reading_session_table_shows_ongoing_end_date() -> None:
     assert 'data-filter-values=\'["Ongoing"]\'' in reading_sessions
 
 
+def test_reading_list_rating_renders_in_table_and_detail() -> None:
+    """Show reading-list ratings with one decimal, including unrated lists."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['enum_label'] = _format_enum_label
+    environment.filters['language'] = lambda language: language or ''
+    environment.filters['age'] = _calculate_age
+    environment.filters['country'] = lambda country: country
+    environment.filters['isbn'] = str
+    config = RelacConfig(title='Test Library')
+
+    session = ReadingSession(
+        id='rated_session',
+        work_edition='rated_edition',
+        book='rated_book',
+        state=ReadingState.FINISHED,
+        work_rating=Rating(rating=8.5),
+    )
+    edition = WorkEdition(
+        id='rated_edition',
+        title='Rated Edition',
+        work='rated_work',
+        language='en',
+        reading_session_objs=[session],
+    )
+    work = Work(
+        id='rated_work',
+        title='Rated Work',
+        authors=[],
+        work_structure=WorkStructure.UNSPECIFIED,
+        work_type=WorkType.UNSPECIFIED,
+        edition_objs=[edition],
+    )
+    rated_list = ReadingList(
+        id='rated_list',
+        name='Rated List',
+        works=[ReadingListItem(order=1, work='rated_work', work_obj=work)],
+    )
+    list_table = environment.get_template('_list_table.html').module.list_table(  # ty: ignore[unresolved-attribute]
+        [rated_list]
+    )
+    list_detail = environment.get_template('list.html').render(
+        list=rated_list,
+        config=config,
+    )
+
+    assert list_table.index('>Works read</th>') < list_table.index(
+        '>Rating</th>'
+    )
+    rated_row = list_table.split('<tr data-href="rated_list.html">', 1)[
+        1
+    ].split('</tr>', 1)[0]
+    assert rated_row.index('data-sort-value="8.5"') > rated_row.rindex('<td')
+    assert (
+        'class="availability-badge rating-value rating-value--high">8.5</span>'
+        in rated_row
+    )
+    rating_fact = list_detail.split('<dt>Rating</dt>', 1)[1].split('</div>', 1)[
+        0
+    ]
+    assert 'rating-value--high">8.5</span>' in rating_fact
+
+    unrated_work = Work(
+        id='unrated_work',
+        title='Unrated Work',
+        authors=[],
+        work_structure=WorkStructure.UNSPECIFIED,
+        work_type=WorkType.UNSPECIFIED,
+    )
+    unrated_list = ReadingList(
+        id='unrated_list',
+        name='Unrated List',
+        works=[
+            ReadingListItem(
+                order=1,
+                work='unrated_work',
+                work_obj=unrated_work,
+            )
+        ],
+    )
+    unrated_table = environment.get_template(
+        '_list_table.html'
+    ).module.list_table([unrated_list])  # ty: ignore[unresolved-attribute]
+    unrated_detail = environment.get_template('list.html').render(
+        list=unrated_list,
+        config=config,
+    )
+
+    assert 'data-filter-values=\'["Unrated"]\'' in unrated_table
+    assert 'rating-value--unrated">Unrated</span>' in unrated_table
+    assert 'rating-value--unrated">Unrated</span>' in unrated_detail
+
+
+def test_book_collection_rating_renders_in_table_and_detail() -> None:
+    """Show BookCollection ratings in the table and detail metadata."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['enum_label'] = _format_enum_label
+    environment.filters['language'] = lambda language: language or ''
+    environment.filters['age'] = _calculate_age
+    environment.filters['country'] = lambda country: country
+    environment.filters['isbn'] = str
+    config = RelacConfig(title='Test Library')
+    environment.globals['config'] = config  # ty: ignore[invalid-assignment]
+
+    session = ReadingSession(
+        id='rated_book_session',
+        work_edition='rated_book_edition',
+        book='rated_book',
+        state=ReadingState.FINISHED,
+        book_rating=Rating(rating=8.5),
+    )
+    book = Book(
+        id='rated_book',
+        isbn13=9781234567897,
+        title='Rated Book',
+        reading_session_objs=[session],
+    )
+    collection = BookCollection(
+        id='rated_collection',
+        name='Rated Collection',
+        book_objs=[book],
+    )
+    collection_table = environment.get_template(
+        '_collection_table.html'
+    ).module.collection_table([collection])  # ty: ignore[unresolved-attribute]
+    collection_detail = environment.get_template('collection.html').render(
+        collection=collection,
+        config=config,
+    )
+
+    assert collection_table.index('>Owned</th>') < collection_table.index(
+        '>Rating</th>'
+    )
+    collection_row = collection_table.split(
+        '<tr data-href="rated_collection.html">', 1
+    )[1].split('</tr>', 1)[0]
+    assert collection_row.index(
+        'data-sort-value="8.5"'
+    ) > collection_row.rindex('<td')
+    assert 'rating-value--high">8.5</span>' in collection_row
+    rating_fact = collection_detail.split('<dt>Rating</dt>', 1)[1].split(
+        '</div>', 1
+    )[0]
+    assert 'rating-value--high">8.5</span>' in rating_fact
+
+    unrated_collection = BookCollection(
+        id='unrated_collection',
+        name='Unrated Collection',
+    )
+    unrated_table = environment.get_template(
+        '_collection_table.html'
+    ).module.collection_table([unrated_collection])  # ty: ignore[unresolved-attribute]
+    unrated_detail = environment.get_template('collection.html').render(
+        collection=unrated_collection,
+        config=config,
+    )
+    assert 'data-filter-values=\'["Unrated"]\'' in unrated_table
+    assert 'rating-value--unrated">Unrated</span>' in unrated_table
+    assert 'rating-value--unrated">Unrated</span>' in unrated_detail
+
+
 def test_static_html_create_generates_reading_session_detail(
     tmp_path: Path,
 ) -> None:
@@ -296,6 +466,7 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'Great characterization' in reading_session_html
     assert 'Comfortable binding' in reading_session_html
     assert 'data-href="test_session.html"' in reading_session_html
+
     assert '8.5' in detail_html
     assert '<title>Work Editions | Test Library</title>' in work_editions_html
     assert 'href="works.html" class="active"' in work_editions_html
@@ -356,9 +527,41 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     )
     assert 'href="test_work.html">Test Work</a>' in reading_session_detail_html
     assert 'href="test_book.html">Test Book</a>' in reading_session_detail_html
+    assert (
+        'href="test_contributor.html">Test Contributor</a>'
+        in reading_session_detail_html
+    )
+    assert (
+        'href="translator.html">Test Translator</a>'
+        in reading_session_detail_html
+    )
+    assert (
+        'href="illustrator.html">Test Illustrator</a>'
+        in reading_session_detail_html
+    )
     assert 'Great characterization' in reading_session_detail_html
     assert 'Comfortable binding' in reading_session_detail_html
     assert 'datetime="2026-01-01"' in reading_session_detail_html
+    work_edition_fact = reading_session_detail_html.split(
+        '<dt>Work edition</dt>', 1
+    )[1].split('</div>', 1)[0]
+    assert 'href="test_edition.html">Test Edition</a>' in work_edition_fact
+    assert 'Authors:' in work_edition_fact
+    assert 'Translators:' in work_edition_fact
+    assert 'Illustrators:' in work_edition_fact
+    assert (
+        'href="test_contributor.html">Test Contributor</a>' in work_edition_fact
+    )
+    assert 'href="translator.html">Test Translator</a>' in work_edition_fact
+    assert 'href="illustrator.html">Test Illustrator</a>' in work_edition_fact
+
+    session.work_rating = Rating(rating=8.5)
+    session.book_rating = Rating(rating=6.5)
+    reading_session_html = environment.get_template(
+        '_reading_session_table.html'
+    ).module.reading_session_table([session])  # ty: ignore[unresolved-attribute]
+    assert '<td>None</td>' not in reading_session_html
+
     assert (
         reading_session_detail_html.index('href="test_work.html">Test Work</a>')
         < reading_session_detail_html.index('8.5')
@@ -401,6 +604,12 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'Works for this contributor' in contributor_html
     assert 'rating-value--high' in contributor_html
     assert 'data-sort-value="8.5"' in contributor_table_html
+    assert contributor_table_html.index(
+        '>Works read</th>'
+    ) < contributor_table_html.index('>Rating</th>')
+    assert contributor_table_html.index(
+        '%</pre>'
+    ) < contributor_table_html.index('data-sort-value="8.5"')
     assert 'rating-value--high' in contributor_table_html
     assert 'Work Editions illustrated by this contributor' in contributor_html
     assert 'Work Editions translated by this contributor' in contributor_html
@@ -444,6 +653,21 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'Unrated' in empty_table_html
     assert empty_detail_html.count('Unspecified') >= 2
     assert 'Unrated' in empty_detail_html
+    session_without_credits = ReadingSession(
+        id='session_without_credits',
+        work_edition='no_credits',
+        book='test_book',
+        state=ReadingState.FINISHED,
+        work_edition_obj=edition_without_credits,
+    )
+    session_without_credits_html = environment.get_template(
+        'reading_session.html'
+    ).render(reading_session=session_without_credits, config=config)
+    session_work_edition_fact = session_without_credits_html.split(
+        '<dt>Work edition</dt>', 1
+    )[1].split('</div>', 1)[0]
+    assert 'Translators:' not in session_work_edition_fact
+    assert 'Illustrators:' not in session_work_edition_fact
 
 
 def test_build_search_index_includes_owner_metadata_and_url() -> None:
