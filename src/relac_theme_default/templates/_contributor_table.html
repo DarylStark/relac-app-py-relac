@@ -12,7 +12,6 @@
         <thead>
             <tr>
                 <th scope="col">Name</th>
-                <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
                 <th scope="col">State</th>
                 <th scope="col" class="right fit-content" data-sort-type="date" data-filter-type="date">Birthdate</th>
                 <th scope="col" class="right fit-content" data-sort-type="date" data-filter-type="date">Deceased date</th>
@@ -21,6 +20,7 @@
                 <th scope="col" class="center fit-content">Works</th>
                 <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Works read</th>
+                <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
             </tr>
         </thead>
         <tbody>
@@ -36,9 +36,6 @@
 {% macro contributor_row(contributor) %}
 <tr data-href="{{ contributor.id }}.html">
     <td>{{ entity_link(contributor, contributor.name) }}</td>
-    <td class="right fit-content" data-sort-value="{{ contributor.rating if contributor.rating is not none else '' }}" data-filter-values='{{ ([contributor.rating] if contributor.rating is not none else ["Unrated"]) | tojson }}'>
-        {{ rating_value(contributor.rating) }}
-    </td>
     <td>{{ contributor.state.value | enum_label }}</td>
     <td class="center fit-content" data-sort-value="{{ contributor.birthdate.isoformat() if contributor.birthdate else '' }}" data-filter-values='{{ ([contributor.birthdate.isoformat()] if contributor.birthdate else [""]) | tojson }}'>
         {% if contributor.birthdate %}
@@ -78,6 +75,9 @@
     </td>
     <td class="right fit-content">
         <pre>{{ contributor.read_percentage | round | int }}%</pre>
+    </td>
+    <td class="right fit-content" data-sort-value="{{ contributor.rating if contributor.rating is not none else '' }}" data-filter-values='{{ ([contributor.rating] if contributor.rating is not none else ["Unrated"]) | tojson }}'>
+        {{ rating_value(contributor.rating) }}
     </td>
 </tr>
 {% endmacro %}

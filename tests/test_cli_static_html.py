@@ -410,6 +410,12 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'Works for this contributor' in contributor_html
     assert 'rating-value--high' in contributor_html
     assert 'data-sort-value="8.5"' in contributor_table_html
+    assert contributor_table_html.index(
+        '>Works read</th>'
+    ) < contributor_table_html.index('>Rating</th>')
+    assert contributor_table_html.index(
+        '%</pre>'
+    ) < contributor_table_html.index('data-sort-value="8.5"')
     assert 'rating-value--high' in contributor_table_html
     assert 'Work Editions illustrated by this contributor' in contributor_html
     assert 'Work Editions translated by this contributor' in contributor_html
