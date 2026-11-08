@@ -6,6 +6,7 @@
 {% from "_owner_table.html" import owner_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_rating_value.html" import format_rating %}
 
 {% set book_medium = book.medium.value %}
 {% set book_binding = book.binding.value %}
@@ -78,7 +79,7 @@
           </div>
           <div class="detail-fact">
             <dt>Rating</dt>
-            <dd>{{ book.rating if book.rating is not none else "Unrated" }}</dd>
+            <dd>{{ format_rating(book.rating) }}</dd>
           </div>
           <div class="detail-fact">
             <dt>Works read</dt>

@@ -7,6 +7,7 @@
 {% from "_reading_session_table.html" import reading_session_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_rating_value.html" import format_rating %}
 
 {% block content %}
 <div class="content">
@@ -55,7 +56,7 @@
           </div>
           <div class="detail-fact">
             <dt>Rating</dt>
-            <dd>{{ work.rating if work.rating is not none else "Unrated" }}</dd>
+            <dd>{{ format_rating(work.rating) }}</dd>
           </div>
         </dl>
       </section>

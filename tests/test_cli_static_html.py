@@ -54,18 +54,18 @@ def test_calculate_age_without_birthdate() -> None:
 
 
 @pytest.mark.parametrize(
-    ('rating', 'expected_class'),
+    ('rating', 'expected_class', 'expected_display'),
     [
-        (4.9, 'rating-value--low'),
-        (5.0, 'rating-value--medium'),
-        (6.9, 'rating-value--medium'),
-        (7.0, 'rating-value--high'),
-        (8.9, 'rating-value--high'),
-        (9.0, 'rating-value--excellent'),
+        (4.9, 'rating-value--low', '4.9'),
+        (5.0, 'rating-value--medium', '5.0'),
+        (6.9, 'rating-value--medium', '6.9'),
+        (7.0, 'rating-value--high', '7.0'),
+        (8.9, 'rating-value--high', '8.9'),
+        (9.0, 'rating-value--excellent', '9.0'),
     ],
 )
 def test_rating_values_use_expected_color_category(
-    rating: float, expected_class: str
+    rating: float, expected_class: str, expected_display: str
 ) -> None:
     """Apply rating colors at each threshold."""
     template_directory = (
@@ -79,6 +79,7 @@ def test_rating_values_use_expected_color_category(
     assert (
         f'class="availability-badge rating-value {expected_class}"' in rendered
     )
+    assert f'>{expected_display}</span>' in rendered
 
 
 @pytest.mark.parametrize(
