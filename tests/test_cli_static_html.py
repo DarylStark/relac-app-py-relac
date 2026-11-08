@@ -358,9 +358,33 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     )
     assert 'href="test_work.html">Test Work</a>' in reading_session_detail_html
     assert 'href="test_book.html">Test Book</a>' in reading_session_detail_html
+    assert (
+        'href="test_contributor.html">Test Contributor</a>'
+        in reading_session_detail_html
+    )
+    assert (
+        'href="translator.html">Test Translator</a>'
+        in reading_session_detail_html
+    )
+    assert (
+        'href="illustrator.html">Test Illustrator</a>'
+        in reading_session_detail_html
+    )
     assert 'Great characterization' in reading_session_detail_html
     assert 'Comfortable binding' in reading_session_detail_html
     assert 'datetime="2026-01-01"' in reading_session_detail_html
+    work_edition_fact = reading_session_detail_html.split(
+        '<dt>Work edition</dt>', 1
+    )[1].split('</div>', 1)[0]
+    assert 'href="test_edition.html">Test Edition</a>' in work_edition_fact
+    assert 'Authors:' in work_edition_fact
+    assert 'Translators:' in work_edition_fact
+    assert 'Illustrators:' in work_edition_fact
+    assert (
+        'href="test_contributor.html">Test Contributor</a>' in work_edition_fact
+    )
+    assert 'href="translator.html">Test Translator</a>' in work_edition_fact
+    assert 'href="illustrator.html">Test Illustrator</a>' in work_edition_fact
 
     session.work_rating = Rating(rating=8.5)
     session.book_rating = Rating(rating=6.5)
@@ -460,6 +484,21 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'Unrated' in empty_table_html
     assert empty_detail_html.count('Unspecified') >= 2
     assert 'Unrated' in empty_detail_html
+    session_without_credits = ReadingSession(
+        id='session_without_credits',
+        work_edition='no_credits',
+        book='test_book',
+        state=ReadingState.FINISHED,
+        work_edition_obj=edition_without_credits,
+    )
+    session_without_credits_html = environment.get_template(
+        'reading_session.html'
+    ).render(reading_session=session_without_credits, config=config)
+    session_work_edition_fact = session_without_credits_html.split(
+        '<dt>Work edition</dt>', 1
+    )[1].split('</div>', 1)[0]
+    assert 'Translators:' not in session_work_edition_fact
+    assert 'Illustrators:' not in session_work_edition_fact
 
 
 def test_build_search_index_includes_owner_metadata_and_url() -> None:
