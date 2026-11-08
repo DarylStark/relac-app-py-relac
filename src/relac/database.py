@@ -211,6 +211,23 @@ class Database:
                 )
             self._relac_config.owner_obj = owner_obj
 
+    def _get_labels(self, label_ids: list[str] | None) -> list[Label]:
+        """Get a list of `Label` objects from their ID's."""
+        rv: list[Label] = []
+        for label_id in label_ids or []:
+            label_obj = self._labels.get(label_id)
+            if label_obj is None:
+                raise ValueError(f'Label with id "{label_id}" doesn\'t exist')
+            rv.append(label_obj)
+        return rv
+
+    def _converge_contributors(self) -> None:
+        """Converge Contributors objects."""
+        for contributor in self._contributors.values():
+            contributor.label_objs = self._get_labels(contributor.labels)
+            for label in contributor.label_objs:
+                label.contributor_objs.append(contributor)
+
     def converge(self) -> None:
         """Converge all objects."""
         self._converge_relac_config()
@@ -221,6 +238,7 @@ class Database:
         self._converge_reading_lists()
         self._converge_series()
         self._converge_reading_sessions()
+        self._converge_contributors()
 
     def add_contributor(self, id: str, obj: Contributor) -> None:
         """Add a contributor to the database."""

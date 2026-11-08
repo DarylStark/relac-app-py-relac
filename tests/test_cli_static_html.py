@@ -19,6 +19,7 @@ from relac.model import (
     Book,
     BookCollection,
     Contributor,
+    Label,
     Owner,
     OwnerType,
     Rating,
@@ -548,6 +549,10 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     contributor = Contributor(
         id='test_contributor',
         name='Test Contributor',
+        label_objs=[
+            Label(id='label_zebra', name='Zebra'),
+            Label(id='label_author', name='Author'),
+        ],
         work_objs=[work],
         illustrator_work_edition_objs=[edition],
         translator_work_edition_objs=[edition],
@@ -666,6 +671,12 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
 
     assert 'Works for this contributor' in contributor_html
     assert 'rating-value--high' in contributor_html
+    labels_html = contributor_html.split('<section class="detail-labels"', 1)[
+        1
+    ].split('</section>', 1)[0]
+    assert labels_html.index('Author') < labels_html.index('Zebra')
+    assert '<li class="detail-label-pill">Author</li>' in labels_html
+    assert '<li class="detail-label-pill">Zebra</li>' in labels_html
     assert 'data-sort-value="8.5"' in contributor_table_html
     assert contributor_table_html.index(
         '>Works read</th>'
@@ -698,6 +709,7 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         not in empty_contributor_html
     )
     assert 'Books with this contributor' not in empty_contributor_html
+    assert 'detail-labels' not in empty_contributor_html
 
     edition_without_credits = WorkEdition(
         id='no_credits',

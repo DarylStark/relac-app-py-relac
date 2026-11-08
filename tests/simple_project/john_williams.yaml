@@ -7,6 +7,8 @@ contributor.john_williams:
   state: deceased
   birthdate: 1922-08-29
   deceased_date: 1994-03-03
+  labels:
+    - label.test_label
 #-------------------------------------------------------------------------------
 # Works and work editions
 #-------------------------------------------------------------------------------

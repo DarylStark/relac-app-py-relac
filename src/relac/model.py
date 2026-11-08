@@ -84,6 +84,7 @@ class Contributor(ResourceBase):
     birthdate: date | None = None
     deceased_date: date | None = None
     countries: list[str] = Field(default_factory=list)
+    labels: list[str] | None = None
 
     # Relation (real objects)
     work_objs: list[Work] = Field(default_factory=list)
@@ -94,6 +95,7 @@ class Contributor(ResourceBase):
     translator_work_edition_objs: list[WorkEdition] = Field(
         default_factory=list
     )
+    label_objs: list[Label] = Field(default_factory=list)
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -577,6 +579,9 @@ class Label(ResourceBase):
     """A label."""
 
     name: str
+
+    # Relationships (real objects)
+    contributor_objs: list[Contributor] = Field(default_factory=list)
 
 
 class ReadingListItem(ResourceBase):
