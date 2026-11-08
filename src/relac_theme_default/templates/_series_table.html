@@ -1,4 +1,5 @@
 {% from "_availability_counts.html" import availability_cell %}
+{% from "_rating_value.html" import rating_value %}
 
 {% macro series_table(series_list, title="Series") %}
 <div class="card table-card">
@@ -15,10 +16,12 @@
                     <th scope="col" class="right fit-content">Availability</th>
                     <th scope="col" class="right fit-content">Reading state</th>
                     <th scope="col" class="right fit-content">Works read</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
                 </tr>
             </thead>
             <tbody>
                 {% for series in series_list %}
+                {% set rating = series.rating %}
                 <tr data-href="{{ series.id }}.html">
                     <td>{{ series.name }}</td>
                     <td class="center fit-content">
@@ -42,6 +45,9 @@
                     </td>
                     <td class="right fit-content">
                         <pre>{{ series.read_percentage | round | int }}%</pre>
+                    </td>
+                    <td class="right fit-content" data-sort-value="{{ rating if rating is not none else '' }}" data-filter-values='{{ ([rating] if rating is not none else ["Unrated"]) | tojson }}'>
+                        {{ rating_value(rating) }}
                     </td>
                 </tr>
                 {% endfor %}

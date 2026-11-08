@@ -29,6 +29,7 @@ from relac.model import (
     RelacConfig,
     ResourceAvailability,
     Series,
+    SeriesItem,
     Work,
     WorkEdition,
     WorkStructure,
@@ -290,6 +291,68 @@ def test_reading_list_rating_renders_in_table_and_detail() -> None:
     assert 'data-filter-values=\'["Unrated"]\'' in unrated_table
     assert 'rating-value--unrated">Unrated</span>' in unrated_table
     assert 'rating-value--unrated">Unrated</span>' in unrated_detail
+
+
+def test_series_rating_renders_in_table_and_detail() -> None:
+    """Show a series rating in the final column and its detail metadata."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['enum_label'] = _format_enum_label
+    environment.filters['language'] = lambda language: language or ''
+    environment.filters['age'] = _calculate_age
+    environment.filters['country'] = lambda country: country
+    environment.filters['isbn'] = str
+    config = RelacConfig(title='Test Library')
+
+    session = ReadingSession(
+        id='series_session',
+        work_edition='series_edition',
+        book='series_book',
+        state=ReadingState.FINISHED,
+        work_rating=Rating(rating=8.5),
+    )
+    edition = WorkEdition(
+        id='series_edition',
+        title='Series Edition',
+        work='series_work',
+        language='en',
+        reading_session_objs=[session],
+    )
+    work = Work(
+        id='series_work',
+        title='Series Work',
+        authors=[],
+        work_structure=WorkStructure.UNSPECIFIED,
+        work_type=WorkType.UNSPECIFIED,
+        edition_objs=[edition],
+    )
+    series = Series(
+        id='test_series',
+        name='Test Series',
+        works=[SeriesItem(number=1, work='series_work', work_obj=work)],
+    )
+    series_table = environment.get_template(
+        '_series_table.html'
+    ).module.series_table([series])  # ty: ignore[unresolved-attribute]
+    series_detail = environment.get_template('series_detail.html').render(
+        series=series,
+        config=config,
+    )
+
+    assert series_table.index('>Works read</th>') < series_table.index(
+        '>Rating</th>'
+    )
+    series_row = series_table.split('<tr data-href="test_series.html">', 1)[
+        1
+    ].split('</tr>', 1)[0]
+    assert series_row.index('data-sort-value="8.5"') > series_row.rindex('<td')
+    assert 'rating-value--high">8.5</span>' in series_row
+    rating_fact = series_detail.split('<dt>Rating</dt>', 1)[1].split(
+        '</div>', 1
+    )[0]
+    assert 'rating-value--high">8.5</span>' in rating_fact
 
 
 def test_book_collection_rating_renders_in_table_and_detail() -> None:
