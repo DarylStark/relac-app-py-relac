@@ -198,6 +198,7 @@ class Work(LabelledResource):
     authors: list[str]
     work_type: WorkType | None = None
     work_structure: WorkStructure | None = None
+    premise: str | None = None
 
     # Relation (real objects)
     author_objs: list[Contributor] = Field(default_factory=list)

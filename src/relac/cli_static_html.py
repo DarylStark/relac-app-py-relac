@@ -8,12 +8,21 @@ from pathlib import Path
 
 from isbnlib import mask
 from jinja2 import Environment, FileSystemLoader
+from markdown_it import MarkdownIt
+from markupsafe import Markup
 from pycountry import countries, languages
 from typer import Context, Option, Typer
 
 from relac.theme import RelacTheme
 
 from .database import Database
+
+_MARKDOWN = MarkdownIt('commonmark', {'html': False})
+
+
+def _render_markdown(text: str) -> Markup:
+    """Render Markdown while treating source HTML as plain text."""
+    return Markup(_MARKDOWN.render(text))
 
 
 def _calculate_age(
@@ -308,6 +317,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     env = Environment(loader=FileSystemLoader(metadata.source_dir))
     env.filters['isbn'] = lambda x: mask(str(x))
+    env.filters['markdown'] = _render_markdown
     env.filters['enum_label'] = _format_enum_label
     env.filters['age'] = _calculate_age
     env.filters['language'] = _code_to_language

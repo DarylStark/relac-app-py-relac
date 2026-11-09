@@ -11,6 +11,7 @@ from relac.cli_static_html import (
     _build_search_index,
     _calculate_age,
     _format_enum_label,
+    _render_markdown,
 )
 from relac.database import Database
 from relac.main import app
@@ -510,12 +511,13 @@ def test_static_html_create_generates_reading_session_detail(
     )
 
 
-def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR0915
-    """Render optional illustrators and translators as linked contributors."""
+def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PLR0915
+    """Render edition credits and safely formatted Markdown premise text."""
     template_directory = (
         Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
     )
     environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['markdown'] = _render_markdown
     environment.filters['enum_label'] = _format_enum_label
     environment.filters['language'] = lambda language: language or ''
     environment.filters['age'] = _calculate_age
@@ -530,6 +532,7 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         authors=[],
         work_structure=WorkStructure.UNSPECIFIED,
         work_type=WorkType.UNSPECIFIED,
+        premise='First **bold** line\n\nSecond <b>line</b>',
     )
     illustrator = Contributor(id='illustrator', name='Test Illustrator')
     translator = Contributor(id='translator', name='Test Translator')
@@ -629,6 +632,9 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'data-sort-value="8.5"' in work_table_html
     assert '<dt>Rating</dt>' in work_detail_html
     assert '8.5' in work_detail_html
+    assert '<p>First <strong>bold</strong> line</p>' in work_detail_html
+    assert '<p>Second &lt;b&gt;line&lt;/b&gt;</p>' in work_detail_html
+    assert '<b>line</b>' not in work_detail_html
     book = Book(
         id='test_book',
         isbn13=9781234567897,

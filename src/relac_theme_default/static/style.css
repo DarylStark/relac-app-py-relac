@@ -1395,6 +1395,30 @@ table.resources tbody tr.table-empty-state td {
     margin: 5px 0;
 }
 
+.detail-premise
+{
+    margin: 24px 0 0;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+div.card .detail-premise p:first-child,
+div.card .detail-premise p:last-child
+{
+    margin: 0 0 1em;
+    color: var(--text);
+    font-size: inherit;
+    font-weight: 400;
+    font-variant-numeric: normal;
+    line-height: inherit;
+}
+
+div.card .detail-premise p:last-child
+{
+    margin-bottom: 0;
+}
+
 .detail-small,
 .detail-unspecified
 {

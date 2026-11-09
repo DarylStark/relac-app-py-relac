@@ -61,6 +61,11 @@
           </div>
         </dl>
       </section>
+      {% if work.premise %}
+      <section class="detail-premise" aria-label="Premise">
+        {{ work.premise | markdown }}
+      </section>
+      {% endif %}
       {{ detail_labels(work.label_objs) }}
   </div>
 
