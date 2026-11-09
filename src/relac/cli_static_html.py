@@ -432,6 +432,14 @@ def create(  # noqa: PLR0912, PLR0915
             out_path = output / f'{contributor.id}.html'
             out_path.write_text(html)
 
+    # Locations
+    if 'location' in metadata.resource_pages:
+        for location in db.get_locations():
+            template = env.get_template(metadata.resource_pages['location'])
+            html = template.render(location=location)
+            out_path = output / f'{location.id}.html'
+            out_path.write_text(html)
+
     # Labels
     if 'label' in metadata.resource_pages:
         for label in db.get_labels():

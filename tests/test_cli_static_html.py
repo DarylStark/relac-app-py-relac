@@ -559,7 +559,10 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     assert '<th scope="col">Name</th>' in locations_html
     assert '<th scope="col">Country</th>' in locations_html
     assert '<th scope="col">Description</th>' in locations_html
-    assert 'University of Missouri' in locations_html
+    assert (
+        '<a href="location.university_missouri.html">'
+        'University of Missouri</a>' in locations_html
+    )
     assert 'United States' in locations_html
     assert 'Missouri' in locations_html
     assert (
@@ -570,6 +573,18 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     assert (
         '<a href="literary_analysis.work.john_williams__stoner.html">'
         'Work Analysis</a>' in locations_html
+    )
+    location_detail_path = tmp_path / 'location.university_missouri.html'
+    assert location_detail_path.exists()
+    location_detail_html = location_detail_path.read_text()
+    assert '<title>Location: University of Missouri |' in location_detail_html
+    assert '<p class="detail-kind">Location</p>' in location_detail_html
+    assert '<dt>Country</dt>' in location_detail_html
+    assert 'United States' in location_detail_html
+    assert 'Works using this location' in location_detail_html
+    assert (
+        '<a href="work.john_williams__stoner.html">Stoner</a>'
+        in location_detail_html
     )
     characters_path = (
         tmp_path

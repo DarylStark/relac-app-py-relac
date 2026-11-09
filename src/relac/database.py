@@ -107,7 +107,9 @@ class Database:
 
             if obj.literary_analysis is not None:
                 if obj.literary_analysis.setting:
-                    self._converge_story_setting(obj.literary_analysis.setting)
+                    self._converge_story_setting(
+                        obj.literary_analysis.setting, obj
+                    )
 
                 for character in obj.literary_analysis.characters or []:
                     self._converge_work_character(character)
@@ -276,7 +278,9 @@ class Database:
             for label in contributor.label_objs:
                 label.owner_objs.append(contributor)
 
-    def _converge_story_setting(self, obj: StorySetting) -> None:
+    def _converge_story_setting(
+        self, obj: StorySetting, work_obj: Work
+    ) -> None:
         """Converge StorySetting objects."""
         for location_id in obj.locations or []:
             location_obj = self._locations.get(location_id)
@@ -285,6 +289,11 @@ class Database:
                     f'Location with id "{location_id}" doesn\'t exist'
                 )
             obj.location_objs.append(location_obj)
+            if not any(
+                related_work is work_obj
+                for related_work in location_obj.work_objs
+            ):
+                location_obj.work_objs.append(work_obj)
 
     def _converge_work_character(self, obj: WorkCharacter) -> None:
         """Converge StorySetting objects."""

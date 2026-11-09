@@ -10,6 +10,8 @@ from relac.model import (
     Book,
     BookCollection,
     Contributor,
+    LiteraryAnalysis,
+    Location,
     Owner,
     OwnerType,
     ReadingList,
@@ -20,6 +22,7 @@ from relac.model import (
     ResourceAvailability,
     Series,
     SeriesItem,
+    StorySetting,
     Work,
     WorkEdition,
 )
@@ -175,6 +178,40 @@ def test_work_edition_contributors_are_optional() -> None:
 
     assert edition.illustrators is None
     assert edition.translators is None
+
+
+def test_location_resolves_related_works() -> None:
+    """Expose every work that references a location in its story setting."""
+    database = Database()
+    database.set_relac_config(RelacConfig(title='Test Library'))
+    shared_location = Location(id='shared', name='Shared location')
+    unused_location = Location(id='unused', name='Unused location')
+    works = [
+        Work(
+            id=f'work-{index}',
+            title=f'Work {index}',
+            authors=[],
+            literary_analysis=LiteraryAnalysis(
+                setting=StorySetting(locations=['shared'])
+            ),
+        )
+        for index in range(2)
+    ]
+
+    database.add_location('shared', shared_location)
+    database.add_location('unused', unused_location)
+    for work in works:
+        database.add_work(work.id, work)  # ty: ignore[invalid-argument-type]
+    database.converge()
+
+    assert len(shared_location.work_objs) == 2
+    assert all(
+        related_work is work
+        for related_work, work in zip(
+            shared_location.work_objs, works, strict=True
+        )
+    )
+    assert unused_location.work_objs == []
 
 
 @pytest.mark.parametrize(

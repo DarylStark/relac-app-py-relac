@@ -224,6 +224,9 @@ class Location(ResourceBase):
     country: str | None = None
     description: str | None = None
 
+    # Relation (real objects)
+    work_objs: list[Work] = Field(default_factory=list)
+
 
 class StorySetting(BaseModel):
     """The setting for a story."""

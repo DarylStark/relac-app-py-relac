@@ -13,6 +13,7 @@ relac_theme = RelacTheme(
     resource_pages={
         'book': 'book.html',
         'contributor': 'contributor.html',
+        'location': 'location.html',
         'label': 'label.html',
         'work': 'work.html',
         'literary_analysis': 'literary_analysis.html',

@@ -16,7 +16,7 @@
       <tbody>
         {% for location in locations %}
         <tr>
-          <td>{{ location.name | e }}</td>
+          <td><a href="{{ location.id }}.html">{{ location.name | e }}</a></td>
           <td>{% if location.country %}{{ location.country | country }}{% endif %}</td>
           <td>{{ location.description | e if location.description else '' }}</td>
         </tr>
