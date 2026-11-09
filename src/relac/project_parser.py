@@ -10,9 +10,12 @@ from .model import (
     Book,
     BookCollection,
     BookPublisher,
+    Character,
     Contributor,
     Label,
+    Location,
     Owner,
+    Quote,
     ReadingList,
     ReadingSession,
     RelacConfig,
@@ -77,6 +80,9 @@ class ProjectParser:
             'owner': self._parse_owner_object,
             'series': self._parse_series_object,
             'reading_session': self._parse_reading_session_object,
+            'location': self._parse_location_object,
+            'character': self._parse_character_object,
+            'quote': self._parse_quote_object,
         }
 
         for obj_id, obj in raw_data.items():
@@ -186,4 +192,26 @@ class ProjectParser:
         """Parse an raw relac object into a RelacConfig object."""
         obj = RelacConfig.model_validate(data, extra='forbid')
         self._database.set_relac_config(obj)
+        return obj
+
+    def _parse_location_object(
+        self, obj_id: str, data: dict[str, str]
+    ) -> Location:
+        """Parse an raw location object into a Location object."""
+        obj = self._parse_object(Location, data)
+        self._database.add_location(obj_id, obj)
+        return obj
+
+    def _parse_character_object(
+        self, obj_id: str, data: dict[str, str]
+    ) -> Character:
+        """Parse an raw character object into a Character object."""
+        obj = self._parse_object(Character, data)
+        self._database.add_character(obj_id, obj)
+        return obj
+
+    def _parse_quote_object(self, obj_id: str, data: dict[str, str]) -> Quote:
+        """Parse an raw character object into a Character object."""
+        obj = self._parse_object(Quote, data)
+        self._database.add_quote(obj_id, obj)
         return obj

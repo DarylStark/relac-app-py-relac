@@ -6,15 +6,20 @@ from relac.model import (
     Book,
     BookCollection,
     BookPublisher,
+    Character,
     Contributor,
     Label,
+    Location,
     Owner,
+    Quote,
     ReadingList,
     ReadingSession,
     RelacConfig,
     ResourceBase,
     Series,
+    StorySetting,
     Work,
+    WorkCharacter,
     WorkEdition,
 )
 
@@ -36,6 +41,9 @@ class Database:
         self._owners: dict[str, Owner] = {}
         self._series: dict[str, Series] = {}
         self._reading_sessions: dict[str, ReadingSession] = {}
+        self._locations: dict[str, Location] = {}
+        self._characters: dict[str, Character] = {}
+        self._quotes: dict[str, Quote] = {}
 
     def _id_exists[ResourceModel: ResourceBase](
         self, id: str, collection: dict[str, ResourceModel]
@@ -98,6 +106,29 @@ class Database:
             obj.label_objs = self._get_labels(obj.labels)
             for label in obj.label_objs:
                 label.work_objs.append(obj)
+
+            if obj.literary_analysis is not None:
+                if obj.literary_analysis.setting:
+                    self._converge_story_setting(
+                        obj.literary_analysis.setting, obj
+                    )
+
+                for character_obj in obj.literary_analysis.characters or []:
+                    self._converge_work_character(character_obj, obj)
+
+                if obj.literary_analysis.narrator:
+                    character_id = obj.literary_analysis.narrator.character
+                    if character_id:
+                        character_obj = self._characters.get(character_id)
+                        if not character_obj:
+                            # TODO: Custom error
+                            raise ValueError(
+                                f'Character with id "{character_id}" '
+                                "doesn't exist"
+                            )
+                        obj.literary_analysis.narrator.character_obj = (
+                            character_obj
+                        )
 
     def _converge_books(self) -> None:  # noqa: PLR0912
         """Converge all books."""
@@ -263,6 +294,78 @@ class Database:
             for label in contributor.label_objs:
                 label.owner_objs.append(contributor)
 
+    def _converge_story_setting(
+        self, obj: StorySetting, work_obj: Work
+    ) -> None:
+        """Converge StorySetting objects."""
+        for location_id in obj.locations or []:
+            location_obj = self._locations.get(location_id)
+            if location_obj is None:
+                raise ValueError(
+                    f'Location with id "{location_id}" doesn\'t exist'
+                )
+            obj.location_objs.append(location_obj)
+            if not any(
+                related_work is work_obj
+                for related_work in location_obj.work_objs
+            ):
+                location_obj.work_objs.append(work_obj)
+
+    def _converge_work_character(
+        self, obj: WorkCharacter, work_obj: Work
+    ) -> None:
+        """Converge a work-character relation."""
+        character_obj = self._characters.get(obj.character)
+        if character_obj is None:
+            raise ValueError(
+                f'Character with id "{obj.character}" doesn\'t exist'
+            )
+        obj.character_obj = character_obj
+        obj.work_obj = work_obj
+        if not any(
+            work_character is obj
+            for work_character in character_obj.work_character_objs
+        ):
+            character_obj.work_character_objs.append(obj)
+
+    def _converge_quotes(self) -> None:
+        """Converge Owners objects."""
+        for quote in self._quotes.values():
+            contributor_obj = self._contributors.get(quote.contributor)
+            if contributor_obj is None:
+                raise ValueError(
+                    f'Contributor with id "{quote.contributor}" doesn\'t exist'
+                )
+            quote.contributor_obj = contributor_obj
+            if not any(
+                related_quote is quote
+                for related_quote in contributor_obj.quote_objs
+            ):
+                contributor_obj.quote_objs.append(quote)
+
+            if quote.character:
+                character_obj = self._characters.get(quote.character)
+                if character_obj is None:
+                    raise ValueError(
+                        f'Character with id "{quote.character}" doesn\'t exist'
+                    )
+                quote.character_obj = character_obj
+                if not any(
+                    related_quote is quote
+                    for related_quote in character_obj.quote_objs
+                ):
+                    character_obj.quote_objs.append(quote)
+
+            if quote.work:
+                work_obj = self._works.get(quote.work)
+                if work_obj is None:
+                    raise ValueError(
+                        f'Work with id "{quote.work}" doesn\'t exist'
+                    )
+                quote.work_obj = work_obj
+                if work_obj.literary_analysis:
+                    work_obj.literary_analysis.quote_objs.append(quote)
+
     def converge(self) -> None:
         """Converge all objects."""
         self._converge_relac_config()
@@ -275,6 +378,7 @@ class Database:
         self._converge_reading_sessions()
         self._converge_contributors()
         self._converge_owners()
+        self._converge_quotes()
 
     def add_contributor(self, id: str, obj: Contributor) -> None:
         """Add a contributor to the database."""
@@ -374,3 +478,27 @@ class Database:
             # TODO: Custom error
             raise ValueError('Relac config is not set.')
         return self._relac_config
+
+    def add_location(self, id: str, obj: Location) -> None:
+        """Add a location to the database."""
+        self._add_object(id, obj, self._locations)
+
+    def get_locations(self) -> list[Location]:
+        """Get all locations in the database."""
+        return list(self._locations.values())
+
+    def add_character(self, id: str, obj: Character) -> None:
+        """Add a character to the database."""
+        self._add_object(id, obj, self._characters)
+
+    def get_characters(self) -> list[Character]:
+        """Get all characters in the database."""
+        return list(self._characters.values())
+
+    def add_quote(self, id: str, obj: Quote) -> None:
+        """Add a quote to the database."""
+        self._add_object(id, obj, self._quotes)
+
+    def get_quotes(self) -> list[Quote]:
+        """Get all quotes in the database."""
+        return list(self._quotes.values())

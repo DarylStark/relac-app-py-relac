@@ -31,6 +31,10 @@
         },
         "command": true,
         "./.venv/bin/pytest": true,
-        "ty": true
+        "ty": true,
+        "/^python -m http\\.server 8765 --directory out$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }

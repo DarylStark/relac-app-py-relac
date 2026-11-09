@@ -1,0 +1,35 @@
+{% macro character_works_table(work_characters) %}
+<div class="card table-card">
+  <header class="table-card-header">
+    <h2 class="table-card-title">Works using this character</h2>
+    <div class="table-card-actions"></div>
+  </header>
+  <div class="table-scroll">
+    <table id="character-works-table" class="resources" data-sortable>
+      <thead>
+        <tr>
+          <th scope="col">Work</th>
+          <th scope="col">Roles</th>
+          <th scope="col">Story arc</th>
+          <th scope="col">Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for work_character in work_characters %}
+        {% set work = work_character.work_obj %}
+        <tr data-href="{{ work.id }}.html">
+          <td><a href="{{ work.id }}.html">{{ work.title | e }}</a></td>
+          <td>
+            {% for role in work_character.roles %}
+              {% if not loop.first %}, {% endif %}{{ role.value | enum_label }}
+            {% endfor %}
+          </td>
+          <td>{{ work_character.story_arc.value | enum_label if work_character.story_arc else '' }}</td>
+          <td>{{ work_character.note | e if work_character.note else '' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endmacro %}

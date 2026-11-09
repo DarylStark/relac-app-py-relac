@@ -8,12 +8,21 @@ from pathlib import Path
 
 from isbnlib import mask
 from jinja2 import Environment, FileSystemLoader
+from markdown_it import MarkdownIt
+from markupsafe import Markup
 from pycountry import countries, languages
 from typer import Context, Option, Typer
 
 from relac.theme import RelacTheme
 
 from .database import Database
+
+_MARKDOWN = MarkdownIt('commonmark', {'html': False})
+
+
+def _render_markdown(text: str) -> Markup:
+    """Render Markdown while treating source HTML as plain text."""
+    return Markup(_MARKDOWN.render(text))
 
 
 def _calculate_age(
@@ -62,7 +71,7 @@ def _code_to_country(country_code: str) -> str:
     return country.name if country else country_code
 
 
-def _build_search_index(
+def _build_search_index(  # noqa: PLR0912
     db: Database,
 ) -> dict[str, list[dict[str, str | list[str]]]]:
     """Build the client-side search data for every linked resource."""
@@ -144,6 +153,15 @@ def _build_search_index(
             [detail for detail in details if detail],
             labels=[label.name for label in work.label_objs],
         )
+        if work.id and work.literary_analysis:
+            for chapter in work.literary_analysis.chapters:
+                if chapter.title:
+                    add_entry(
+                        'Chapter',
+                        f'literary_analysis_chapter.{work.id}.{chapter.number}',
+                        f'{chapter.number}. {chapter.title}',
+                        [f'Work: {work.title}'],
+                    )
 
     for contributor in db.get_contributors():
         details = [
@@ -156,6 +174,40 @@ def _build_search_index(
             contributor.name,
             [detail for detail in details if detail],
             labels=[label.name for label in contributor.label_objs],
+        )
+
+    for character in db.get_characters():
+        work_titles = [
+            link.work_obj.title
+            for link in character.work_character_objs
+            if link.work_obj
+        ]
+        details = [
+            f'Birthplace: {character.birthplace}',
+            f'Birth country: {character.birthcountry}',
+            f'Works: {", ".join(work_titles)}' if work_titles else '',
+        ]
+        add_entry(
+            'Character',
+            character.id,
+            character.name,
+            [detail for detail in details if detail],
+        )
+
+    for location in db.get_locations():
+        work_titles = [work.title for work in location.work_objs]
+        details = [
+            f'Country: {location.country}' if location.country else '',
+            f'Description: {location.description}'
+            if location.description
+            else '',
+            f'Works: {", ".join(work_titles)}' if work_titles else '',
+        ]
+        add_entry(
+            'Location',
+            location.id,
+            location.name,
+            [detail for detail in details if detail],
         )
 
     for edition in db.get_work_editions():
@@ -308,6 +360,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     env = Environment(loader=FileSystemLoader(metadata.source_dir))
     env.filters['isbn'] = lambda x: mask(str(x))
+    env.filters['markdown'] = _render_markdown
     env.filters['enum_label'] = _format_enum_label
     env.filters['age'] = _calculate_age
     env.filters['language'] = _code_to_language
@@ -366,6 +419,18 @@ def create(  # noqa: PLR0912, PLR0915
         out_path = output / 'contributors.html'
         out_path.write_text(html)
 
+    if 'characters' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['characters'])
+        html = template.render(characters=db.get_characters())
+        out_path = output / 'characters.html'
+        out_path.write_text(html)
+
+    if 'locations' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['locations'])
+        html = template.render(locations=db.get_locations())
+        out_path = output / 'locations.html'
+        out_path.write_text(html)
+
     if 'labels' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['labels'])
         html = template.render(
@@ -422,6 +487,22 @@ def create(  # noqa: PLR0912, PLR0915
             out_path = output / f'{contributor.id}.html'
             out_path.write_text(html)
 
+    # Locations
+    if 'location' in metadata.resource_pages:
+        for location in db.get_locations():
+            template = env.get_template(metadata.resource_pages['location'])
+            html = template.render(location=location)
+            out_path = output / f'{location.id}.html'
+            out_path.write_text(html)
+
+    # Characters
+    if 'character' in metadata.resource_pages:
+        for character in db.get_characters():
+            template = env.get_template(metadata.resource_pages['character'])
+            html = template.render(character=character)
+            out_path = output / f'{character.id}.html'
+            out_path.write_text(html)
+
     # Labels
     if 'label' in metadata.resource_pages:
         for label in db.get_labels():
@@ -453,6 +534,82 @@ def create(  # noqa: PLR0912, PLR0915
             )
             out_path = output / f'{work.id}.html'
             out_path.write_text(html)
+            if (
+                work.literary_analysis
+                and 'literary_analysis' in metadata.resource_pages
+            ):
+                analysis_template = env.get_template(
+                    metadata.resource_pages['literary_analysis']
+                )
+                analysis_html = analysis_template.render(work=work)
+                analysis_path = output / f'literary_analysis.{work.id}.html'
+                analysis_path.write_text(analysis_html)
+                if (
+                    work.literary_analysis.chapters
+                    and 'literary_analysis_chapter' in metadata.resource_pages
+                ):
+                    chapter_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_chapter']
+                    )
+                    for chapter in work.literary_analysis.chapters:
+                        chapter_html = chapter_template.render(
+                            work=work, chapter=chapter
+                        )
+                        chapter_path = output / (
+                            f'literary_analysis_chapter.{work.id}.'
+                            f'{chapter.number}.html'
+                        )
+                        chapter_path.write_text(chapter_html)
+                if (
+                    work.literary_analysis.setting
+                    and work.literary_analysis.setting.location_objs
+                    and 'literary_analysis_locations' in metadata.resource_pages
+                ):
+                    locations_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_locations']
+                    )
+                    locations_html = locations_template.render(work=work)
+                    locations_path = output / (
+                        f'literary_analysis_locations.{work.id}.html'
+                    )
+                    locations_path.write_text(locations_html)
+                if (
+                    work.literary_analysis.characters
+                    and 'literary_analysis_characters'
+                    in metadata.resource_pages
+                ):
+                    characters_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_characters']
+                    )
+                    characters_html = characters_template.render(work=work)
+                    characters_path = output / (
+                        f'literary_analysis_characters.{work.id}.html'
+                    )
+                    characters_path.write_text(characters_html)
+                if (
+                    work.literary_analysis.motifs
+                    and 'literary_analysis_motifs' in metadata.resource_pages
+                ):
+                    motifs_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_motifs']
+                    )
+                    motifs_html = motifs_template.render(work=work)
+                    motifs_path = output / (
+                        f'literary_analysis_motifs.{work.id}.html'
+                    )
+                    motifs_path.write_text(motifs_html)
+                if (
+                    work.literary_analysis.quote_objs
+                    and 'literary_analysis_quotes' in metadata.resource_pages
+                ):
+                    quotes_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_quotes']
+                    )
+                    quotes_html = quotes_template.render(work=work)
+                    quotes_path = output / (
+                        f'literary_analysis_quotes.{work.id}.html'
+                    )
+                    quotes_path.write_text(quotes_html)
 
     # Work editions
     if 'work_edition' in metadata.resource_pages:

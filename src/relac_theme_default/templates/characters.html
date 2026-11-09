@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% set active_page = "characters" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_character_index_table.html" import character_index_table %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([("Works", "works.html"), ("Characters", none)]) }}
+  {{ character_index_table(characters) }}
+</div>
+{% endblock %}

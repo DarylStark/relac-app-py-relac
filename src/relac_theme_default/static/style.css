@@ -72,7 +72,7 @@ main.page-shell
 {
     width: 100%;
     margin: 0 auto;
-    padding: 44px 32px 64px;
+    padding: 32px 32px 64px;
 }
 
 .page-header
@@ -106,6 +106,14 @@ h1
     font-weight: 380;
     line-height: 1.2;
     letter-spacing: 0;
+}
+
+.page-title-group h1 a,
+.page-title-group h1 a:hover
+{
+    color: inherit;
+    cursor: pointer;
+    text-decoration: none;
 }
 
 .page-title-group
@@ -976,7 +984,7 @@ nav.breadcrumbs [aria-current="page"]
 {
     main.page-shell
     {
-        padding: 32px 24px 48px;
+        padding: 24px 24px 48px;
     }
 
     .page-header
@@ -1015,7 +1023,7 @@ nav.breadcrumbs [aria-current="page"]
 {
     main.page-shell
     {
-        padding: 24px 16px 36px;
+        padding: 16px 16px 36px;
     }
 
     nav.tab-nav a,
@@ -1393,6 +1401,313 @@ table.resources tbody tr.table-empty-state td {
 .detail-fact dd > .rating-value
 {
     margin: 5px 0;
+}
+
+.detail-premise
+{
+    margin: 24px 0 0;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+div.card .detail-premise p:first-child,
+div.card .detail-premise p:last-child
+{
+    margin: 0 0 1em;
+    color: var(--text);
+    font-size: inherit;
+    font-weight: 400;
+    font-variant-numeric: normal;
+    line-height: inherit;
+}
+
+div.card .detail-premise p:last-child
+{
+    margin-bottom: 0;
+}
+
+.detail-actions
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.detail-action
+{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid var(--accent-text);
+    border-radius: 5px;
+    color: var(--accent-text);
+    background: var(--surface);
+    font-size: 14px;
+    font-weight: 550;
+    text-decoration: none;
+}
+
+.detail-action:not([aria-disabled="true"]):hover
+{
+    background: var(--hover-surface);
+}
+
+.detail-action:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.chapter-navigation
+{
+    justify-content: space-between;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+}
+
+.detail-action[aria-disabled="true"]
+{
+    border-color: var(--line);
+    color: var(--muted);
+}
+
+.literary-analysis-layout
+{
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(180px, 0.32fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 14px;
+}
+
+@media (max-width: 760px)
+{
+    .literary-analysis-layout
+    {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+div.content .literary-analysis-layout > .card:not(.small)
+{
+    grid-column: auto;
+}
+
+.literary-analysis-menu-card
+{
+    min-width: 0;
+}
+
+.literary-analysis-content
+{
+    display: grid;
+    min-width: 0;
+    gap: 14px;
+}
+
+.literary-analysis-content > .card
+{
+    min-width: 0;
+}
+
+.literary-analysis-menu ul
+{
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.literary-analysis-menu .literary-analysis-submenu
+{
+    margin: 4px 0 8px 10px;
+    padding-left: 10px;
+    border-left: 1px solid var(--line);
+}
+
+.literary-analysis-menu a,
+.literary-analysis-menu summary,
+.literary-analysis-menu .is-active
+{
+    display: block;
+    padding: 9px 10px;
+    border-left: 2px solid transparent;
+    border-radius: 3px;
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.literary-analysis-menu summary
+{
+    display: list-item;
+    list-style-position: inside;
+    cursor: pointer;
+}
+
+.literary-analysis-menu summary.is-active
+{
+    display: list-item;
+}
+
+.literary-analysis-menu a:hover,
+.literary-analysis-menu summary:hover,
+.literary-analysis-menu .is-active
+{
+    border-left-color: var(--accent-text);
+    color: var(--text-strong);
+    background: var(--hover-surface);
+}
+
+.literary-analysis-menu a:focus-visible,
+.literary-analysis-menu summary:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.literary-analysis-header
+{
+    margin-bottom: 24px;
+}
+
+.literary-analysis-header .detail-title
+{
+    margin: 0;
+}
+
+.detail-metadata.literary-analysis-metadata
+{
+    gap: 16px;
+    margin: 22px 0 0;
+}
+
+.literary-analysis-metadata + .literary-analysis-section
+{
+    margin-top: 28px;
+}
+
+.literary-analysis-section + .literary-analysis-section
+{
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+}
+
+.literary-analysis-section h3
+{
+    margin: 0 0 12px;
+    color: var(--text-strong);
+    font-size: 18px;
+    font-weight: 550;
+}
+
+.literary-analysis-prose
+{
+    max-width: 78ch;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+div.card .literary-analysis-prose > p:first-child,
+div.card .literary-analysis-prose > p:last-child
+{
+    margin: 0 0 1em;
+    color: var(--text);
+    font-size: inherit;
+    font-weight: 400;
+    font-variant-numeric: normal;
+    line-height: inherit;
+}
+
+div.card .literary-analysis-prose > p:last-child
+{
+    margin-bottom: 0;
+}
+
+.literary-analysis-empty
+{
+    margin: 0;
+    color: var(--muted);
+}
+
+.literary-quote-list
+{
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.literary-quote-list li + li
+{
+    border-top: 1px solid var(--line);
+}
+
+.literary-quote
+{
+    padding: 18px 4px;
+}
+
+.literary-quote-list li:first-child .literary-quote
+{
+    padding-top: 0;
+}
+
+.literary-quote-list li:last-child .literary-quote
+{
+    padding-bottom: 0;
+}
+
+.literary-quote
+{
+    margin: 0;
+}
+
+.literary-quote blockquote
+{
+    max-width: 72ch;
+    margin: 0;
+    padding-left: 18px;
+    border-left: 2px solid var(--accent-text);
+    color: var(--text-strong);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1.65;
+}
+
+.literary-quote-attribution
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 14px 0 0 20px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.literary-quote-attribution a
+{
+    color: var(--accent-text);
+    text-decoration: none;
+}
+
+.literary-quote-attribution a:hover
+{
+    text-decoration: underline;
+}
+
+.literary-quote-attribution a:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
 }
 
 .detail-small,

@@ -1,0 +1,8 @@
+{% macro literary_analysis_section(section_id, title, content) %}
+<section id="{{ section_id }}" class="literary-analysis-section" aria-labelledby="{{ section_id }}-title">
+  <h3 id="{{ section_id }}-title">{{ title }}</h3>
+  <div class="literary-analysis-prose">
+    {{ content | markdown }}
+  </div>
+</section>
+{% endmacro %}

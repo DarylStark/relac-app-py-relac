@@ -1,0 +1,55 @@
+{% extends "_base.html" %}
+{% set active_page = "literary-analysis" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_literary_analysis.html" import literary_analysis_section %}
+{% from "_literary_analysis_menu.html" import literary_analysis_menu %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([
+      ("Work", "works.html"),
+      (work.title, work.id ~ ".html"),
+      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
+      ("Work Analysis", none)
+  ]) }}
+  <div class="literary-analysis-layout">
+    {{ literary_analysis_menu(work, active_page) }}
+    <div class="card literary-analysis-card" role="article" aria-labelledby="analysis-title">
+      <header class="literary-analysis-header">
+        <p class="detail-kind">Literary analysis</p>
+        <h2 class="detail-title" id="analysis-title">{{ work.title }}</h2>
+      </header>
+      {% if work.literary_analysis.structure or (work.literary_analysis.setting and work.literary_analysis.setting.time_period) %}
+      <dl class="detail-metadata literary-analysis-metadata">
+        {% if work.literary_analysis.setting and work.literary_analysis.setting.time_period %}
+        <div class="detail-fact">
+          <dt>Time period</dt>
+          <dd>{{ work.literary_analysis.setting.time_period | e }}</dd>
+        </div>
+        {% endif %}
+        {% if work.literary_analysis.structure %}
+        <div class="detail-fact">
+          <dt>Chronology</dt>
+          <dd>{{ work.literary_analysis.structure.chronology.value | enum_label }}</dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Pacing</dt>
+          <dd>{{ work.literary_analysis.structure.pacing.value | enum_label }}</dd>
+        </div>
+        {% endif %}
+      </dl>
+      {% endif %}
+      {% if work.literary_analysis.work_summary %}
+      {{ literary_analysis_section("work-summary", "Summary", work.literary_analysis.work_summary) }}
+      {% endif %}
+      {% if work.literary_analysis.work_analysis %}
+      {{ literary_analysis_section("work-analysis", "Analysis", work.literary_analysis.work_analysis) }}
+      {% endif %}
+      {% if not work.literary_analysis.work_summary and not work.literary_analysis.work_analysis %}
+      <p class="literary-analysis-empty">No literary analysis has been written for this work yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

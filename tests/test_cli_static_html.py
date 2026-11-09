@@ -10,7 +10,9 @@ from typer.testing import CliRunner
 from relac.cli_static_html import (
     _build_search_index,
     _calculate_age,
+    _code_to_country,
     _format_enum_label,
+    _render_markdown,
 )
 from relac.database import Database
 from relac.main import app
@@ -18,10 +20,16 @@ from relac.model import (
     Availability,
     Book,
     BookCollection,
+    ChapterAnalysis,
+    Character,
     Contributor,
     Label,
+    LiteraryAnalysis,
+    Location,
+    Narrator,
     Owner,
     OwnerType,
+    Perspective,
     Rating,
     ReadingList,
     ReadingListItem,
@@ -32,6 +40,7 @@ from relac.model import (
     Series,
     SeriesItem,
     Work,
+    WorkCharacter,
     WorkEdition,
     WorkStructure,
     WorkType,
@@ -102,6 +111,66 @@ def test_resource_availability_labels(
 ) -> None:
     """Format the new resource availability values for display."""
     assert _format_enum_label(availability.value) == expected
+
+
+@pytest.mark.parametrize(
+    'active_page',
+    [
+        'literary-analysis',
+        'literary-analysis-locations',
+        'literary-analysis-characters',
+        'literary-analysis-quotes',
+        'literary-analysis-chapter',
+        'literary-analysis-motifs',
+    ],
+)
+def test_literary_analysis_pages_select_works_navigation(
+    active_page: str,
+) -> None:
+    """Select Works in the main navigation on every analysis page."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    template = Environment(
+        loader=FileSystemLoader(template_directory)
+    ).get_template('_base.html')
+    rendered = template.render(
+        active_page=active_page,
+        config=RelacConfig(title='Test library'),
+    )
+
+    assert (
+        'href="works.html" class="active" aria-current="page">Works</a>'
+        in rendered
+    )
+
+
+def test_unset_narrator_reliability_is_not_displayed() -> None:
+    """Omit reliability metadata when the narrator value is unknown."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['age'] = _calculate_age
+    environment.filters['country'] = _code_to_country
+    environment.filters['enum_label'] = _format_enum_label
+    environment.filters['markdown'] = _render_markdown
+    template = environment.get_template('literary_analysis_characters.html')
+    work = Work(
+        id='test_work',
+        title='Test Work',
+        authors=[],
+        literary_analysis=LiteraryAnalysis(
+            narrator=Narrator(perspective=Perspective.FIRST_PERSON),
+        ),
+    )
+
+    rendered = template.render(
+        work=work,
+        config=RelacConfig(title='Test library'),
+    )
+
+    assert '<dt>Reliable</dt>' not in rendered
 
 
 def test_build_search_index_includes_book_metadata_and_url() -> None:
@@ -188,6 +257,65 @@ def test_build_search_index_includes_reading_session_details() -> None:
     assert 'Test Book' in entry['searchText']
     assert 'Great story' in entry['searchText']
     assert '2026-01-01' in entry['searchText']
+
+
+def test_build_search_index_includes_characters_locations_and_titled_chapters() -> (  # noqa: E501
+    None
+):
+    """Index characters, locations, and only titled chapter analyses."""
+    database = Database()
+    work = Work(
+        id='the_tide',
+        title='The Tide',
+        authors=[],
+        literary_analysis=LiteraryAnalysis(
+            chapters=[
+                ChapterAnalysis(number=1, title='First Light'),
+                ChapterAnalysis(number=2),
+            ]
+        ),
+    )
+    character = Character(
+        id='the_narrator',
+        name='The Narrator',
+        birthplace='Old Harbor',
+        birthcountry='US',
+        work_character_objs=[
+            WorkCharacter(character='the_narrator', work_obj=work)
+        ],
+    )
+    location = Location(
+        id='old_harbor',
+        name='Old Harbor',
+        country='US',
+        description='A coastal town',
+        work_objs=[work],
+    )
+    database.add_work('the_tide', work)
+    database.add_character('the_narrator', character)
+    database.add_location('old_harbor', location)
+
+    entries = _build_search_index(database)['items']
+    character_entry = next(
+        item for item in entries if item['type'] == 'Character'
+    )
+    location_entry = next(
+        item for item in entries if item['type'] == 'Location'
+    )
+    chapter_entries = [item for item in entries if item['type'] == 'Chapter']
+
+    assert character_entry['href'] == 'the_narrator.html'
+    assert character_entry['title'] == 'The Narrator'
+    assert 'The Tide' in character_entry['searchText']
+    assert location_entry['href'] == 'old_harbor.html'
+    assert location_entry['title'] == 'Old Harbor'
+    assert 'A coastal town' in location_entry['searchText']
+    assert len(chapter_entries) == 1
+    assert chapter_entries[0]['href'] == (
+        'literary_analysis_chapter.the_tide.1.html'
+    )
+    assert chapter_entries[0]['title'] == '1. First Light'
+    assert 'The Tide' in chapter_entries[0]['searchText']
 
 
 def test_reading_session_table_shows_ongoing_end_date() -> None:
@@ -440,7 +568,7 @@ def test_book_collection_rating_renders_in_table_and_detail() -> None:
     assert 'rating-value--unrated">Unrated</span>' in unrated_detail
 
 
-def test_static_html_create_generates_reading_session_detail(
+def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     tmp_path: Path,
 ) -> None:
     """Generate a dedicated HTML page for each reading session."""
@@ -458,9 +586,376 @@ def test_static_html_create_generates_reading_session_detail(
     )
 
     assert result.exit_code == 0, result.exception or result.output
+    index_html = (tmp_path / 'index.html').read_text()
+    assert (
+        '<h1><a class="home-link" href="index.html">Relac library</a></h1>'
+        in index_html
+    )
+    works_html = (tmp_path / 'works.html').read_text()
+    assert (
+        '<th scope="col" class="center fit-content">Literary analysis</th>'
+        in works_html
+    )
+    assert works_html.index('>Availability</th>') < works_html.index(
+        '>Literary analysis</th>'
+    )
+    stoner_row = works_html.split(
+        '<tr data-href="work.john_williams__stoner.html">', 1
+    )[1].split('</tr>', 1)[0]
+    assert 'data-sort-value="1" data-filter-values=' in stoner_row
+    assert (
+        '<span class="availability-badge availability-owned">Yes</span>'
+        in stoner_row
+    )
+    augustus_row = works_html.split(
+        '<tr data-href="work.john_williams__augustus.html">', 1
+    )[1].split('</tr>', 1)[0]
+    assert 'data-sort-value="0" data-filter-values=' in augustus_row
+    assert (
+        '<span class="availability-badge availability-not-owned">No</span>'
+        in augustus_row
+    )
+    stoner_analysis_path = (
+        tmp_path / 'literary_analysis.work.john_williams__stoner.html'
+    )
+    assert stoner_analysis_path.exists()
+    stoner_analysis_html = stoner_analysis_path.read_text()
+    assert '<title>Literary analysis: Stoner |' in stoner_analysis_html
+    assert (
+        '<span aria-current="page">Work Analysis</span>' in stoner_analysis_html
+    )
+    assert '<a href="works.html">Work</a>' in stoner_analysis_html
+    assert (
+        '<a href="literary_analysis.work.john_williams__stoner.html">'
+        'Literary Analysis</a>' in stoner_analysis_html
+    )
+    assert '<em>good</em>' in stoner_analysis_html
+    assert '<em>and</em>' in stoner_analysis_html
+    assert '<dt>Chronology</dt>' in stoner_analysis_html
+    assert '<dd>Linear</dd>' in stoner_analysis_html
+    assert '<dt>Pacing</dt>' in stoner_analysis_html
+    assert '<dd>Contemplative</dd>' in stoner_analysis_html
+    assert '<dt>Time period</dt>' in stoner_analysis_html
+    assert '<dd>1900 - 1950</dd>' in stoner_analysis_html
+    assert (
+        'href="literary_analysis_locations.work.john_williams__stoner.html">'
+        'Locations</a>' in stoner_analysis_html
+    )
+    assert (
+        'href="literary_analysis_characters.work.john_williams__stoner.html">'
+        'Characters</a>' in stoner_analysis_html
+    )
+    assert (
+        'href="literary_analysis_motifs.work.john_williams__stoner.html">'
+        'Motifs</a>' in stoner_analysis_html
+    )
+    assert (
+        'href="literary_analysis_chapter.work.john_williams__stoner.1.html">'
+        '1. First chapter</a>' in stoner_analysis_html
+    )
+    assert (
+        'href="literary_analysis_chapter.work.john_williams__stoner.3.html">'
+        'Chapter 3</a>' in stoner_analysis_html
+    )
+    chapter_path = (
+        tmp_path / 'literary_analysis_chapter.work.john_williams__stoner.1.html'
+    )
+    assert chapter_path.exists()
+    chapter_html = chapter_path.read_text()
+    assert '<title>Chapter 1: First chapter: Stoner |' in chapter_html
+    assert (
+        '<h2 class="detail-title" id="chapter-title">1. First chapter</h2>'
+        in chapter_html
+    )
+    assert '<strong>chapter</strong>' in chapter_html
+    assert 'Chronology' not in chapter_html
+    assert (
+        '<span class="is-active" aria-current="page">1. First chapter</span>'
+        in chapter_html
+    )
+    assert (
+        '<span class="detail-action" aria-disabled="true">'
+        '<span aria-hidden="true">&larr;</span> Previous</span>' in chapter_html
+    )
+    assert (
+        '<a class="detail-action" aria-label="Next chapter: 2. Second chapter" '
+        'href="literary_analysis_chapter.work.john_williams__stoner.2.html">'
+        '2. Second chapter <span aria-hidden="true">&rarr;</span></a>'
+        in chapter_html
+    )
+    untitled_chapter_path = (
+        tmp_path / 'literary_analysis_chapter.work.john_williams__stoner.3.html'
+    )
+    assert untitled_chapter_path.exists()
+    untitled_chapter_html = untitled_chapter_path.read_text()
+    assert '<title>Chapter 3: Stoner |' in untitled_chapter_html
+    assert (
+        '<h2 class="detail-title" id="chapter-title">Chapter 3</h2>'
+        in untitled_chapter_html
+    )
+    assert (
+        '<a class="detail-action" aria-label="Previous chapter: 2. '
+        'Second chapter" '
+        'href="literary_analysis_chapter.work.john_williams__stoner.2.html">'
+        '<span aria-hidden="true">&larr;</span> 2. Second chapter</a>'
+        in untitled_chapter_html
+    )
+    assert (
+        '<span class="detail-action" aria-disabled="true">'
+        'Next <span aria-hidden="true">&rarr;</span></span>'
+        in untitled_chapter_html
+    )
+    locations_path = (
+        tmp_path / 'literary_analysis_locations.work.john_williams__stoner.html'
+    )
+    assert locations_path.exists()
+    locations_html = locations_path.read_text()
+    assert '<title>Locations: Stoner |' in locations_html
+    assert '<a href="works.html">Work</a>' in locations_html
+    assert (
+        '<a href="literary_analysis.work.john_williams__stoner.html">'
+        'Literary Analysis</a>' in locations_html
+    )
+    assert '<th scope="col">Name</th>' in locations_html
+    assert '<th scope="col">Country</th>' in locations_html
+    assert '<th scope="col">Description</th>' in locations_html
+    assert (
+        '<a href="location.university_missouri.html">'
+        'University of Missouri</a>' in locations_html
+    )
+    assert 'United States' in locations_html
+    assert 'Missouri' in locations_html
+    assert (
+        '<span class="is-active" aria-current="page">Locations</span>'
+        in locations_html
+    )
+    assert '<summary>Chapter analysis</summary>' in locations_html
+    assert (
+        '<a href="literary_analysis.work.john_williams__stoner.html">'
+        'Work Analysis</a>' in locations_html
+    )
+    location_detail_path = tmp_path / 'location.university_missouri.html'
+    assert location_detail_path.exists()
+    location_detail_html = location_detail_path.read_text()
+    assert '<title>Location: University of Missouri |' in location_detail_html
+    assert '<p class="detail-kind">Location</p>' in location_detail_html
+    assert '<dt>Country</dt>' in location_detail_html
+    assert 'United States' in location_detail_html
+    assert 'Works using this location' in location_detail_html
+    assert (
+        '<a href="work.john_williams__stoner.html">Stoner</a>'
+        in location_detail_html
+    )
+    characters_path = (
+        tmp_path
+        / 'literary_analysis_characters.work.john_williams__stoner.html'
+    )
+    assert characters_path.exists()
+    characters_html = characters_path.read_text()
+    assert '<title>Characters: Stoner |' in characters_html
+    assert characters_html.index('id="narrator-title"') < characters_html.index(
+        'id="literary-analysis-characters-table"'
+    )
+    assert '<dt>Perspective</dt>' in characters_html
+    assert '<dd>Third person limited</dd>' in characters_html
+    assert (
+        '<a href="character.william_stoner.html">William Stoner</a>'
+        in characters_html
+    )
+    assert '<dt>Reliable</dt>' in characters_html
+    assert '<dd>No</dd>' in characters_html
+    narrator_section_start = characters_html.index('id="narrator-title"')
+    narrator_metadata_end = characters_html.index(
+        '</dl>', narrator_section_start
+    )
+    narrator_notes_position = characters_html.index(
+        'The narration stays close to William.'
+    )
+    assert narrator_metadata_end < narrator_notes_position
+    assert '<th scope="col">Character</th>' in characters_html
+    assert '<th scope="col">Roles</th>' in characters_html
+    assert '<th scope="col">Story arc</th>' in characters_html
+    assert '>Deceased date</th>' in characters_html
+    assert 'data-sort-value="65"><pre>65</pre></td>' in characters_html
+    assert (
+        'datetime="1891-05-05" data-local-date>1891-05-05</time>'
+        in characters_html
+    )
+    assert (
+        'datetime="1956-05-05" data-local-date>1956-05-05</time>'
+        in characters_html
+    )
+    assert (
+        'class="right fit-content character-age" data-sort-value=""></td>'
+        in characters_html
+    )
+    assert (
+        '<a href="character.william_stoner.html">William Stoner</a>'
+        in characters_html
+    )
+    assert 'Protagonist' in characters_html
+    assert 'Edith Elaine Bostwick' in characters_html
+    assert 'Love interest' in characters_html
+    assert 'Grace Stoner' in characters_html
+    assert (
+        '<span class="is-active" aria-current="page">Characters</span>'
+        in characters_html
+    )
+    assert (
+        '<a href="literary_analysis_quotes.work.john_williams__stoner.html">'
+        'Quotes</a>' in characters_html
+    )
+    assert (
+        'href="literary_analysis_locations.work.john_williams__stoner.html">'
+        'Locations</a>' in characters_html
+    )
+    motifs_path = (
+        tmp_path / 'literary_analysis_motifs.work.john_williams__stoner.html'
+    )
+    assert motifs_path.exists()
+    motifs_html = motifs_path.read_text()
+    assert '<title>Motifs: Stoner |' in motifs_html
+    assert '<th scope="col">Name</th>' in motifs_html
+    assert '<th scope="col">Type</th>' in motifs_html
+    assert '<th scope="col">Symbolizes</th>' in motifs_html
+    assert '<th scope="col">Description</th>' in motifs_html
+    assert 'Value of a unremarkable life' in motifs_html
+    assert 'Thematic' in motifs_html
+    assert 'The distance between people' in motifs_html
+    assert (
+        '<span class="is-active" aria-current="page">Motifs</span>'
+        in motifs_html
+    )
+    characters_index_path = tmp_path / 'characters.html'
+    assert characters_index_path.exists()
+    characters_index_html = characters_index_path.read_text()
+    assert '<title>Characters |' in characters_index_html
+    assert (
+        '<a href="character.william_stoner.html">William Stoner</a>'
+        in characters_index_html
+    )
+    assert (
+        '<a href="work.john_williams__stoner.html">Stoner</a>'
+        in characters_index_html
+    )
+    assert (
+        'href="characters.html" class="active" aria-current="page">'
+        'Characters</a>' in characters_index_html
+    )
+    locations_index_path = tmp_path / 'locations.html'
+    assert locations_index_path.exists()
+    locations_index_html = locations_index_path.read_text()
+    assert '<title>Locations |' in locations_index_html
+    assert (
+        '<a href="location.university_missouri.html">'
+        'University of Missouri</a>' in locations_index_html
+    )
+    assert (
+        '<a href="work.john_williams__stoner.html">Stoner</a>'
+        in locations_index_html
+    )
+    character_path = tmp_path / 'character.william_stoner.html'
+    assert character_path.exists()
+    character_html = character_path.read_text()
+    assert '<title>Character: William Stoner |' in character_html
+    assert 'Works using this character' in character_html
+    assert (
+        '<a href="work.john_williams__stoner.html">Stoner</a>' in character_html
+    )
+    assert 'Protagonist' in character_html
+    assert (
+        '<div class="card table-card literary-quotes-card" '
+        'aria-labelledby="character-quotes-title">' in character_html
+    )
+    assert (
+        '<h2 class="table-card-title" id="character-quotes-title">'
+        'Quotes featuring this character</h2>' in character_html
+    )
+    assert '<blockquote>Sometimes, immersed in his books,' in character_html
+    assert 'My God, to read without joy is stupid.' not in character_html
+    quotes_path = (
+        tmp_path / 'literary_analysis_quotes.work.john_williams__stoner.html'
+    )
+    assert quotes_path.exists()
+    quotes_html = quotes_path.read_text()
+    assert '<title>Quotes: Stoner |' in quotes_html
+    assert (
+        '<div class="card table-card literary-quotes-card" '
+        'aria-labelledby="quotes-title">' in quotes_html
+    )
+    assert (
+        '<h2 class="table-card-title" id="quotes-title">Quotes</h2>'
+        in quotes_html
+    )
+    assert '<blockquote>Sometimes, immersed in his books,' in quotes_html
+    assert (
+        '<a href="contributor.john_williams.html">John Willams</a>'
+        in quotes_html
+    )
+    assert (
+        '<span class="literary-quote-character">Character: '
+        '<a href="character.william_stoner.html">William Stoner</a>'
+        '</span>' in quotes_html
+    )
+    assert (
+        'datetime="1986-01-01" data-local-date>1986-01-01</time>' in quotes_html
+    )
+    assert 'My God, to read without joy is stupid.' not in quotes_html
+    contributor_html = (tmp_path / 'contributor.john_williams.html').read_text()
+    assert (
+        '<div class="card table-card literary-quotes-card" '
+        'aria-labelledby="contributor-quotes-title">' in contributor_html
+    )
+    assert (
+        '<h2 class="table-card-title" id="contributor-quotes-title">Quotes</h2>'
+        in contributor_html
+    )
+    assert 'Sometimes, immersed in his books' in contributor_html
+    assert 'My God, to read without joy is stupid.' in contributor_html
+    assert (
+        '<span class="literary-quote-work">Work: '
+        '<a href="work.john_williams__stoner.html">Stoner</a></span>'
+        in contributor_html
+    )
+    assert contributor_html.count('class="literary-quote-work"') == 1
+    assert contributor_html.index(
+        'Books with this contributor'
+    ) < contributor_html.index('Sometimes, immersed in his books')
+    assert 'class="literary-analysis-layout"' in stoner_analysis_html
+    assert 'card literary-analysis-menu-card' in stoner_analysis_html
+    assert (
+        '<span class="is-active" aria-current="page">Work Analysis</span>'
+        in stoner_analysis_html
+    )
+    assert '<summary>Chapter analysis</summary>' in stoner_analysis_html
+    assert '<details open>' in stoner_analysis_html
+    assert 'href="#work-summary"' not in stoner_analysis_html
+    assert 'href="#work-analysis"' not in stoner_analysis_html
+    stoner_work_html = (
+        tmp_path / 'work.john_williams__stoner.html'
+    ).read_text()
+    assert (
+        'class="detail-action" '
+        'href="literary_analysis.work.john_williams__stoner.html">'
+        'Read literary analysis</a>' in stoner_work_html
+    )
+    augustus_analysis_path = (
+        tmp_path / 'literary_analysis.work.john_williams__augustus.html'
+    )
+    assert not augustus_analysis_path.exists()
+    augustus_work_html = (
+        tmp_path / 'work.john_williams__augustus.html'
+    ).read_text()
+    assert 'Read literary analysis' not in augustus_work_html
     session_pages = list(tmp_path.glob('reading_session.*.html'))
     assert session_pages
     assert '<title>Reading session:' in session_pages[0].read_text()
+    reading_sessions_html = (tmp_path / 'reading-sessions.html').read_text()
+    assert (
+        'href="reading-sessions.html" class="active" aria-current="page">'
+        'Reading sessions</a>' in reading_sessions_html
+    )
+    assert 'aria-label="Works"' not in reading_sessions_html
     labels_page = tmp_path / 'labels.html'
     assert labels_page.exists()
     labels_html = labels_page.read_text()
@@ -510,12 +1005,13 @@ def test_static_html_create_generates_reading_session_detail(
     )
 
 
-def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR0915
-    """Render optional illustrators and translators as linked contributors."""
+def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PLR0915
+    """Render edition credits and safely formatted Markdown premise text."""
     template_directory = (
         Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
     )
     environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['markdown'] = _render_markdown
     environment.filters['enum_label'] = _format_enum_label
     environment.filters['language'] = lambda language: language or ''
     environment.filters['age'] = _calculate_age
@@ -530,6 +1026,7 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         authors=[],
         work_structure=WorkStructure.UNSPECIFIED,
         work_type=WorkType.UNSPECIFIED,
+        premise='First **bold** line\n\nSecond <b>line</b>',
     )
     illustrator = Contributor(id='illustrator', name='Test Illustrator')
     translator = Contributor(id='translator', name='Test Translator')
@@ -629,6 +1126,9 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     assert 'data-sort-value="8.5"' in work_table_html
     assert '<dt>Rating</dt>' in work_detail_html
     assert '8.5' in work_detail_html
+    assert '<p>First <strong>bold</strong> line</p>' in work_detail_html
+    assert '<p>Second &lt;b&gt;line&lt;/b&gt;</p>' in work_detail_html
+    assert '<b>line</b>' not in work_detail_html
     book = Book(
         id='test_book',
         isbn13=9781234567897,

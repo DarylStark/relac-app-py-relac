@@ -1,0 +1,21 @@
+{% extends "_base.html" %}
+{% set active_page = "literary-analysis-quotes" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_literary_analysis_menu.html" import literary_analysis_menu %}
+{% from "_quote_cards.html" import quote_cards %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([
+      ("Work", "works.html"),
+      (work.title, work.id ~ ".html"),
+      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
+      ("Quotes", none)
+  ]) }}
+  <div class="literary-analysis-layout">
+    {{ literary_analysis_menu(work, active_page) }}
+    {{ quote_cards(work.literary_analysis.quote_objs) }}
+  </div>
+</div>
+{% endblock %}

@@ -96,13 +96,13 @@ class Contributor(LabelledResource):
     # Relation (real objects)
     work_objs: list[Work] = Field(default_factory=list)
     book_objs: list[Book] = Field(default_factory=list)
+    quote_objs: list[Quote] = Field(default_factory=list)
     illustrator_work_edition_objs: list[WorkEdition] = Field(
         default_factory=list
     )
     translator_work_edition_objs: list[WorkEdition] = Field(
         default_factory=list
     )
-    # label_objs: list[Label] = Field(default_factory=list)
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -191,6 +191,181 @@ class WorkStructure(Enum):
     MANUAL = 'manual'
 
 
+class WorkChronology(Enum):
+    """Work chronology."""
+
+    LINEAR = 'linear'
+    NON_LINEAR = 'non-linear'
+    FRAMED = 'framed'
+    DUAL_TIMELINE = 'dual-timeline'
+
+
+class WorkPacing(Enum):
+    """Work pacing."""
+
+    GRADUAL_BUILD = 'gradual-build'
+    FAST_PACED = 'fast-paced'
+    IN_MEDIA_RES = 'in-media-res'
+    CYCLICAL = 'cyclical'
+    CONTEMPLATIVE = 'contemplative'
+    FRONT_LOADED = 'front-loaded'
+
+
+class StoryStructure(BaseModel):
+    """Structure for the literary work."""
+
+    chronology: WorkChronology
+    pacing: WorkPacing
+
+
+class Location(ResourceBase):
+    """Model for a location."""
+
+    name: str
+    country: str | None = None
+    description: str | None = None
+
+    # Relation (real objects)
+    work_objs: list[Work] = Field(default_factory=list)
+
+
+class StorySetting(BaseModel):
+    """The setting for a story."""
+
+    time_period: str | None = None
+    locations: list[str] | None = None
+
+    # Relation (real objects)
+    location_objs: list[Location] = Field(default_factory=list)
+
+
+class Character(ResourceBase):
+    """A character in a story."""
+
+    name: str
+    birthdate: date | None = None
+    birthplace: str
+    birthcountry: str
+    deceased_date: date | None = None
+
+    # Relation (real objects)
+    work_character_objs: list[WorkCharacter] = Field(default_factory=list)
+    quote_objs: list[Quote] = Field(default_factory=list)
+
+
+class CharacterRole(Enum):
+    """Roles for characters."""
+
+    PROTAGONIST = 'protagonist'
+    ANTAGONIST = 'antagonist'
+    DEUTERAGONIST = 'deuteragonist'
+    TRITAGONIST = 'tritagonist'
+    MENTOR = 'mentor'
+    FOIL = 'foil'
+    LOVE_INTEREST = 'love-interest'
+    CONFIDANT = 'confidant'
+
+
+class StoryArc(Enum):
+    """Story arcs for characters."""
+
+    POSITIVE_CHANGE = 'positive-change'
+    TRAGIC_FALL = 'tragic-fall'
+    FLAT = 'flat'
+
+
+class WorkCharacter(BaseModel):
+    """A link between a character and a LiteraryAnalysis."""
+
+    character: str
+    roles: list[CharacterRole] = Field(default_factory=list)
+    note: str | None = None
+    story_arc: StoryArc | None = None
+
+    # Relation (real objects)
+    character_obj: Character | None = None
+    work_obj: Work | None = None
+
+
+class ChapterAnalysis(BaseModel):
+    """Analysis for a chapter."""
+
+    number: int
+    title: str | None = None
+    summary: str | None = None
+    analysis: str | None = None
+
+
+class Quote(ResourceBase):
+    """A quote from a contributor."""
+
+    quote: str
+    contributor: str
+    quote_date: date | None = None
+    character: str | None = None
+    work: str | None = None
+
+    # Relation (real objects)
+    contributor_obj: Contributor | None = None
+    character_obj: Character | None = None
+    work_obj: Work | None = None
+
+
+class MotifType(Enum):
+    """Types of motif."""
+
+    LEITMOTIV = 'leitmotiv'
+    SITUATION = 'situation'
+    THEMATIC = 'thematic'
+
+
+class Motif(BaseModel):
+    """A motif for a work."""
+
+    name: str
+    motif_type: MotifType
+    symbolizes: str | None = None
+    description: str | None = None
+
+
+class Perspective(Enum):
+    """Perspectives for a story."""
+
+    FIRST_PERSON = 'first-person'
+    THIRD_PERSON_LIMITED = 'third-person-limited'
+    THIRD_PERSON_OMNISCENT = 'third-person-omniscent'
+    MULTIPLE_POV = 'multiple-pov'
+
+
+class Narrator(BaseModel):
+    """Model for a narrator."""
+
+    perspective: Perspective
+    character: str | None = None
+    reliable: bool | None = None
+    notes: str | None = None
+
+    # Relation (real objects)
+    character_obj: Character | None = None
+
+
+class LiteraryAnalysis(BaseModel):
+    """Model for a works literary analysis."""
+
+    work_summary: str | None = None
+    work_analysis: str | None = None
+    structure: StoryStructure | None = None
+    setting: StorySetting | None = None
+    characters: list[WorkCharacter] = Field(default_factory=list)
+    chapters: list[ChapterAnalysis] = Field(default_factory=list)
+    quotes: list[str] = Field(default_factory=list)
+    motifs: list[Motif] = Field(default_factory=list)
+    narrator: Narrator | None = None
+
+    # Relation (real objects)
+    quote_objs: list[Quote] = Field(default_factory=list)
+
+
 class Work(LabelledResource):
     """Model for a work."""
 
@@ -198,6 +373,9 @@ class Work(LabelledResource):
     authors: list[str]
     work_type: WorkType | None = None
     work_structure: WorkStructure | None = None
+    premise: str | None = None
+
+    literary_analysis: LiteraryAnalysis | None = None
 
     # Relation (real objects)
     author_objs: list[Contributor] = Field(default_factory=list)

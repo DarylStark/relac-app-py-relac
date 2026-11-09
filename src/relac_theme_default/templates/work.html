@@ -61,6 +61,16 @@
           </div>
         </dl>
       </section>
+      {% if work.premise %}
+      <section class="detail-premise" aria-label="Premise">
+        {{ work.premise | markdown }}
+      </section>
+      {% endif %}
+      {% if work.literary_analysis %}
+      <div class="detail-actions">
+        <a class="detail-action" href="literary_analysis.{{ work.id }}.html">Read literary analysis</a>
+      </div>
+      {% endif %}
       {{ detail_labels(work.label_objs) }}
   </div>
 

@@ -1,0 +1,73 @@
+{% macro chapter_label(chapter) -%}
+{% if chapter.title %}{{ chapter.number }}. {{ chapter.title }}{% else %}Chapter {{ chapter.number }}{% endif %}
+{%- endmacro %}
+
+{% macro literary_analysis_menu(work, active_page, current_chapter=none) %}
+<div class="card literary-analysis-menu-card">
+  <nav class="literary-analysis-menu" aria-label="Work analysis pages">
+    <ul>
+      <li>
+        {% if active_page == "literary-analysis" %}
+        <span class="is-active" aria-current="page">Work Analysis</span>
+        {% else %}
+        <a href="literary_analysis.{{ work.id }}.html">Work Analysis</a>
+        {% endif %}
+      </li>
+      {% if work.literary_analysis.chapters %}
+      <li class="literary-analysis-menu-group">
+        <details {% if active_page in ["literary-analysis", "literary-analysis-chapter"] %}open{% endif %}>
+          <summary>Chapter analysis</summary>
+          <ul class="literary-analysis-submenu">
+            {% for chapter in work.literary_analysis.chapters %}
+            <li>
+              {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.number == chapter.number %}
+              <span class="is-active" aria-current="page">{{ chapter_label(chapter) }}</span>
+              {% else %}
+              <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.number }}.html">{{ chapter_label(chapter) }}</a>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+        </details>
+      </li>
+      {% endif %}
+      {% if work.literary_analysis.setting and work.literary_analysis.setting.location_objs %}
+      <li>
+        {% if active_page == "literary-analysis-locations" %}
+        <span class="is-active" aria-current="page">Locations</span>
+        {% else %}
+        <a href="literary_analysis_locations.{{ work.id }}.html">Locations</a>
+        {% endif %}
+      </li>
+      {% endif %}
+      {% if work.literary_analysis.characters %}
+      <li>
+        {% if active_page == "literary-analysis-characters" %}
+        <span class="is-active" aria-current="page">Characters</span>
+        {% else %}
+        <a href="literary_analysis_characters.{{ work.id }}.html">Characters</a>
+        {% endif %}
+      </li>
+      {% endif %}
+      {% if work.literary_analysis.motifs %}
+      <li>
+        {% if active_page == "literary-analysis-motifs" %}
+        <span class="is-active" aria-current="page">Motifs</span>
+        {% else %}
+        <a href="literary_analysis_motifs.{{ work.id }}.html">Motifs</a>
+        {% endif %}
+      </li>
+      {% endif %}
+      {% if work.literary_analysis.quote_objs %}
+      <li>
+        {% if active_page == "literary-analysis-quotes" %}
+        <span class="is-active" aria-current="page">Quotes</span>
+        {% else %}
+        <a href="literary_analysis_quotes.{{ work.id }}.html">Quotes</a>
+        {% endif %}
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+</div>
+{% endmacro %}

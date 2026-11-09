@@ -1,0 +1,61 @@
+{% extends "_base.html" %}
+{% set active_page = "literary-analysis-characters" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_literary_analysis_characters_table.html" import literary_analysis_characters_table %}
+{% from "_literary_analysis_menu.html" import literary_analysis_menu %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([
+      ("Work", "works.html"),
+      (work.title, work.id ~ ".html"),
+      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
+      ("Characters", none)
+  ]) }}
+  <div class="literary-analysis-layout">
+    {{ literary_analysis_menu(work, active_page) }}
+    <div class="literary-analysis-content">
+      {% if work.literary_analysis.narrator %}
+      {% set narrator = work.literary_analysis.narrator %}
+      <div class="card literary-analysis-card" role="article" aria-labelledby="narrator-title">
+        <header class="literary-analysis-header">
+          <p class="detail-kind">Narrator</p>
+          <h2 class="detail-title" id="narrator-title">Narrator</h2>
+        </header>
+        <dl class="detail-metadata literary-analysis-metadata">
+          <div class="detail-fact">
+            <dt>Perspective</dt>
+            <dd>{{ narrator.perspective.value | enum_label }}</dd>
+          </div>
+          {% if narrator.character_obj or narrator.character %}
+          <div class="detail-fact">
+            <dt>Character</dt>
+            <dd>
+              {% if narrator.character_obj %}
+              <a href="{{ narrator.character_obj.id }}.html">{{ narrator.character_obj.name | e }}</a>
+              {% else %}
+              {{ narrator.character | e }}
+              {% endif %}
+            </dd>
+          </div>
+          {% endif %}
+          {% if narrator.reliable is not none %}
+          <div class="detail-fact">
+            <dt>Reliable</dt>
+            <dd>{{ "Yes" if narrator.reliable else "No" }}</dd>
+          </div>
+          {% endif %}
+        </dl>
+        {% if narrator.notes %}
+        <section class="detail-premise" aria-label="Narrator notes">
+          {{ narrator.notes | markdown }}
+        </section>
+        {% endif %}
+      </div>
+      {% endif %}
+      {{ literary_analysis_characters_table(work.literary_analysis.characters) }}
+    </div>
+  </div>
+</div>
+{% endblock %}

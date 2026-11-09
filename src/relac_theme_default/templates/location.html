@@ -1,0 +1,45 @@
+{% extends "_base.html" %}
+{% set active_page = "locations" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_work_table.html" import work_table %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([("Works", "works.html"), (location.name, none)]) }}
+  <div class="card">
+    <section class="detail-summary" aria-labelledby="detail-title">
+      <div class="detail-summary-header">
+        <div>
+          <p class="detail-kind">Location</p>
+          <h3 id="detail-title">{{ location.name | e }}</h3>
+        </div>
+      </div>
+      {% if location.country or location.description %}
+      <dl class="detail-metadata">
+        {% if location.country %}
+        <div class="detail-fact">
+          <dt>Country</dt>
+          <dd>{{ location.country | country }}</dd>
+        </div>
+        {% endif %}
+        {% if location.description %}
+        <div class="detail-fact">
+          <dt>Description</dt>
+          <dd>{{ location.description | e }}</dd>
+        </div>
+        {% endif %}
+      </dl>
+      {% endif %}
+    </section>
+  </div>
+
+  {% if location.work_objs %}
+    {{ work_table(location.work_objs, title="Works using this location") }}
+  {% else %}
+  <div class="card">
+    <p class="detail-unspecified">No works are linked to this location.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

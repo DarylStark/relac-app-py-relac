@@ -1,0 +1,30 @@
+{% macro literary_analysis_motifs_table(motifs) %}
+<div class="card table-card">
+  <header class="table-card-header">
+    <h2 class="table-card-title">Motifs</h2>
+    <div class="table-card-actions"></div>
+  </header>
+  <div class="table-scroll">
+    <table id="literary-analysis-motifs-table" class="resources" data-sortable>
+      <thead>
+        <tr>
+          <th scope="col">Name</th>
+          <th scope="col">Type</th>
+          <th scope="col">Symbolizes</th>
+          <th scope="col">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for motif in motifs %}
+        <tr>
+          <td>{{ motif.name | e }}</td>
+          <td>{{ motif.motif_type.value | enum_label }}</td>
+          <td>{{ motif.symbolizes | e if motif.symbolizes else '' }}</td>
+          <td>{{ motif.description | e if motif.description else '' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endmacro %}
