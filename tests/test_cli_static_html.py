@@ -842,6 +842,12 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     session_pages = list(tmp_path.glob('reading_session.*.html'))
     assert session_pages
     assert '<title>Reading session:' in session_pages[0].read_text()
+    reading_sessions_html = (tmp_path / 'reading-sessions.html').read_text()
+    assert (
+        'href="reading-sessions.html" class="active" aria-current="page">'
+        'Reading sessions</a>' in reading_sessions_html
+    )
+    assert 'aria-label="Works"' not in reading_sessions_html
     labels_page = tmp_path / 'labels.html'
     assert labels_page.exists()
     labels_html = labels_page.read_text()

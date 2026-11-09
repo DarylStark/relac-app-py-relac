@@ -77,17 +77,17 @@
             <nav class="tab-nav">
                 <a href="index.html" {% if active_page == "overview" %}class="active" aria-current="page"{% endif %}>Overview</a>
                 <a href="contributors.html" {% if active_page == "contributors" %}class="active" aria-current="page"{% endif %}>Contributors</a>
-                <a href="works.html" {% if active_page in ["works", "work-editions", "lists", "series", "reading-sessions", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "locations", "characters", "character"] %}class="active"{% if active_page in ["works", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "locations", "characters", "character"] %} aria-current="page"{% endif %}{% endif %}>Works</a>
-                {% if active_page in ["works", "work-editions", "lists", "series", "reading-sessions", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "locations", "characters", "character"] %}
+                <a href="works.html" {% if active_page in ["works", "work-editions", "lists", "series", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "locations", "characters", "character"] %}class="active"{% if active_page in ["works", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "locations", "characters", "character"] %} aria-current="page"{% endif %}{% endif %}>Works</a>
+                {% if active_page in ["works", "work-editions", "lists", "series", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "locations", "characters", "character"] %}
                 <div class="nav-submenu" role="group" aria-label="Works">
                     <a href="work-editions.html" {% if active_page == "work-editions" or work_edition is defined %}class="active" aria-current="page"{% endif %}>Work Editions</a>
                     <a href="series.html" {% if active_page == "series" %}class="active" aria-current="page"{% endif %}>Series</a>
                     <a href="lists.html" {% if active_page == "lists" %}class="active" aria-current="page"{% endif %}>Reading lists</a>
-                    <a href="reading-sessions.html" {% if active_page == "reading-sessions" %}class="active" aria-current="page"{% endif %}>Reading sessions</a>
                     <a href="characters.html" {% if active_page in ["characters", "character", "literary-analysis-characters"] %}class="active" aria-current="page"{% endif %}>Characters</a>
                     <a href="locations.html" {% if active_page in ["locations", "literary-analysis-locations"] %}class="active" aria-current="page"{% endif %}>Locations</a>
                 </div>
                 {% endif %}
+                <a href="reading-sessions.html" {% if active_page == "reading-sessions" %}class="active" aria-current="page"{% endif %}>Reading sessions</a>
                 <a href="books.html" {% if active_page in ["books", "owners", "collections"] %}class="active"{% if active_page == "books" %} aria-current="page"{% endif %}{% endif %}>Books</a>
                 {% if active_page in ["books", "owners", "collections"] %}
                 <div class="nav-submenu" role="group" aria-label="Books">
