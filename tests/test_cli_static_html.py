@@ -110,6 +110,38 @@ def test_resource_availability_labels(
     assert _format_enum_label(availability.value) == expected
 
 
+@pytest.mark.parametrize(
+    'active_page',
+    [
+        'literary-analysis',
+        'literary-analysis-locations',
+        'literary-analysis-characters',
+        'literary-analysis-quotes',
+        'literary-analysis-chapter',
+        'literary-analysis-motifs',
+    ],
+)
+def test_literary_analysis_pages_select_works_navigation(
+    active_page: str,
+) -> None:
+    """Select Works in the main navigation on every analysis page."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    template = Environment(
+        loader=FileSystemLoader(template_directory)
+    ).get_template('_base.html')
+    rendered = template.render(
+        active_page=active_page,
+        config=RelacConfig(title='Test library'),
+    )
+
+    assert (
+        'href="works.html" class="active" aria-current="page">Works</a>'
+        in rendered
+    )
+
+
 def test_build_search_index_includes_book_metadata_and_url() -> None:
     """Include book labels, ID, related contributor, ISBN, and URL."""
     database = Database()
@@ -599,7 +631,7 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     )
     assert chapter_path.exists()
     chapter_html = chapter_path.read_text()
-    assert '<title>Chapter 1: First chapter |' in chapter_html
+    assert '<title>Chapter 1: First chapter: Stoner |' in chapter_html
     assert (
         '<h2 class="detail-title" id="chapter-title">1. First chapter</h2>'
         in chapter_html

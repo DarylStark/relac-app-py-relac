@@ -29,8 +29,10 @@
         {% set page_title = ("Characters: " ~ work.title) if work is defined else "Literary analysis characters" %}
     {% elif active_page == "literary-analysis-quotes" %}
         {% set page_title = ("Quotes: " ~ work.title) if work is defined else "Literary analysis quotes" %}
+    {% elif active_page == "literary-analysis-motifs" %}
+        {% set page_title = ("Motifs: " ~ work.title) if work is defined else "Literary analysis motifs" %}
     {% elif active_page == "literary-analysis-chapter" %}
-        {% set page_title = ("Chapter " ~ chapter.number ~ ": " ~ (chapter.title if chapter.title else work.title)) if chapter is defined and work is defined else "Chapter analysis" %}
+        {% set page_title = (("Chapter " ~ chapter.number ~ ": " ~ chapter.title ~ ": " ~ work.title) if chapter.title else ("Chapter " ~ chapter.number ~ ": " ~ work.title)) if chapter is defined and work is defined else "Chapter analysis" %}
     {% elif active_page == "works" %}
         {% set page_title = ("Edition: " ~ work_edition.title) if work_edition is defined else ("Work: " ~ work.title) if work is defined else "Works" %}
     {% elif active_page == "lists" %}
@@ -77,8 +79,8 @@
             <nav class="tab-nav">
                 <a href="index.html" {% if active_page == "overview" %}class="active" aria-current="page"{% endif %}>Overview</a>
                 <a href="contributors.html" {% if active_page == "contributors" %}class="active" aria-current="page"{% endif %}>Contributors</a>
-                <a href="works.html" {% if active_page in ["works", "work-editions", "lists", "series", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "locations", "characters", "character"] %}class="active"{% if active_page in ["works", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "locations", "characters", "character"] %} aria-current="page"{% endif %}{% endif %}>Works</a>
-                {% if active_page in ["works", "work-editions", "lists", "series", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "locations", "characters", "character"] %}
+                <a href="works.html" {% if active_page in ["works", "work-editions", "lists", "series", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "literary-analysis-motifs", "locations", "characters", "character"] %}class="active"{% if active_page in ["works", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "literary-analysis-motifs", "locations", "characters", "character"] %} aria-current="page"{% endif %}{% endif %}>Works</a>
+                {% if active_page in ["works", "work-editions", "lists", "series", "literary-analysis", "literary-analysis-locations", "literary-analysis-characters", "literary-analysis-chapter", "literary-analysis-quotes", "literary-analysis-motifs", "locations", "characters", "character"] %}
                 <div class="nav-submenu" role="group" aria-label="Works">
                     <a href="work-editions.html" {% if active_page == "work-editions" or work_edition is defined %}class="active" aria-current="page"{% endif %}>Work Editions</a>
                     <a href="series.html" {% if active_page == "series" %}class="active" aria-current="page"{% endif %}>Series</a>
