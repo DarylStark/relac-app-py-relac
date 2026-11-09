@@ -3,6 +3,7 @@
 
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_literary_analysis.html" import literary_analysis_section %}
+{% from "_literary_analysis_menu.html" import literary_analysis_menu %}
 
 {% block content %}
 <div class="content">
@@ -13,19 +14,7 @@
       ("Work Analysis", none)
   ]) }}
   <div class="literary-analysis-layout">
-    <div class="card literary-analysis-menu-card">
-      <nav class="literary-analysis-menu" aria-label="Work analysis pages">
-        <ul>
-          <li><span class="is-active" aria-current="page">Work analysis</span></li>
-          {% if work.literary_analysis.setting and work.literary_analysis.setting.location_objs %}
-          <li><a href="literary_analysis_locations.{{ work.id }}.html">Locations</a></li>
-          {% endif %}
-          {% if work.literary_analysis.characters %}
-          <li><a href="literary_analysis_characters.{{ work.id }}.html">Characters</a></li>
-          {% endif %}
-        </ul>
-      </nav>
-    </div>
+    {{ literary_analysis_menu(work, active_page) }}
     <div class="card literary-analysis-card" role="article" aria-labelledby="analysis-title">
       <header class="literary-analysis-header">
         <p class="detail-kind">Literary analysis</p>

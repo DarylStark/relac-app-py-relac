@@ -43,6 +43,7 @@ class RelacTheme:
             'literary_analysis',
             'literary_analysis_locations',
             'literary_analysis_characters',
+            'literary_analysis_chapter',
         ],
         str,
     ] = field(default_factory=dict)

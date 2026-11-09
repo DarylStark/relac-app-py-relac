@@ -1443,7 +1443,7 @@ div.card .detail-premise p:last-child
     text-decoration: none;
 }
 
-.detail-action:hover
+.detail-action:not([aria-disabled="true"]):hover
 {
     background: var(--hover-surface);
 }
@@ -1452,6 +1452,19 @@ div.card .detail-premise p:last-child
 {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
+}
+
+.chapter-navigation
+{
+    justify-content: space-between;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+}
+
+.detail-action[aria-disabled="true"]
+{
+    border-color: var(--line);
+    color: var(--muted);
 }
 
 .literary-analysis-layout
@@ -1490,7 +1503,15 @@ div.content .literary-analysis-layout > .card:not(.small)
     list-style: none;
 }
 
+.literary-analysis-menu .literary-analysis-submenu
+{
+    margin: 4px 0 8px 10px;
+    padding-left: 10px;
+    border-left: 1px solid var(--line);
+}
+
 .literary-analysis-menu a,
+.literary-analysis-menu summary,
 .literary-analysis-menu .is-active
 {
     display: block;
@@ -1501,7 +1522,20 @@ div.content .literary-analysis-layout > .card:not(.small)
     text-decoration: none;
 }
 
+.literary-analysis-menu summary
+{
+    display: list-item;
+    list-style-position: inside;
+    cursor: pointer;
+}
+
+.literary-analysis-menu summary.is-active
+{
+    display: list-item;
+}
+
 .literary-analysis-menu a:hover,
+.literary-analysis-menu summary:hover,
 .literary-analysis-menu .is-active
 {
     border-left-color: var(--accent-text);
@@ -1509,7 +1543,8 @@ div.content .literary-analysis-layout > .card:not(.small)
     background: var(--hover-surface);
 }
 
-.literary-analysis-menu a:focus-visible
+.literary-analysis-menu a:focus-visible,
+.literary-analysis-menu summary:focus-visible
 {
     outline: 2px solid var(--focus);
     outline-offset: 2px;

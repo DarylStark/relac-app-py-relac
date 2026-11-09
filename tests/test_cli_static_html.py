@@ -489,6 +489,62 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         'href="literary_analysis_characters.work.john_williams__stoner.html">'
         'Characters</a>' in stoner_analysis_html
     )
+    assert (
+        'href="literary_analysis_chapter.work.john_williams__stoner.1.html">'
+        '1. First chapter</a>' in stoner_analysis_html
+    )
+    assert (
+        'href="literary_analysis_chapter.work.john_williams__stoner.3.html">'
+        'Chapter 3</a>' in stoner_analysis_html
+    )
+    chapter_path = (
+        tmp_path / 'literary_analysis_chapter.work.john_williams__stoner.1.html'
+    )
+    assert chapter_path.exists()
+    chapter_html = chapter_path.read_text()
+    assert '<title>Chapter 1: First chapter |' in chapter_html
+    assert (
+        '<h2 class="detail-title" id="chapter-title">1. First chapter</h2>'
+        in chapter_html
+    )
+    assert '<strong>chapter</strong>' in chapter_html
+    assert 'Chronology' not in chapter_html
+    assert (
+        '<span class="is-active" aria-current="page">1. First chapter</span>'
+        in chapter_html
+    )
+    assert (
+        '<span class="detail-action" aria-disabled="true">'
+        '<span aria-hidden="true">&larr;</span> Previous</span>' in chapter_html
+    )
+    assert (
+        '<a class="detail-action" aria-label="Next chapter: 2. Second chapter" '
+        'href="literary_analysis_chapter.work.john_williams__stoner.2.html">'
+        '2. Second chapter <span aria-hidden="true">&rarr;</span></a>'
+        in chapter_html
+    )
+    untitled_chapter_path = (
+        tmp_path / 'literary_analysis_chapter.work.john_williams__stoner.3.html'
+    )
+    assert untitled_chapter_path.exists()
+    untitled_chapter_html = untitled_chapter_path.read_text()
+    assert '<title>Chapter 3: Stoner |' in untitled_chapter_html
+    assert (
+        '<h2 class="detail-title" id="chapter-title">Chapter 3</h2>'
+        in untitled_chapter_html
+    )
+    assert (
+        '<a class="detail-action" aria-label="Previous chapter: 2. '
+        'Second chapter" '
+        'href="literary_analysis_chapter.work.john_williams__stoner.2.html">'
+        '<span aria-hidden="true">&larr;</span> 2. Second chapter</a>'
+        in untitled_chapter_html
+    )
+    assert (
+        '<span class="detail-action" aria-disabled="true">'
+        'Next <span aria-hidden="true">&rarr;</span></span>'
+        in untitled_chapter_html
+    )
     locations_path = (
         tmp_path / 'literary_analysis_locations.work.john_williams__stoner.html'
     )
@@ -510,9 +566,10 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         '<span class="is-active" aria-current="page">Locations</span>'
         in locations_html
     )
+    assert '<summary>Chapter analysis</summary>' in locations_html
     assert (
-        'href="literary_analysis.work.john_williams__stoner.html">'
-        'Work analysis</a>' in locations_html
+        '<a href="literary_analysis.work.john_williams__stoner.html">'
+        'Work Analysis</a>' in locations_html
     )
     characters_path = (
         tmp_path
@@ -554,9 +611,11 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     assert 'class="literary-analysis-layout"' in stoner_analysis_html
     assert 'card literary-analysis-menu-card' in stoner_analysis_html
     assert (
-        '<span class="is-active" aria-current="page">Work analysis</span>'
+        '<span class="is-active" aria-current="page">Work Analysis</span>'
         in stoner_analysis_html
     )
+    assert '<summary>Chapter analysis</summary>' in stoner_analysis_html
+    assert '<details open>' in stoner_analysis_html
     assert 'href="#work-summary"' not in stoner_analysis_html
     assert 'href="#work-analysis"' not in stoner_analysis_html
     stoner_work_html = (

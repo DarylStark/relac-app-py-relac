@@ -1,0 +1,58 @@
+{% extends "_base.html" %}
+{% set active_page = "literary-analysis-chapter" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_literary_analysis.html" import literary_analysis_section %}
+{% from "_literary_analysis_menu.html" import chapter_label, literary_analysis_menu %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([
+      ("Work", "works.html"),
+      (work.title, work.id ~ ".html"),
+      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
+      (chapter_label(chapter), none)
+  ]) }}
+  <div class="literary-analysis-layout">
+    {{ literary_analysis_menu(work, active_page, chapter) }}
+    <div class="card literary-analysis-card" role="article" aria-labelledby="chapter-title">
+      <header class="literary-analysis-header">
+        <p class="detail-kind">Chapter analysis</p>
+        <h2 class="detail-title" id="chapter-title">{{ chapter_label(chapter) }}</h2>
+      </header>
+      {% if chapter.summary %}
+      {{ literary_analysis_section("chapter-summary", "Summary", chapter.summary) }}
+      {% endif %}
+      {% if chapter.analysis %}
+      {{ literary_analysis_section("chapter-analysis", "Analysis", chapter.analysis) }}
+      {% endif %}
+      {% if not chapter.summary and not chapter.analysis %}
+      <p class="literary-analysis-empty">No analysis has been written for this chapter yet.</p>
+      {% endif %}
+      {% set neighbors = namespace(previous=none, next=none) %}
+      {% for item in work.literary_analysis.chapters %}
+      {% if item.number == chapter.number %}
+      {% if not loop.first %}
+      {% set neighbors.previous = loop.previtem %}
+      {% endif %}
+      {% if not loop.last %}
+      {% set neighbors.next = loop.nextitem %}
+      {% endif %}
+      {% endif %}
+      {% endfor %}
+      <nav class="detail-actions chapter-navigation" aria-label="Chapter navigation">
+        {% if neighbors.previous %}
+        <a class="detail-action" aria-label="Previous chapter: {{ chapter_label(neighbors.previous) }}" href="literary_analysis_chapter.{{ work.id }}.{{ neighbors.previous.number }}.html"><span aria-hidden="true">&larr;</span> {{ chapter_label(neighbors.previous) }}</a>
+        {% else %}
+        <span class="detail-action" aria-disabled="true"><span aria-hidden="true">&larr;</span> Previous</span>
+        {% endif %}
+        {% if neighbors.next %}
+        <a class="detail-action" aria-label="Next chapter: {{ chapter_label(neighbors.next) }}" href="literary_analysis_chapter.{{ work.id }}.{{ neighbors.next.number }}.html">{{ chapter_label(neighbors.next) }} <span aria-hidden="true">&rarr;</span></a>
+        {% else %}
+        <span class="detail-action" aria-disabled="true">Next <span aria-hidden="true">&rarr;</span></span>
+        {% endif %}
+      </nav>
+    </div>
+  </div>
+</div>
+{% endblock %}

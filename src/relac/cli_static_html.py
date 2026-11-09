@@ -474,6 +474,22 @@ def create(  # noqa: PLR0912, PLR0915
                 analysis_path = output / f'literary_analysis.{work.id}.html'
                 analysis_path.write_text(analysis_html)
                 if (
+                    work.literary_analysis.chapters
+                    and 'literary_analysis_chapter' in metadata.resource_pages
+                ):
+                    chapter_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_chapter']
+                    )
+                    for chapter in work.literary_analysis.chapters:
+                        chapter_html = chapter_template.render(
+                            work=work, chapter=chapter
+                        )
+                        chapter_path = output / (
+                            f'literary_analysis_chapter.{work.id}.'
+                            f'{chapter.number}.html'
+                        )
+                        chapter_path.write_text(chapter_html)
+                if (
                     work.literary_analysis.setting
                     and work.literary_analysis.setting.location_objs
                     and 'literary_analysis_locations' in metadata.resource_pages
