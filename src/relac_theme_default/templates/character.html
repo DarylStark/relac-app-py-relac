@@ -3,6 +3,7 @@
 
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_character_works_table.html" import character_works_table %}
+{% from "_quote_cards.html" import quote_cards %}
 
 {% block content %}
 <div class="content">
@@ -46,6 +47,13 @@
   <div class="card">
     <p class="detail-unspecified">No works are linked to this character.</p>
   </div>
+  {% endif %}
+  {% if character.quote_objs %}
+    {{ quote_cards(
+        character.quote_objs,
+        title="Quotes featuring this character",
+        heading_id="character-quotes-title"
+    ) }}
   {% endif %}
 </div>
 {% endblock %}

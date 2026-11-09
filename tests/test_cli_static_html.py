@@ -639,6 +639,16 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         '<a href="work.john_williams__stoner.html">Stoner</a>' in character_html
     )
     assert 'Protagonist' in character_html
+    assert (
+        '<div class="card table-card literary-quotes-card" '
+        'aria-labelledby="character-quotes-title">' in character_html
+    )
+    assert (
+        '<h2 class="table-card-title" id="character-quotes-title">'
+        'Quotes featuring this character</h2>' in character_html
+    )
+    assert '<blockquote>Sometimes, immersed in his books,' in character_html
+    assert 'My God, to read without joy is stupid.' not in character_html
     quotes_path = (
         tmp_path / 'literary_analysis_quotes.work.john_williams__stoner.html'
     )

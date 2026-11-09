@@ -336,6 +336,11 @@ class Database:
                         f'Character with id "{quote.character}" doesn\'t exist'
                     )
                 quote.character_obj = character_obj
+                if not any(
+                    related_quote is quote
+                    for related_quote in character_obj.quote_objs
+                ):
+                    character_obj.quote_objs.append(quote)
 
             if quote.work:
                 work_obj = self._works.get(quote.work)

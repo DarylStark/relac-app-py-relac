@@ -250,6 +250,7 @@ class Character(ResourceBase):
 
     # Relation (real objects)
     work_character_objs: list[WorkCharacter] = Field(default_factory=list)
+    quote_objs: list[Quote] = Field(default_factory=list)
 
 
 class CharacterRole(Enum):
