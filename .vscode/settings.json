@@ -30,6 +30,7 @@
             "matchCommandLine": true
         },
         "command": true,
-        "./.venv/bin/pytest": true
+        "./.venv/bin/pytest": true,
+        "ty": true
     }
 }

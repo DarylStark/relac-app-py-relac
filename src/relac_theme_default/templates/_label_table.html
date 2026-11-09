@@ -11,16 +11,26 @@
             <thead>
                 <tr>
                     <th scope="col">Name</th>
-                    <th scope="col" class="right fit-content" data-sort-type="number">Contributor count</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Contributor</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Works</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Work editions</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Series</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Reading lists</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Reading sessions</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Books</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Owners</th>
+                    <th scope="col" class="right fit-content" data-sort-type="number">Collections</th>
                 </tr>
             </thead>
             <tbody>
                 {% for label in labels %}
                     <tr data-href="{{ label.id }}.html">
                         <td>{{ entity_link(label, label.name) }}</td>
-                        <td class="right fit-content" data-sort-value="{{ label.contributor_objs | length }}">
-                            <pre>{{ label.contributor_objs | length }}</pre>
-                        </td>
+                        {% for resources in [label.contributor_objs, label.work_objs, label.work_edition_objs, label.series_objs, label.reading_list_objs, label.reading_session_objs, label.book_objs, label.owner_objs, label.book_collection_objs] %}
+                            <td class="right fit-content" data-sort-value="{{ resources | length }}">
+                                <pre>{{ resources | length }}</pre>
+                            </td>
+                        {% endfor %}
                     </tr>
                 {% endfor %}
             </tbody>

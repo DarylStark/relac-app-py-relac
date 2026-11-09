@@ -3,10 +3,44 @@
 
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_contributor_table.html" import contributor_table %}
+{% from "_work_table.html" import work_table %}
+{% from "_work_edition_table.html" import work_edition_table %}
+{% from "_series_table.html" import series_table %}
+{% from "_list_table.html" import list_table %}
+{% from "_reading_session_table.html" import reading_session_table %}
+{% from "_book_table.html" import book_table %}
+{% from "_owner_table.html" import owner_table %}
+{% from "_collection_table.html" import collection_table %}
 
 {% block content %}
 <div class="content">
     {{ breadcrumbs([("Labels", "labels.html"), (label.name, none)]) }}
-    {{ contributor_table(label.contributor_objs, "Contributors with this label") }}
+    {% if label.contributor_objs %}
+        {{ contributor_table(label.contributor_objs, "Contributors with this label") }}
+    {% endif %}
+    {% if label.work_objs %}
+        {{ work_table(label.work_objs, title="Works with this label") }}
+    {% endif %}
+    {% if label.work_edition_objs %}
+        {{ work_edition_table(label.work_edition_objs, title="Work editions with this label") }}
+    {% endif %}
+    {% if label.series_objs %}
+        {{ series_table(label.series_objs, title="Series with this label") }}
+    {% endif %}
+    {% if label.reading_list_objs %}
+        {{ list_table(label.reading_list_objs, title="Reading lists with this label") }}
+    {% endif %}
+    {% if label.reading_session_objs %}
+        {{ reading_session_table(label.reading_session_objs, title="Reading sessions with this label") }}
+    {% endif %}
+    {% if label.book_objs %}
+        {{ book_table(label.book_objs, "Books with this label") }}
+    {% endif %}
+    {% if label.owner_objs %}
+        {{ owner_table(label.owner_objs, title="Owners with this label") }}
+    {% endif %}
+    {% if label.book_collection_objs %}
+        {{ collection_table(label.book_collection_objs, title="Collections with this label") }}
+    {% endif %}
 </div>
 {% endblock %}

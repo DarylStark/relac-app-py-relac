@@ -452,6 +452,19 @@ def test_static_html_create_generates_reading_session_detail(
     assert labels_page.exists()
     labels_html = labels_page.read_text()
     assert 'Contributor count' in labels_html
+    assert all(
+        heading in labels_html
+        for heading in (
+            'Works',
+            'Work editions',
+            'Series',
+            'Reading lists',
+            'Reading sessions',
+            'Books',
+            'Owners',
+            'Collections',
+        )
+    )
     assert (
         'href="labels.html" class="active" aria-current="page">Labels</a>'
         in labels_html
@@ -460,11 +473,25 @@ def test_static_html_create_generates_reading_session_detail(
         1
     ].split('</tr>', 1)[0]
     assert 'href="label.test_label.html">testlabel</a>' in label_row
+    assert label_row.count('<td') == 10
     assert '<pre>1</pre>' in label_row
     label_page = tmp_path / 'label.test_label.html'
     assert label_page.exists()
     label_html = label_page.read_text()
     assert 'Contributors with this label' in label_html
+    assert all(
+        title not in label_html
+        for title in (
+            'Works with this label',
+            'Work editions with this label',
+            'Series with this label',
+            'Reading lists with this label',
+            'Reading sessions with this label',
+            'Books with this label',
+            'Owners with this label',
+            'Collections with this label',
+        )
+    )
     assert (
         'href="contributor.john_williams.html">John Willams</a>' in label_html
     )

@@ -7,6 +7,7 @@
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_rating_value.html" import format_rating %}
+{% from "_detail_labels.html" import detail_labels %}
 
 {% set book_medium = book.medium.value %}
 {% set book_binding = book.binding.value %}
@@ -87,6 +88,7 @@
           </div>
         </dl>
       </section>
+      {{ detail_labels(book.label_objs) }}
   </div>
 
   {% if book.reading_session_objs %}
