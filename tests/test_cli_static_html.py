@@ -610,7 +610,10 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         'class="right fit-content character-age" data-sort-value=""></td>'
         in characters_html
     )
-    assert 'William Stoner' in characters_html
+    assert (
+        '<a href="character.william_stoner.html">William Stoner</a>'
+        in characters_html
+    )
     assert 'Protagonist' in characters_html
     assert 'Edith Elaine Bostwick' in characters_html
     assert 'Love interest' in characters_html
@@ -623,6 +626,15 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         'href="literary_analysis_locations.work.john_williams__stoner.html">'
         'Locations</a>' in characters_html
     )
+    character_path = tmp_path / 'character.william_stoner.html'
+    assert character_path.exists()
+    character_html = character_path.read_text()
+    assert '<title>Character: William Stoner |' in character_html
+    assert 'Works using this character' in character_html
+    assert (
+        '<a href="work.john_williams__stoner.html">Stoner</a>' in character_html
+    )
+    assert 'Protagonist' in character_html
     assert 'class="literary-analysis-layout"' in stoner_analysis_html
     assert 'card literary-analysis-menu-card' in stoner_analysis_html
     assert (

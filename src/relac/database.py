@@ -112,7 +112,7 @@ class Database:
                     )
 
                 for character in obj.literary_analysis.characters or []:
-                    self._converge_work_character(character)
+                    self._converge_work_character(character, obj)
 
     def _converge_books(self) -> None:  # noqa: PLR0912
         """Converge all books."""
@@ -295,14 +295,22 @@ class Database:
             ):
                 location_obj.work_objs.append(work_obj)
 
-    def _converge_work_character(self, obj: WorkCharacter) -> None:
-        """Converge StorySetting objects."""
+    def _converge_work_character(
+        self, obj: WorkCharacter, work_obj: Work
+    ) -> None:
+        """Converge a work-character relation."""
         character_obj = self._characters.get(obj.character)
         if character_obj is None:
             raise ValueError(
-                f'Character with id "{character_obj}" doesn\'t exist'
+                f'Character with id "{obj.character}" doesn\'t exist'
             )
         obj.character_obj = character_obj
+        obj.work_obj = work_obj
+        if not any(
+            work_character is obj
+            for work_character in character_obj.work_character_objs
+        ):
+            character_obj.work_character_objs.append(obj)
 
     def converge(self) -> None:
         """Converge all objects."""

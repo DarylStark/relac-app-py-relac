@@ -1,0 +1,51 @@
+{% extends "_base.html" %}
+{% set active_page = "character" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_character_works_table.html" import character_works_table %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([("Works", "works.html"), (character.name, none)]) }}
+  <div class="card">
+    <section class="detail-summary" aria-labelledby="detail-title">
+      <div class="detail-summary-header">
+        <div>
+          <p class="detail-kind">Character</p>
+          <h3 id="detail-title">{{ character.name | e }}</h3>
+        </div>
+      </div>
+      <dl class="detail-metadata">
+        {% if character.birthdate %}
+        <div class="detail-fact">
+          <dt>Birth date</dt>
+          <dd><time datetime="{{ character.birthdate.isoformat() }}" data-local-date>{{ character.birthdate }}</time></dd>
+        </div>
+        {% endif %}
+        {% if character.deceased_date %}
+        <div class="detail-fact">
+          <dt>Deceased date</dt>
+          <dd><time datetime="{{ character.deceased_date.isoformat() }}" data-local-date>{{ character.deceased_date }}</time></dd>
+        </div>
+        {% endif %}
+        <div class="detail-fact">
+          <dt>Birthplace</dt>
+          <dd>{{ character.birthplace | e }}</dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Birth country</dt>
+          <dd>{{ character.birthcountry | country }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  {% if character.work_character_objs %}
+    {{ character_works_table(character.work_character_objs) }}
+  {% else %}
+  <div class="card">
+    <p class="detail-unspecified">No works are linked to this character.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

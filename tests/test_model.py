@@ -9,6 +9,8 @@ from relac.model import (
     Availability,
     Book,
     BookCollection,
+    Character,
+    CharacterRole,
     Contributor,
     LiteraryAnalysis,
     Location,
@@ -24,6 +26,7 @@ from relac.model import (
     SeriesItem,
     StorySetting,
     Work,
+    WorkCharacter,
     WorkEdition,
 )
 
@@ -212,6 +215,53 @@ def test_location_resolves_related_works() -> None:
         )
     )
     assert unused_location.work_objs == []
+
+
+def test_character_resolves_work_appearances() -> None:
+    """Expose each work-character link with its associated Work."""
+    database = Database()
+    database.set_relac_config(RelacConfig(title='Test Library'))
+    character = Character(
+        id='character',
+        name='Test Character',
+        birthplace='Missouri',
+        birthcountry='US',
+    )
+    work_characters = [
+        WorkCharacter(
+            character='character',
+            roles=[CharacterRole.PROTAGONIST],
+            note=f'Appearance in work {index}',
+        )
+        for index in range(2)
+    ]
+    works = [
+        Work(
+            id=f'work-{index}',
+            title=f'Work {index}',
+            authors=[],
+            literary_analysis=LiteraryAnalysis(characters=[work_character]),
+        )
+        for index, work_character in enumerate(work_characters)
+    ]
+
+    database.add_character('character', character)
+    for index, work in enumerate(works):
+        database.add_work(f'work-{index}', work)
+    database.converge()
+
+    assert len(character.work_character_objs) == 2
+    assert all(
+        work_character is expected_link
+        for work_character, expected_link in zip(
+            character.work_character_objs, work_characters, strict=True
+        )
+    )
+    assert all(
+        work_character.character_obj is character
+        and work_character.work_obj is work
+        for work_character, work in zip(work_characters, works, strict=True)
+    )
 
 
 @pytest.mark.parametrize(

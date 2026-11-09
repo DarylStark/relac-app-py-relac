@@ -24,7 +24,7 @@
         {% set character = work_character.character_obj %}
         {% set character_age = character.birthdate | age(character.deceased_date) if character.birthdate and character.deceased_date else none %}
         <tr>
-          <td>{{ character.name | e }}</td>
+          <td><a href="{{ character.id }}.html">{{ character.name | e }}</a></td>
           <td>
             {% for role in work_character.roles %}
               {% if not loop.first %}, {% endif %}{{ role.value | enum_label }}

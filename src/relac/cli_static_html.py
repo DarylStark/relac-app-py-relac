@@ -440,6 +440,14 @@ def create(  # noqa: PLR0912, PLR0915
             out_path = output / f'{location.id}.html'
             out_path.write_text(html)
 
+    # Characters
+    if 'character' in metadata.resource_pages:
+        for character in db.get_characters():
+            template = env.get_template(metadata.resource_pages['character'])
+            html = template.render(character=character)
+            out_path = output / f'{character.id}.html'
+            out_path.write_text(html)
+
     # Labels
     if 'label' in metadata.resource_pages:
         for label in db.get_labels():

@@ -247,6 +247,9 @@ class Character(ResourceBase):
     birthcountry: str
     deceased_date: date | None = None
 
+    # Relation (real objects)
+    work_character_objs: list[WorkCharacter] = Field(default_factory=list)
+
 
 class CharacterRole(Enum):
     """Roles for characters."""
@@ -279,6 +282,7 @@ class WorkCharacter(BaseModel):
 
     # Relation (real objects)
     character_obj: Character | None = None
+    work_obj: Work | None = None
 
 
 class ChapterAnalysis(BaseModel):
