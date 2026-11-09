@@ -1,2 +1,5 @@
 label.test_label:
   name: testlabel
+
+label.test_label_2:
+  name: testlabel2

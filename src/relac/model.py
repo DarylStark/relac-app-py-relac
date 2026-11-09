@@ -58,6 +58,13 @@ class ResourceBase(BaseModel):
     id: str | None = Field(default=None)
 
 
+class LabelledResource(ResourceBase):
+    """Base model for labelled resources."""
+
+    labels: list[str] | None = None
+    label_objs: list[Label] = Field(default_factory=list)
+
+
 class RelacConfig(BaseModel):
     """Model for Relac configuration."""
 
@@ -76,7 +83,7 @@ class ContributorState(Enum):
     DECEASED = 'deceased'
 
 
-class Contributor(ResourceBase):
+class Contributor(LabelledResource):
     """Model for a contributor."""
 
     name: str
@@ -84,7 +91,7 @@ class Contributor(ResourceBase):
     birthdate: date | None = None
     deceased_date: date | None = None
     countries: list[str] = Field(default_factory=list)
-    labels: list[str] | None = None
+    # labels: list[str] | None = None
 
     # Relation (real objects)
     work_objs: list[Work] = Field(default_factory=list)
@@ -95,7 +102,7 @@ class Contributor(ResourceBase):
     translator_work_edition_objs: list[WorkEdition] = Field(
         default_factory=list
     )
-    label_objs: list[Label] = Field(default_factory=list)
+    # label_objs: list[Label] = Field(default_factory=list)
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -184,7 +191,7 @@ class WorkStructure(Enum):
     MANUAL = 'manual'
 
 
-class Work(ResourceBase):
+class Work(LabelledResource):
     """Model for a work."""
 
     title: str
@@ -271,7 +278,7 @@ class WorkEditionType(Enum):
     ANNOTATED = 'annotated'  # With study notes
 
 
-class WorkEdition(ResourceBase):
+class WorkEdition(LabelledResource):
     """A edition for a work."""
 
     title: str
@@ -346,7 +353,7 @@ class WorkEdition(ResourceBase):
         return statistics.mean(ratings)
 
 
-class BookCollection(ResourceBase):
+class BookCollection(LabelledResource):
     """A collection of books."""
 
     name: str
@@ -408,7 +415,7 @@ class BookBinding(Enum):
     EPUB_DRM = 'epub-drm'
 
 
-class Book(ResourceBase):
+class Book(LabelledResource):
     """A book."""
 
     isbn13: int
@@ -531,7 +538,7 @@ class Rating(BaseModel):
     note: str | None = None
 
 
-class ReadingSession(ResourceBase):
+class ReadingSession(LabelledResource):
     """A reading session."""
 
     work_edition: str
@@ -582,6 +589,14 @@ class Label(ResourceBase):
 
     # Relationships (real objects)
     contributor_objs: list[Contributor] = Field(default_factory=list)
+    work_objs: list[Work] = Field(default_factory=list)
+    work_edition_objs: list[WorkEdition] = Field(default_factory=list)
+    series_objs: list[Series] = Field(default_factory=list)
+    reading_list_objs: list[ReadingList] = Field(default_factory=list)
+    reading_session_objs: list[ReadingSession] = Field(default_factory=list)
+    book_objs: list[Book] = Field(default_factory=list)
+    owner_objs: list[Owner] = Field(default_factory=list)
+    book_collection_objs: list[BookCollection] = Field(default_factory=list)
 
 
 class ReadingListItem(ResourceBase):
@@ -594,7 +609,7 @@ class ReadingListItem(ResourceBase):
     work_obj: Work | None = None
 
 
-class ReadingList(ResourceBase):
+class ReadingList(LabelledResource):
     """A list of resources."""
 
     name: str
@@ -685,7 +700,7 @@ class Availability(Enum):
     INDIRECTLY_AVAILABLE = 'indirectly'
 
 
-class Owner(ResourceBase):
+class Owner(LabelledResource):
     """Model for a owner."""
 
     name: str
@@ -706,7 +721,7 @@ class SeriesItem(ResourceBase):
     work_obj: Work | None = None
 
 
-class Series(ResourceBase):
+class Series(LabelledResource):
     """A serie of works."""
 
     name: str

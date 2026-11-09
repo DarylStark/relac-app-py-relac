@@ -19,6 +19,8 @@ work.john_williams__stoner:
     - contributor.john_williams
   work_structure: novel
   work_type: literary-fiction
+  labels:
+    - label.test_label_2
 
 work_edition.john_williams__stoner__original:
   title: Stoner
