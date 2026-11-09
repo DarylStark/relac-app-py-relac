@@ -451,7 +451,7 @@ def test_static_html_create_generates_reading_session_detail(
     labels_page = tmp_path / 'labels.html'
     assert labels_page.exists()
     labels_html = labels_page.read_text()
-    assert 'Contributor count' in labels_html
+    assert 'Contributors' in labels_html
     assert all(
         heading in labels_html
         for heading in (
