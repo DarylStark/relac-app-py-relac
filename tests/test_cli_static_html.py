@@ -523,6 +523,11 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     )
 
     assert result.exit_code == 0, result.exception or result.output
+    index_html = (tmp_path / 'index.html').read_text()
+    assert (
+        '<h1><a class="home-link" href="index.html">Relac library</a></h1>'
+        in index_html
+    )
     works_html = (tmp_path / 'works.html').read_text()
     assert (
         '<th scope="col" class="center fit-content">Literary analysis</th>'
