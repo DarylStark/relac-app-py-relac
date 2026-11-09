@@ -61,6 +61,15 @@
           </div>
         </dl>
       </section>
+      {% if contributor.label_objs %}
+      <section class="detail-labels" aria-label="Labels">
+        <ul class="detail-label-list">
+          {% for label in contributor.label_objs | sort(attribute="name") %}
+            <li><a class="detail-label-pill" href="{{ label.id }}.html">{{ label.name }}</a></li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
   </div>
 
   {% if contributor.work_objs %}

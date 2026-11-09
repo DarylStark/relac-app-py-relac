@@ -78,6 +78,10 @@ class Database:
                     else:
                         contributor.translator_work_edition_objs.append(obj)
 
+            obj.label_objs = self._get_labels(obj.labels)
+            for label in obj.label_objs:
+                label.work_edition_objs.append(obj)
+
     def _converge_works(self) -> None:
         """Converge all works."""
         for obj in self._works.values():
@@ -91,7 +95,11 @@ class Database:
                 obj.author_objs.append(contributor)
                 contributor.work_objs.append(obj)
 
-    def _converge_books(self) -> None:
+            obj.label_objs = self._get_labels(obj.labels)
+            for label in obj.label_objs:
+                label.work_objs.append(obj)
+
+    def _converge_books(self) -> None:  # noqa: PLR0912
         """Converge all books."""
         for obj in self._books.values():
             if obj.publisher is not None:
@@ -146,6 +154,10 @@ class Database:
                 obj.owner_objs.append(owner_obj)
                 owner_obj.book_objs.append(obj)
 
+            obj.label_objs = self._get_labels(obj.labels)
+            for label in obj.label_objs:
+                label.book_objs.append(obj)
+
     def _converge_book_collections(self) -> None:
         """Converge all book collections."""
         for obj in self._book_collections.values():
@@ -156,6 +168,10 @@ class Database:
                 obj.book_objs.append(book_obj)
                 book_obj.collection_objs.append(obj)
 
+            obj.label_objs = self._get_labels(obj.labels)
+            for label in obj.label_objs:
+                label.book_collection_objs.append(obj)
+
     def _converge_reading_lists(self) -> None:
         """Converge all book reading lists."""
         for obj in self._reading_lists.values():
@@ -164,6 +180,10 @@ class Database:
                 if work_obj is None:
                     raise ValueError(f'Work with id "{work}" doesn\'t exist')
                 work.work_obj = work_obj
+
+            obj.label_objs = self._get_labels(obj.labels)
+            for label in obj.label_objs:
+                label.reading_list_objs.append(obj)
 
     def _converge_series(self) -> None:
         """Converge all book reading lists."""
@@ -176,6 +196,10 @@ class Database:
                     )
                 serie_item.work_obj = work_obj
                 work_obj.series_objs.append(obj)
+
+            obj.label_objs = self._get_labels(obj.labels)
+            for label in obj.label_objs:
+                label.series_objs.append(obj)
 
     def _converge_reading_sessions(self) -> None:
         """Converge all reading sessions."""
@@ -196,6 +220,10 @@ class Database:
             book_obj.reading_session_objs.append(obj)
             work_edition_obj.reading_session_objs.append(obj)
 
+            obj.label_objs = self._get_labels(obj.labels)
+            for label in obj.label_objs:
+                label.reading_session_objs.append(obj)
+
     def _converge_relac_config(self) -> None:
         """Converge the RelacConfig object."""
         if self._relac_config is None:
@@ -211,6 +239,30 @@ class Database:
                 )
             self._relac_config.owner_obj = owner_obj
 
+    def _get_labels(self, label_ids: list[str] | None) -> list[Label]:
+        """Get a list of `Label` objects from their ID's."""
+        rv: list[Label] = []
+        for label_id in label_ids or []:
+            label_obj = self._labels.get(label_id)
+            if label_obj is None:
+                raise ValueError(f'Label with id "{label_id}" doesn\'t exist')
+            rv.append(label_obj)
+        return rv
+
+    def _converge_contributors(self) -> None:
+        """Converge Contributors objects."""
+        for contributor in self._contributors.values():
+            contributor.label_objs = self._get_labels(contributor.labels)
+            for label in contributor.label_objs:
+                label.contributor_objs.append(contributor)
+
+    def _converge_owners(self) -> None:
+        """Converge Owners objects."""
+        for contributor in self._owners.values():
+            contributor.label_objs = self._get_labels(contributor.labels)
+            for label in contributor.label_objs:
+                label.owner_objs.append(contributor)
+
     def converge(self) -> None:
         """Converge all objects."""
         self._converge_relac_config()
@@ -221,6 +273,8 @@ class Database:
         self._converge_reading_lists()
         self._converge_series()
         self._converge_reading_sessions()
+        self._converge_contributors()
+        self._converge_owners()
 
     def add_contributor(self, id: str, obj: Contributor) -> None:
         """Add a contributor to the database."""

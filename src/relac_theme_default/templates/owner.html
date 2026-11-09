@@ -3,6 +3,7 @@
 
 {% from "_book_table.html" import book_table %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_detail_labels.html" import detail_labels %}
 
 {% block content %}
 <div class="content">
@@ -26,6 +27,7 @@
         </div>
       </dl>
     </section>
+    {{ detail_labels(owner.label_objs) }}
   </div>
 
   {{ book_table(owner.book_objs, "Books owned by " ~ owner.name) }}

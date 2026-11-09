@@ -1402,6 +1402,37 @@ table.resources tbody tr.table-empty-state td {
     font-size: 12px;
 }
 
+.detail-labels
+{
+    margin-top: 18px;
+}
+
+.detail-label-list
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.detail-label-pill
+{
+    display: inline-flex;
+    align-items: center;
+    max-width: 100%;
+    padding: 4px 10px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--text);
+    background: var(--transparent);
+    font-size: 12px;
+    line-height: 1.2;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
 .detail-contents-header
 {
     align-items: center;

@@ -19,6 +19,7 @@ from relac.model import (
     Book,
     BookCollection,
     Contributor,
+    Label,
     Owner,
     OwnerType,
     Rating,
@@ -104,16 +105,19 @@ def test_resource_availability_labels(
 
 
 def test_build_search_index_includes_book_metadata_and_url() -> None:
-    """Include a book's ID, related contributor, ISBN, and page URL."""
+    """Include book labels, ID, related contributor, ISBN, and URL."""
     database = Database()
     contributor = Contributor(id='jane_doe', name='Jane Doe')
+    label = Label(id='science_fiction', name='Science Fiction')
     book = Book(
         id='glass_hotel',
         isbn13=9781982137984,
         title='The Glass Hotel',
         contributor_objs=[contributor],
+        label_objs=[label],
     )
     database.add_contributor('jane_doe', contributor)
+    database.add_label('science_fiction', label)
     database.add_book('glass_hotel', book)
 
     book_entry = next(
@@ -127,6 +131,8 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     assert 'glass_hotel' not in book_entry['details']
     assert 'Jane Doe' in book_entry['searchText']
     assert str(book.isbn13) in book_entry['searchText']
+    assert 'Science Fiction' in book_entry['searchText']
+    assert 'Labels: Science Fiction' in book_entry['details']
 
     contributor_entry = next(
         item
@@ -135,6 +141,14 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     )
     assert contributor_entry['href'] == 'jane_doe.html'
     assert contributor_entry['title'] == 'Jane Doe'
+
+    label_entry = next(
+        item
+        for item in _build_search_index(database)['items']
+        if item['type'] == 'Label'
+    )
+    assert label_entry['href'] == 'science_fiction.html'
+    assert label_entry['title'] == 'Science Fiction'
 
 
 def test_build_search_index_includes_reading_session_details() -> None:
@@ -447,6 +461,53 @@ def test_static_html_create_generates_reading_session_detail(
     session_pages = list(tmp_path.glob('reading_session.*.html'))
     assert session_pages
     assert '<title>Reading session:' in session_pages[0].read_text()
+    labels_page = tmp_path / 'labels.html'
+    assert labels_page.exists()
+    labels_html = labels_page.read_text()
+    assert 'Contributors' in labels_html
+    assert all(
+        heading in labels_html
+        for heading in (
+            'Works',
+            'Work editions',
+            'Series',
+            'Reading lists',
+            'Reading sessions',
+            'Books',
+            'Owners',
+            'Collections',
+        )
+    )
+    assert (
+        'href="labels.html" class="active" aria-current="page">Labels</a>'
+        in labels_html
+    )
+    label_row = labels_html.split('<tr data-href="label.test_label.html">', 1)[
+        1
+    ].split('</tr>', 1)[0]
+    assert 'href="label.test_label.html">testlabel</a>' in label_row
+    assert label_row.count('<td') == 10
+    assert '<pre>1</pre>' in label_row
+    label_page = tmp_path / 'label.test_label.html'
+    assert label_page.exists()
+    label_html = label_page.read_text()
+    assert 'Contributors with this label' in label_html
+    assert all(
+        title not in label_html
+        for title in (
+            'Works with this label',
+            'Work editions with this label',
+            'Series with this label',
+            'Reading lists with this label',
+            'Reading sessions with this label',
+            'Books with this label',
+            'Owners with this label',
+            'Collections with this label',
+        )
+    )
+    assert (
+        'href="contributor.john_williams.html">John Willams</a>' in label_html
+    )
 
 
 def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR0915
@@ -548,6 +609,10 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
     contributor = Contributor(
         id='test_contributor',
         name='Test Contributor',
+        label_objs=[
+            Label(id='label_zebra', name='Zebra'),
+            Label(id='label_author', name='Author'),
+        ],
         work_objs=[work],
         illustrator_work_edition_objs=[edition],
         translator_work_edition_objs=[edition],
@@ -666,6 +731,18 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
 
     assert 'Works for this contributor' in contributor_html
     assert 'rating-value--high' in contributor_html
+    labels_html = contributor_html.split('<section class="detail-labels"', 1)[
+        1
+    ].split('</section>', 1)[0]
+    assert labels_html.index('Author') < labels_html.index('Zebra')
+    assert (
+        '<a class="detail-label-pill" href="label_author.html">Author</a>'
+        in labels_html
+    )
+    assert (
+        '<a class="detail-label-pill" href="label_zebra.html">Zebra</a>'
+        in labels_html
+    )
     assert 'data-sort-value="8.5"' in contributor_table_html
     assert contributor_table_html.index(
         '>Works read</th>'
@@ -698,6 +775,7 @@ def test_work_edition_credits_render_in_table_and_detail() -> None:  # noqa: PLR
         not in empty_contributor_html
     )
     assert 'Books with this contributor' not in empty_contributor_html
+    assert 'detail-labels' not in empty_contributor_html
 
     edition_without_credits = WorkEdition(
         id='no_credits',

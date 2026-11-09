@@ -5,6 +5,8 @@
         {% set page_title = "Overview" %}
     {% elif active_page == "contributors" %}
         {% set page_title = ("Contributor: " ~ contributor.name) if contributor is defined else "Contributors" %}
+    {% elif active_page == "labels" %}
+        {% set page_title = ("Label: " ~ label.name) if label is defined else "Labels" %}
     {% elif active_page == "books" %}
         {% set page_title = ("Book: " ~ book.title) if book is defined else "Books" %}
     {% elif active_page == "collections" %}
@@ -75,6 +77,7 @@
                     <a href="collections.html" {% if active_page == "collections" %}class="active" aria-current="page"{% endif %}>Collections</a>
                 </div>
                 {% endif %}
+                <a href="labels.html" {% if active_page == "labels" %}class="active" aria-current="page"{% endif %}>Labels</a>
             </nav>
         </header>
 
