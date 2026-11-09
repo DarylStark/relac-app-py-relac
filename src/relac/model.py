@@ -311,6 +311,23 @@ class Quote(ResourceBase):
     work_obj: Work | None = None
 
 
+class MotifType(Enum):
+    """Types of motif."""
+
+    LEITMOTIV = 'leitmotiv'
+    SITUATION = 'situation'
+    THEMATIC = 'thematic'
+
+
+class Motif(BaseModel):
+    """A motif for a work."""
+
+    name: str
+    motif_type: MotifType
+    symbolizes: str | None = None
+    description: str | None = None
+
+
 class LiteraryAnalysis(BaseModel):
     """Model for a works literary analysis."""
 
@@ -321,6 +338,7 @@ class LiteraryAnalysis(BaseModel):
     characters: list[WorkCharacter] = Field(default_factory=list)
     chapters: list[ChapterAnalysis] = Field(default_factory=list)
     quotes: list[str] = Field(default_factory=list)
+    motifs: list[Motif] = Field(default_factory=list)
 
     # Relation (real objects)
     quote_objs: list[Quote] = Field(default_factory=list)

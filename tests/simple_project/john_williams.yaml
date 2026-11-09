@@ -97,6 +97,25 @@ work.john_williams__stoner:
       - number: 3
         summary: "Titleless chapter"
         analysis: "Just to see if it works"
+    motifs:
+      - name: "Value of a unremarkable life"
+        description: "On the outside a failure, on the inside a lot of devotion, integrity and passion"
+        motif_type: thematic
+      - name: "Passion as isolating power"
+        description: "Love for literature lifts him, but also enstrages him from family"
+        motif_type: thematic
+      - name: "Emotional enstrangement and silence"
+        motif_type: situation
+        symbolizes: "The distance between people"
+        description: "Edith keeps constantly dissapearing and he loses contact with his daughter."
+      - name: "Published book"
+        motif_type: leitmotiv
+        symbolizes: "Silence devotion and legacy"
+        description: "A monografy that nobody reads but as the physical proof of his existense and integrity"
+      - name: "Own build study room"
+        motif_type: leitmotiv
+        symbolizes: "Intellectual property"
+        description: "His refugee at home; get's taken away by Edith"
 
 work_edition.john_williams__stoner__original:
   title: Stoner
