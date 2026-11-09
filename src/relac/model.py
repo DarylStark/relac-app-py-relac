@@ -235,6 +235,49 @@ class StorySetting(BaseModel):
     location_objs: list[Location] = Field(default_factory=list)
 
 
+class Character(ResourceBase):
+    """A character in a story."""
+
+    name: str
+    birthdate: date | None = None
+    birthplace: str
+    birthcountry: str
+    deceased_date: date | None = None
+
+
+class CharacterRole(Enum):
+    """Roles for characters."""
+
+    PROTAGONIST = 'protagonist'
+    ANTAGONIST = 'antagonist'
+    DEUTERAGONIST = 'deuteragonist'
+    TRITAGONIST = 'tritagonist'
+    MENTOR = 'mentor'
+    FOIL = 'foil'
+    LOVE_INTEREST = 'love-interest'
+    CONFIDANT = 'confidant'
+
+
+class StoryArc(Enum):
+    """Story arcs for characters."""
+
+    POSITIVE_CHANGE = 'positive-change'
+    TRAGIC_FALL = 'tragic-fall'
+    FLAT = 'flat'
+
+
+class WorkCharacter(BaseModel):
+    """A link between a character and a LiteraryAnalysis."""
+
+    character: str
+    roles: list[CharacterRole] = Field(default_factory=list)
+    note: str | None = None
+    story_arc: StoryArc | None = None
+
+    # Relation (real objects)
+    character_obj: Character | None = None
+
+
 class LiteraryAnalysis(BaseModel):
     """Model for a works literary analysis."""
 
@@ -242,6 +285,7 @@ class LiteraryAnalysis(BaseModel):
     work_analysis: str | None = None
     structure: StoryStructure | None = None
     setting: StorySetting | None = None
+    characters: list[WorkCharacter] = Field(default_factory=list)
 
 
 class Work(LabelledResource):

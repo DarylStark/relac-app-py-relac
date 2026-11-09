@@ -10,6 +10,7 @@ from .model import (
     Book,
     BookCollection,
     BookPublisher,
+    Character,
     Contributor,
     Label,
     Location,
@@ -79,6 +80,7 @@ class ProjectParser:
             'series': self._parse_series_object,
             'reading_session': self._parse_reading_session_object,
             'location': self._parse_location_object,
+            'character': self._parse_character_object,
         }
 
         for obj_id, obj in raw_data.items():
@@ -196,4 +198,12 @@ class ProjectParser:
         """Parse an raw location object into a Location object."""
         obj = self._parse_object(Location, data)
         self._database.add_location(obj_id, obj)
+        return obj
+
+    def _parse_character_object(
+        self, obj_id: str, data: dict[str, str]
+    ) -> Character:
+        """Parse an raw character object into a Character object."""
+        obj = self._parse_object(Character, data)
+        self._database.add_character(obj_id, obj)
         return obj

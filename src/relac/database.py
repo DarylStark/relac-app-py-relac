@@ -6,6 +6,7 @@ from relac.model import (
     Book,
     BookCollection,
     BookPublisher,
+    Character,
     Contributor,
     Label,
     Location,
@@ -17,6 +18,7 @@ from relac.model import (
     Series,
     StorySetting,
     Work,
+    WorkCharacter,
     WorkEdition,
 )
 
@@ -39,6 +41,7 @@ class Database:
         self._series: dict[str, Series] = {}
         self._reading_sessions: dict[str, ReadingSession] = {}
         self._locations: dict[str, Location] = {}
+        self._characters: dict[str, Character] = {}
 
     def _id_exists[ResourceModel: ResourceBase](
         self, id: str, collection: dict[str, ResourceModel]
@@ -102,11 +105,12 @@ class Database:
             for label in obj.label_objs:
                 label.work_objs.append(obj)
 
-            if (
-                obj.literary_analysis is not None
-                and obj.literary_analysis.setting is not None
-            ):
-                self._converge_story_setting(obj.literary_analysis.setting)
+            if obj.literary_analysis is not None:
+                if obj.literary_analysis.setting:
+                    self._converge_story_setting(obj.literary_analysis.setting)
+
+                for character in obj.literary_analysis.characters or []:
+                    self._converge_work_character(character)
 
     def _converge_books(self) -> None:  # noqa: PLR0912
         """Converge all books."""
@@ -282,6 +286,15 @@ class Database:
                 )
             obj.location_objs.append(location_obj)
 
+    def _converge_work_character(self, obj: WorkCharacter) -> None:
+        """Converge StorySetting objects."""
+        character_obj = self._characters.get(obj.character)
+        if character_obj is None:
+            raise ValueError(
+                f'Character with id "{character_obj}" doesn\'t exist'
+            )
+        obj.character_obj = character_obj
+
     def converge(self) -> None:
         """Converge all objects."""
         self._converge_relac_config()
@@ -401,3 +414,11 @@ class Database:
     def get_locations(self) -> list[Location]:
         """Get all locations in the database."""
         return list(self._locations.values())
+
+    def add_character(self, id: str, obj: Character) -> None:
+        """Add a character to the database."""
+        self._add_object(id, obj, self._characters)
+
+    def get_characters(self) -> list[Character]:
+        """Get all characters in the database."""
+        return list(self._characters.values())
