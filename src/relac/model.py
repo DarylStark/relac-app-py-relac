@@ -294,6 +294,21 @@ class ChapterAnalysis(BaseModel):
     analysis: str | None = None
 
 
+class Quote(ResourceBase):
+    """A quote from a contributor."""
+
+    quote: str
+    contributor: str
+    quote_date: date | None = None
+    character: str | None = None
+    work: str | None = None
+
+    # Relation (real objects)
+    contributor_obj: Contributor | None = None
+    character_obj: Character | None = None
+    work_obj: Work | None = None
+
+
 class LiteraryAnalysis(BaseModel):
     """Model for a works literary analysis."""
 
@@ -303,6 +318,10 @@ class LiteraryAnalysis(BaseModel):
     setting: StorySetting | None = None
     characters: list[WorkCharacter] = Field(default_factory=list)
     chapters: list[ChapterAnalysis] = Field(default_factory=list)
+    quotes: list[str] = Field(default_factory=list)
+
+    # Relation (real objects)
+    quote_objs: list[Quote] = Field(default_factory=list)
 
 
 class Work(LabelledResource):

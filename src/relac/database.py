@@ -11,6 +11,7 @@ from relac.model import (
     Label,
     Location,
     Owner,
+    Quote,
     ReadingList,
     ReadingSession,
     RelacConfig,
@@ -42,6 +43,7 @@ class Database:
         self._reading_sessions: dict[str, ReadingSession] = {}
         self._locations: dict[str, Location] = {}
         self._characters: dict[str, Character] = {}
+        self._quotes: dict[str, Quote] = {}
 
     def _id_exists[ResourceModel: ResourceBase](
         self, id: str, collection: dict[str, ResourceModel]
@@ -312,6 +314,34 @@ class Database:
         ):
             character_obj.work_character_objs.append(obj)
 
+    def _converge_quotes(self) -> None:
+        """Converge Owners objects."""
+        for quote in self._quotes.values():
+            contributor_obj = self._contributors.get(quote.contributor)
+            if contributor_obj is None:
+                raise ValueError(
+                    f'Contributor with id "{quote.contributor}" doesn\'t exist'
+                )
+            quote.contributor_obj = contributor_obj
+
+            if quote.character:
+                character_obj = self._characters.get(quote.character)
+                if character_obj is None:
+                    raise ValueError(
+                        f'Character with id "{quote.character}" doesn\'t exist'
+                    )
+                quote.character_obj = character_obj
+
+            if quote.work:
+                work_obj = self._works.get(quote.work)
+                if work_obj is None:
+                    raise ValueError(
+                        f'Work with id "{quote.work}" doesn\'t exist'
+                    )
+                quote.work_obj = work_obj
+                if work_obj.literary_analysis:
+                    work_obj.literary_analysis.quote_objs.append(quote)
+
     def converge(self) -> None:
         """Converge all objects."""
         self._converge_relac_config()
@@ -324,6 +354,7 @@ class Database:
         self._converge_reading_sessions()
         self._converge_contributors()
         self._converge_owners()
+        self._converge_quotes()
 
     def add_contributor(self, id: str, obj: Contributor) -> None:
         """Add a contributor to the database."""
@@ -439,3 +470,11 @@ class Database:
     def get_characters(self) -> list[Character]:
         """Get all characters in the database."""
         return list(self._characters.values())
+
+    def add_quote(self, id: str, obj: Quote) -> None:
+        """Add a quote to the database."""
+        self._add_object(id, obj, self._quotes)
+
+    def get_quotes(self) -> list[Quote]:
+        """Get all quotes in the database."""
+        return list(self._quotes.values())

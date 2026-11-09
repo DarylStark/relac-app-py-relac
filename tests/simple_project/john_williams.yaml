@@ -41,6 +41,16 @@ character.grace_stoner:
   birthplace: Missouri
   birthcountry: US
 
+quote.without_joy:
+  quote: "My God, to read without joy is stupid."
+  contributor: contributor.john_williams
+  quote_date: 1986-01-01
+
+quote.william_stoner:
+  quote: "Sometimes, immersed in his books, there would come to him the awareness of all that he did not know, of all that he had not read; and the serenity for which he labored was shattered as he realized the little time he had in life to read so much, to learn what he had to know."
+  contributor: contributor.john_williams
+  character: character.william_stoner
+
 work.john_williams__stoner:
   title: Stoner
   <<: *template_work
