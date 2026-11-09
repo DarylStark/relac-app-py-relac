@@ -485,6 +485,10 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         'href="literary_analysis_locations.work.john_williams__stoner.html">'
         'Locations</a>' in stoner_analysis_html
     )
+    assert (
+        'href="literary_analysis_characters.work.john_williams__stoner.html">'
+        'Characters</a>' in stoner_analysis_html
+    )
     locations_path = (
         tmp_path / 'literary_analysis_locations.work.john_williams__stoner.html'
     )
@@ -509,6 +513,43 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     assert (
         'href="literary_analysis.work.john_williams__stoner.html">'
         'Work analysis</a>' in locations_html
+    )
+    characters_path = (
+        tmp_path
+        / 'literary_analysis_characters.work.john_williams__stoner.html'
+    )
+    assert characters_path.exists()
+    characters_html = characters_path.read_text()
+    assert '<title>Characters: Stoner |' in characters_html
+    assert '<th scope="col">Character</th>' in characters_html
+    assert '<th scope="col">Roles</th>' in characters_html
+    assert '<th scope="col">Story arc</th>' in characters_html
+    assert '>Deceased date</th>' in characters_html
+    assert 'data-sort-value="65"><pre>65</pre></td>' in characters_html
+    assert (
+        'datetime="1891-05-05" data-local-date>1891-05-05</time>'
+        in characters_html
+    )
+    assert (
+        'datetime="1956-05-05" data-local-date>1956-05-05</time>'
+        in characters_html
+    )
+    assert (
+        'class="right fit-content character-age" data-sort-value=""></td>'
+        in characters_html
+    )
+    assert 'William Stoner' in characters_html
+    assert 'Protagonist' in characters_html
+    assert 'Edith Elaine Bostwick' in characters_html
+    assert 'Love interest' in characters_html
+    assert 'Grace Stoner' in characters_html
+    assert (
+        '<span class="is-active" aria-current="page">Characters</span>'
+        in characters_html
+    )
+    assert (
+        'href="literary_analysis_locations.work.john_williams__stoner.html">'
+        'Locations</a>' in characters_html
     )
     assert 'class="literary-analysis-layout"' in stoner_analysis_html
     assert 'card literary-analysis-menu-card' in stoner_analysis_html

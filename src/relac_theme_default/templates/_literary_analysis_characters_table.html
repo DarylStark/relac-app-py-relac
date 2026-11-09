@@ -1,0 +1,54 @@
+{% macro literary_analysis_characters_table(characters) %}
+<div class="card table-card">
+  <header class="table-card-header">
+    <h2 class="table-card-title">Characters</h2>
+    <div class="table-card-actions"></div>
+  </header>
+  <div class="table-scroll">
+    <table id="literary-analysis-characters-table" class="resources" data-sortable>
+      <thead>
+        <tr>
+          <th scope="col">Character</th>
+          <th scope="col">Roles</th>
+          <th scope="col">Story arc</th>
+          <th scope="col" data-sort-type="date" data-filter-type="date">Birth date</th>
+          <th scope="col" data-sort-type="date" data-filter-type="date">Deceased date</th>
+          <th scope="col" class="right fit-content" data-sort-type="number">Age</th>
+          <th scope="col">Birthplace</th>
+          <th scope="col">Country</th>
+          <th scope="col">Note</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for work_character in characters %}
+        {% set character = work_character.character_obj %}
+        {% set character_age = character.birthdate | age(character.deceased_date) if character.birthdate and character.deceased_date else none %}
+        <tr>
+          <td>{{ character.name | e }}</td>
+          <td>
+            {% for role in work_character.roles %}
+              {% if not loop.first %}, {% endif %}{{ role.value | enum_label }}
+            {% endfor %}
+          </td>
+          <td>{{ work_character.story_arc.value | enum_label if work_character.story_arc else '' }}</td>
+          <td class="center fit-content" data-sort-value="{{ character.birthdate.isoformat() if character.birthdate else '' }}" data-filter-values='{{ ([character.birthdate.isoformat()] if character.birthdate else [""]) | tojson }}'>
+            {% if character.birthdate %}
+            <time datetime="{{ character.birthdate.isoformat() }}" data-local-date>{{ character.birthdate }}</time>
+            {% endif %}
+          </td>
+          <td class="center fit-content" data-sort-value="{{ character.deceased_date.isoformat() if character.deceased_date else '' }}" data-filter-values='{{ ([character.deceased_date.isoformat()] if character.deceased_date else [""]) | tojson }}'>
+            {% if character.deceased_date %}
+            <time datetime="{{ character.deceased_date.isoformat() }}" data-local-date>{{ character.deceased_date }}</time>
+            {% endif %}
+          </td>
+          <td class="right fit-content character-age" data-sort-value="{{ character_age if character_age is not none else '' }}">{% if character_age is not none %}<pre>{{ character_age }}</pre>{% endif %}</td>
+          <td>{{ character.birthplace | e }}</td>
+          <td>{{ character.birthcountry | country }}</td>
+          <td>{{ work_character.note | e if work_character.note else '' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endmacro %}

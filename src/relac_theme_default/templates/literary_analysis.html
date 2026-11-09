@@ -20,6 +20,9 @@
           {% if work.literary_analysis.setting and work.literary_analysis.setting.location_objs %}
           <li><a href="literary_analysis_locations.{{ work.id }}.html">Locations</a></li>
           {% endif %}
+          {% if work.literary_analysis.characters %}
+          <li><a href="literary_analysis_characters.{{ work.id }}.html">Characters</a></li>
+          {% endif %}
         </ul>
       </nav>
     </div>

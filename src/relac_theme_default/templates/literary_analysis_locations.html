@@ -18,6 +18,9 @@
         <ul>
           <li><a href="literary_analysis.{{ work.id }}.html">Work analysis</a></li>
           <li><span class="is-active" aria-current="page">Locations</span></li>
+          {% if work.literary_analysis.characters %}
+          <li><a href="literary_analysis_characters.{{ work.id }}.html">Characters</a></li>
+          {% endif %}
         </ul>
       </nav>
     </div>

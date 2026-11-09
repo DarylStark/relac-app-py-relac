@@ -1,0 +1,30 @@
+{% extends "_base.html" %}
+{% set active_page = "literary-analysis-characters" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_literary_analysis_characters_table.html" import literary_analysis_characters_table %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([
+      ("Work", "works.html"),
+      (work.title, work.id ~ ".html"),
+      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
+      ("Characters", none)
+  ]) }}
+  <div class="literary-analysis-layout">
+    <div class="card literary-analysis-menu-card">
+      <nav class="literary-analysis-menu" aria-label="Work analysis pages">
+        <ul>
+          <li><a href="literary_analysis.{{ work.id }}.html">Work analysis</a></li>
+          {% if work.literary_analysis.setting and work.literary_analysis.setting.location_objs %}
+          <li><a href="literary_analysis_locations.{{ work.id }}.html">Locations</a></li>
+          {% endif %}
+          <li><span class="is-active" aria-current="page">Characters</span></li>
+        </ul>
+      </nav>
+    </div>
+    {{ literary_analysis_characters_table(work.literary_analysis.characters) }}
+  </div>
+</div>
+{% endblock %}
