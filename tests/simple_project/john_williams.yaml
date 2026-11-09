@@ -73,6 +73,18 @@ work.john_williams__stoner:
       - character: character.grace_stoner
         roles:
           - deuteragonist
+    chapters:
+      - number: 1
+        title: "First chapter"
+        summary: "First __chapter__ tells a lot"
+        analysis: "Just an introduction to the story"
+      - number: 2
+        title: "Second chapter"
+        summary: "Movement to uni"
+        analysis: "Falls in love with literature"
+      - number: 3
+        summary: "Titleless chapter"
+        analysis: "Just to see if it works"
 
 work_edition.john_williams__stoner__original:
   title: Stoner

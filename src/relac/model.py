@@ -278,6 +278,15 @@ class WorkCharacter(BaseModel):
     character_obj: Character | None = None
 
 
+class ChapterAnalysis(BaseModel):
+    """Analysis for a chapter."""
+
+    number: int
+    title: str | None = None
+    summary: str | None = None
+    analysis: str | None = None
+
+
 class LiteraryAnalysis(BaseModel):
     """Model for a works literary analysis."""
 
@@ -286,6 +295,7 @@ class LiteraryAnalysis(BaseModel):
     structure: StoryStructure | None = None
     setting: StorySetting | None = None
     characters: list[WorkCharacter] = Field(default_factory=list)
+    chapters: list[ChapterAnalysis] = Field(default_factory=list)
 
 
 class Work(LabelledResource):
