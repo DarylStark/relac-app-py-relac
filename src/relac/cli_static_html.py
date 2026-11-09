@@ -74,9 +74,13 @@ def _build_search_index(
         title: str,
         details: list[str],
         search_terms: list[str] | None = None,
+        labels: list[str] | None = None,
     ) -> None:
         if resource_id is None:
             return
+
+        if labels:
+            details = [*details, f'Labels: {", ".join(labels)}']
 
         terms = [
             resource_type,
@@ -112,7 +116,14 @@ def _build_search_index(
             f'Collections: {", ".join(c.name for c in book.collection_objs)}',
         ]
         details = [detail for detail in details if not detail.endswith(': ')]
-        add_entry('Book', book.id, book.title, details, [str(book.isbn13)])
+        add_entry(
+            'Book',
+            book.id,
+            book.title,
+            details,
+            [str(book.isbn13)],
+            [label.name for label in book.label_objs],
+        )
 
     for work in db.get_works():
         authors = ', '.join(author.name for author in work.author_objs)
@@ -131,6 +142,7 @@ def _build_search_index(
             work.id,
             work.title,
             [detail for detail in details if detail],
+            labels=[label.name for label in work.label_objs],
         )
 
     for contributor in db.get_contributors():
@@ -143,6 +155,7 @@ def _build_search_index(
             contributor.id,
             contributor.name,
             [detail for detail in details if detail],
+            labels=[label.name for label in contributor.label_objs],
         )
 
     for edition in db.get_work_editions():
@@ -162,6 +175,7 @@ def _build_search_index(
             edition.id,
             edition.title,
             [detail for detail in details if detail],
+            labels=[label.name for label in edition.label_objs],
         )
 
     for collection in db.get_book_collections():
@@ -173,6 +187,7 @@ def _build_search_index(
             collection.id,
             collection.name,
             [detail for detail in details if detail],
+            labels=[label.name for label in collection.label_objs],
         )
 
     for owner in db.get_owners():
@@ -186,6 +201,7 @@ def _build_search_index(
             owner.id,
             owner.name,
             [detail for detail in details if not detail.endswith(': ')],
+            labels=[label.name for label in owner.label_objs],
         )
 
     for reading_list in db.get_reading_lists():
@@ -193,14 +209,26 @@ def _build_search_index(
             item.work_obj.title for item in reading_list.works if item.work_obj
         ]
         details = [f'Works: {", ".join(work_titles)}'] if work_titles else []
-        add_entry('Reading list', reading_list.id, reading_list.name, details)
+        add_entry(
+            'Reading list',
+            reading_list.id,
+            reading_list.name,
+            details,
+            labels=[label.name for label in reading_list.label_objs],
+        )
 
     for series in db.get_series():
         work_titles = [
             item.work_obj.title for item in series.works if item.work_obj
         ]
         details = [f'Works: {", ".join(work_titles)}'] if work_titles else []
-        add_entry('Series', series.id, series.name, details)
+        add_entry(
+            'Series',
+            series.id,
+            series.name,
+            details,
+            labels=[label.name for label in series.label_objs],
+        )
 
     for reading_session in db.get_reading_sessions():
         work_edition_title = (
@@ -242,7 +270,11 @@ def _build_search_index(
             or reading_session.id
             or 'Reading session',
             [detail for detail in details if detail],
+            labels=[label.name for label in reading_session.label_objs],
         )
+
+    for label in db.get_labels():
+        add_entry('Label', label.id, label.name, [])
 
     return {'items': entries}
 

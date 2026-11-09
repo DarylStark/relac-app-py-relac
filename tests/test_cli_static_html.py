@@ -105,16 +105,19 @@ def test_resource_availability_labels(
 
 
 def test_build_search_index_includes_book_metadata_and_url() -> None:
-    """Include a book's ID, related contributor, ISBN, and page URL."""
+    """Include book labels, ID, related contributor, ISBN, and URL."""
     database = Database()
     contributor = Contributor(id='jane_doe', name='Jane Doe')
+    label = Label(id='science_fiction', name='Science Fiction')
     book = Book(
         id='glass_hotel',
         isbn13=9781982137984,
         title='The Glass Hotel',
         contributor_objs=[contributor],
+        label_objs=[label],
     )
     database.add_contributor('jane_doe', contributor)
+    database.add_label('science_fiction', label)
     database.add_book('glass_hotel', book)
 
     book_entry = next(
@@ -128,6 +131,8 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     assert 'glass_hotel' not in book_entry['details']
     assert 'Jane Doe' in book_entry['searchText']
     assert str(book.isbn13) in book_entry['searchText']
+    assert 'Science Fiction' in book_entry['searchText']
+    assert 'Labels: Science Fiction' in book_entry['details']
 
     contributor_entry = next(
         item
@@ -136,6 +141,14 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     )
     assert contributor_entry['href'] == 'jane_doe.html'
     assert contributor_entry['title'] == 'Jane Doe'
+
+    label_entry = next(
+        item
+        for item in _build_search_index(database)['items']
+        if item['type'] == 'Label'
+    )
+    assert label_entry['href'] == 'science_fiction.html'
+    assert label_entry['title'] == 'Science Fiction'
 
 
 def test_build_search_index_includes_reading_session_details() -> None:
