@@ -7,6 +7,7 @@
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_rating_value.html" import rating_value %}
+{% from "_quote_cards.html" import quote_cards %}
 
 {% block content %}
 <div class="content">
@@ -91,6 +92,12 @@
   {% endif %}
   {% if contributor.book_objs %}
     {{ book_table(contributor.book_objs, "Books with this contributor") }}
+  {% endif %}
+  {% if contributor.quote_objs %}
+    {{ quote_cards(
+        contributor.quote_objs,
+        heading_id="contributor-quotes-title"
+    ) }}
   {% endif %}
 
 </div>

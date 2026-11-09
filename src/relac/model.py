@@ -96,6 +96,7 @@ class Contributor(LabelledResource):
     # Relation (real objects)
     work_objs: list[Work] = Field(default_factory=list)
     book_objs: list[Book] = Field(default_factory=list)
+    quote_objs: list[Quote] = Field(default_factory=list)
     illustrator_work_edition_objs: list[WorkEdition] = Field(
         default_factory=list
     )

@@ -1616,28 +1616,33 @@ div.card .literary-analysis-prose > p:last-child
     color: var(--muted);
 }
 
-.literary-quotes-content
-{
-    min-width: 0;
-}
-
-.literary-quotes-content .literary-analysis-header
-{
-    margin-bottom: 16px;
-}
-
 .literary-quote-list
 {
     display: grid;
-    gap: 12px;
+    gap: 0;
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.literary-quote-card
+.literary-quote-list li + li
 {
-    padding: 22px 24px;
+    border-top: 1px solid var(--line);
+}
+
+.literary-quote
+{
+    padding: 18px 4px;
+}
+
+.literary-quote-list li:first-child .literary-quote
+{
+    padding-top: 0;
+}
+
+.literary-quote-list li:last-child .literary-quote
+{
+    padding-bottom: 0;
 }
 
 .literary-quote

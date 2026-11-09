@@ -1,0 +1,29 @@
+{% macro quote_cards(quotes, title="Quotes", heading_id="quotes-title") %}
+<div class="card table-card literary-quotes-card" aria-labelledby="{{ heading_id }}">
+  <header class="table-card-header">
+    <h2 class="table-card-title" id="{{ heading_id }}">{{ title | e }}</h2>
+    <div class="table-card-actions"></div>
+  </header>
+  <ol class="literary-quote-list">
+  {% for quote in quotes %}
+  <li>
+    <figure class="literary-quote">
+      <blockquote>{{ quote.quote | e }}</blockquote>
+      <figcaption class="literary-quote-attribution">
+        <span class="literary-quote-contributor"><a href="{{ quote.contributor_obj.id }}.html">{{ quote.contributor_obj.name | e }}</a></span>
+        {% if quote.work_obj %}
+        <span class="literary-quote-work">Work: <a href="{{ quote.work_obj.id }}.html">{{ quote.work_obj.title | e }}</a></span>
+        {% endif %}
+        {% if quote.character_obj %}
+        <span class="literary-quote-character">Character: <a href="{{ quote.character_obj.id }}.html">{{ quote.character_obj.name | e }}</a></span>
+        {% endif %}
+        {% if quote.quote_date %}
+        <time datetime="{{ quote.quote_date.isoformat() }}" data-local-date>{{ quote.quote_date }}</time>
+        {% endif %}
+      </figcaption>
+    </figure>
+  </li>
+  {% endfor %}
+  </ol>
+</div>
+{% endmacro %}

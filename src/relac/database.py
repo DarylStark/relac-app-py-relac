@@ -323,6 +323,11 @@ class Database:
                     f'Contributor with id "{quote.contributor}" doesn\'t exist'
                 )
             quote.contributor_obj = contributor_obj
+            if not any(
+                related_quote is quote
+                for related_quote in contributor_obj.quote_objs
+            ):
+                contributor_obj.quote_objs.append(quote)
 
             if quote.character:
                 character_obj = self._characters.get(quote.character)

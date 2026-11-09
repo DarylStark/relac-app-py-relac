@@ -645,6 +645,14 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     assert quotes_path.exists()
     quotes_html = quotes_path.read_text()
     assert '<title>Quotes: Stoner |' in quotes_html
+    assert (
+        '<div class="card table-card literary-quotes-card" '
+        'aria-labelledby="quotes-title">' in quotes_html
+    )
+    assert (
+        '<h2 class="table-card-title" id="quotes-title">Quotes</h2>'
+        in quotes_html
+    )
     assert '<blockquote>Sometimes, immersed in his books,' in quotes_html
     assert (
         '<a href="contributor.john_williams.html">John Willams</a>'
@@ -659,6 +667,26 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         'datetime="1986-01-01" data-local-date>1986-01-01</time>' in quotes_html
     )
     assert 'My God, to read without joy is stupid.' not in quotes_html
+    contributor_html = (tmp_path / 'contributor.john_williams.html').read_text()
+    assert (
+        '<div class="card table-card literary-quotes-card" '
+        'aria-labelledby="contributor-quotes-title">' in contributor_html
+    )
+    assert (
+        '<h2 class="table-card-title" id="contributor-quotes-title">Quotes</h2>'
+        in contributor_html
+    )
+    assert 'Sometimes, immersed in his books' in contributor_html
+    assert 'My God, to read without joy is stupid.' in contributor_html
+    assert (
+        '<span class="literary-quote-work">Work: '
+        '<a href="work.john_williams__stoner.html">Stoner</a></span>'
+        in contributor_html
+    )
+    assert contributor_html.count('class="literary-quote-work"') == 1
+    assert contributor_html.index(
+        'Books with this contributor'
+    ) < contributor_html.index('Sometimes, immersed in his books')
     assert 'class="literary-analysis-layout"' in stoner_analysis_html
     assert 'card literary-analysis-menu-card' in stoner_analysis_html
     assert (
