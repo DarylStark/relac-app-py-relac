@@ -191,6 +191,13 @@ class WorkStructure(Enum):
     MANUAL = 'manual'
 
 
+class LiteraryAnalysis(BaseModel):
+    """Model for a works literary analysis."""
+
+    work_summary: str | None = None
+    work_analysis: str | None = None
+
+
 class Work(LabelledResource):
     """Model for a work."""
 
@@ -199,6 +206,8 @@ class Work(LabelledResource):
     work_type: WorkType | None = None
     work_structure: WorkStructure | None = None
     premise: str | None = None
+
+    literary_analysis: LiteraryAnalysis | None = None
 
     # Relation (real objects)
     author_objs: list[Contributor] = Field(default_factory=list)

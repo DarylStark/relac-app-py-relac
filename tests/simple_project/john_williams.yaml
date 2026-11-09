@@ -22,6 +22,9 @@ work.john_williams__stoner:
   labels:
     - label.test_label_2
   premise: "The premise of _Stoner_ by _John Williams_ follows the quiet, unremarkable life of William Stoner, a poor Missouri farm boy who goes to the University of Missouri to study agriculture and instead falls in love with English literature.\n\nExtremly <b>good</b> book"
+  literary_analysis:
+    work_summary: "This is a *good* book about Stoner."
+    work_analysis: "Depression _and_ loneliness."
 
 work_edition.john_williams__stoner__original:
   title: Stoner
