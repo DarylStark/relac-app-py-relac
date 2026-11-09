@@ -1502,6 +1502,18 @@ div.content .literary-analysis-layout > .card:not(.small)
     min-width: 0;
 }
 
+.literary-analysis-content
+{
+    display: grid;
+    min-width: 0;
+    gap: 14px;
+}
+
+.literary-analysis-content > .card
+{
+    min-width: 0;
+}
+
 .literary-analysis-menu ul
 {
     display: grid;

@@ -328,6 +328,27 @@ class Motif(BaseModel):
     description: str | None = None
 
 
+class Perspective(Enum):
+    """Perspectives for a story."""
+
+    FIRST_PERSON = 'first-person'
+    THIRD_PERSON_LIMITED = 'third-person-limited'
+    THIRD_PERSON_OMNISCENT = 'third-person-omniscent'
+    MULTIPLE_POV = 'multiple-pov'
+
+
+class Narrator(BaseModel):
+    """Model for a narrator."""
+
+    perspective: Perspective
+    character: str | None = None
+    reliable: bool | None = None
+    notes: str | None = None
+
+    # Relation (real objects)
+    character_obj: Character | None = None
+
+
 class LiteraryAnalysis(BaseModel):
     """Model for a works literary analysis."""
 
@@ -339,6 +360,7 @@ class LiteraryAnalysis(BaseModel):
     chapters: list[ChapterAnalysis] = Field(default_factory=list)
     quotes: list[str] = Field(default_factory=list)
     motifs: list[Motif] = Field(default_factory=list)
+    narrator: Narrator | None = None
 
     # Relation (real objects)
     quote_objs: list[Quote] = Field(default_factory=list)

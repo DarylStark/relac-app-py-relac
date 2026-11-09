@@ -113,8 +113,22 @@ class Database:
                         obj.literary_analysis.setting, obj
                     )
 
-                for character in obj.literary_analysis.characters or []:
-                    self._converge_work_character(character, obj)
+                for character_obj in obj.literary_analysis.characters or []:
+                    self._converge_work_character(character_obj, obj)
+
+                if obj.literary_analysis.narrator:
+                    character_id = obj.literary_analysis.narrator.character
+                    if character_id:
+                        character_obj = self._characters.get(character_id)
+                        if not character_obj:
+                            # TODO: Custom error
+                            raise ValueError(
+                                f'Character with id "{character_id}" '
+                                "doesn't exist"
+                            )
+                        obj.literary_analysis.narrator.character_obj = (
+                            character_obj
+                        )
 
     def _converge_books(self) -> None:  # noqa: PLR0912
         """Converge all books."""

@@ -10,6 +10,7 @@ from typer.testing import CliRunner
 from relac.cli_static_html import (
     _build_search_index,
     _calculate_age,
+    _code_to_country,
     _format_enum_label,
     _render_markdown,
 )
@@ -25,8 +26,10 @@ from relac.model import (
     Label,
     LiteraryAnalysis,
     Location,
+    Narrator,
     Owner,
     OwnerType,
+    Perspective,
     Rating,
     ReadingList,
     ReadingListItem,
@@ -140,6 +143,34 @@ def test_literary_analysis_pages_select_works_navigation(
         'href="works.html" class="active" aria-current="page">Works</a>'
         in rendered
     )
+
+
+def test_unset_narrator_reliability_is_not_displayed() -> None:
+    """Omit reliability metadata when the narrator value is unknown."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['age'] = _calculate_age
+    environment.filters['country'] = _code_to_country
+    environment.filters['enum_label'] = _format_enum_label
+    environment.filters['markdown'] = _render_markdown
+    template = environment.get_template('literary_analysis_characters.html')
+    work = Work(
+        id='test_work',
+        title='Test Work',
+        authors=[],
+        literary_analysis=LiteraryAnalysis(
+            narrator=Narrator(perspective=Perspective.FIRST_PERSON),
+        ),
+    )
+
+    rendered = template.render(
+        work=work,
+        config=RelacConfig(title='Test library'),
+    )
+
+    assert '<dt>Reliable</dt>' not in rendered
 
 
 def test_build_search_index_includes_book_metadata_and_url() -> None:
@@ -722,6 +753,25 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     assert characters_path.exists()
     characters_html = characters_path.read_text()
     assert '<title>Characters: Stoner |' in characters_html
+    assert characters_html.index('id="narrator-title"') < characters_html.index(
+        'id="literary-analysis-characters-table"'
+    )
+    assert '<dt>Perspective</dt>' in characters_html
+    assert '<dd>Third person limited</dd>' in characters_html
+    assert (
+        '<a href="character.william_stoner.html">William Stoner</a>'
+        in characters_html
+    )
+    assert '<dt>Reliable</dt>' in characters_html
+    assert '<dd>No</dd>' in characters_html
+    narrator_section_start = characters_html.index('id="narrator-title"')
+    narrator_metadata_end = characters_html.index(
+        '</dl>', narrator_section_start
+    )
+    narrator_notes_position = characters_html.index(
+        'The narration stays close to William.'
+    )
+    assert narrator_metadata_end < narrator_notes_position
     assert '<th scope="col">Character</th>' in characters_html
     assert '<th scope="col">Roles</th>' in characters_html
     assert '<th scope="col">Story arc</th>' in characters_html

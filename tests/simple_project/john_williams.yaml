@@ -85,6 +85,12 @@ work.john_williams__stoner:
       - character: character.grace_stoner
         roles:
           - deuteragonist
+    narrator:
+      perspective: third-person-limited
+      character: character.william_stoner
+      reliable: false
+      notes: "The narration stays close to William."
+
     chapters:
       - number: 1
         title: "First chapter"
