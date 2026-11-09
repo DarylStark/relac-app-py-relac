@@ -1616,6 +1616,75 @@ div.card .literary-analysis-prose > p:last-child
     color: var(--muted);
 }
 
+.literary-quotes-content
+{
+    min-width: 0;
+}
+
+.literary-quotes-content .literary-analysis-header
+{
+    margin-bottom: 16px;
+}
+
+.literary-quote-list
+{
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.literary-quote-card
+{
+    padding: 22px 24px;
+}
+
+.literary-quote
+{
+    margin: 0;
+}
+
+.literary-quote blockquote
+{
+    max-width: 72ch;
+    margin: 0;
+    padding-left: 18px;
+    border-left: 2px solid var(--accent-text);
+    color: var(--text-strong);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 19px;
+    font-weight: 400;
+    line-height: 1.65;
+}
+
+.literary-quote-attribution
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    margin: 14px 0 0 20px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.literary-quote-attribution a
+{
+    color: var(--accent-text);
+    text-decoration: none;
+}
+
+.literary-quote-attribution a:hover
+{
+    text-decoration: underline;
+}
+
+.literary-quote-attribution a:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
 .detail-small,
 .detail-unspecified
 {

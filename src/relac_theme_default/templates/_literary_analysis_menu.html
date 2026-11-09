@@ -49,6 +49,15 @@
         {% endif %}
       </li>
       {% endif %}
+      {% if work.literary_analysis.quote_objs %}
+      <li>
+        {% if active_page == "literary-analysis-quotes" %}
+        <span class="is-active" aria-current="page">Quotes</span>
+        {% else %}
+        <a href="literary_analysis_quotes.{{ work.id }}.html">Quotes</a>
+        {% endif %}
+      </li>
+      {% endif %}
     </ul>
   </nav>
 </div>

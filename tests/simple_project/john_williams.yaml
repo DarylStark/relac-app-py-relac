@@ -50,6 +50,8 @@ quote.william_stoner:
   quote: "Sometimes, immersed in his books, there would come to him the awareness of all that he did not know, of all that he had not read; and the serenity for which he labored was shattered as he realized the little time he had in life to read so much, to learn what he had to know."
   contributor: contributor.john_williams
   character: character.william_stoner
+  quote_date: 1986-01-01
+  work: work.john_williams__stoner
 
 work.john_williams__stoner:
   title: Stoner

@@ -44,6 +44,7 @@ class RelacTheme:
             'literary_analysis_locations',
             'literary_analysis_characters',
             'literary_analysis_chapter',
+            'literary_analysis_quotes',
             'location',
             'character',
         ],

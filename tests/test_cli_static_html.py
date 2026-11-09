@@ -623,6 +623,10 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         in characters_html
     )
     assert (
+        '<a href="literary_analysis_quotes.work.john_williams__stoner.html">'
+        'Quotes</a>' in characters_html
+    )
+    assert (
         'href="literary_analysis_locations.work.john_williams__stoner.html">'
         'Locations</a>' in characters_html
     )
@@ -635,6 +639,26 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         '<a href="work.john_williams__stoner.html">Stoner</a>' in character_html
     )
     assert 'Protagonist' in character_html
+    quotes_path = (
+        tmp_path / 'literary_analysis_quotes.work.john_williams__stoner.html'
+    )
+    assert quotes_path.exists()
+    quotes_html = quotes_path.read_text()
+    assert '<title>Quotes: Stoner |' in quotes_html
+    assert '<blockquote>Sometimes, immersed in his books,' in quotes_html
+    assert (
+        '<a href="contributor.john_williams.html">John Willams</a>'
+        in quotes_html
+    )
+    assert (
+        '<span class="literary-quote-character">Character: '
+        '<a href="character.william_stoner.html">William Stoner</a>'
+        '</span>' in quotes_html
+    )
+    assert (
+        'datetime="1986-01-01" data-local-date>1986-01-01</time>' in quotes_html
+    )
+    assert 'My God, to read without joy is stupid.' not in quotes_html
     assert 'class="literary-analysis-layout"' in stoner_analysis_html
     assert 'card literary-analysis-menu-card' in stoner_analysis_html
     assert (

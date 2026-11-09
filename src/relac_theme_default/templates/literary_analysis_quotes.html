@@ -1,0 +1,45 @@
+{% extends "_base.html" %}
+{% set active_page = "literary-analysis-quotes" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_literary_analysis_menu.html" import literary_analysis_menu %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([
+      ("Work", "works.html"),
+      (work.title, work.id ~ ".html"),
+      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
+      ("Quotes", none)
+  ]) }}
+  <div class="literary-analysis-layout">
+    {{ literary_analysis_menu(work, active_page) }}
+    <div class="literary-quotes-content">
+      <header class="literary-analysis-header">
+        <p class="detail-kind">Literary analysis</p>
+        <h2 class="detail-title" id="quotes-title">Quotes from {{ work.title | e }}</h2>
+      </header>
+      <ol class="literary-quote-list">
+        {% for quote in work.literary_analysis.quote_objs %}
+        <li>
+          <div class="card literary-quote-card">
+            <figure class="literary-quote">
+              <blockquote>{{ quote.quote | e }}</blockquote>
+              <figcaption class="literary-quote-attribution">
+                <span class="literary-quote-contributor"><a href="{{ quote.contributor_obj.id }}.html">{{ quote.contributor_obj.name | e }}</a></span>
+                {% if quote.character_obj %}
+                <span class="literary-quote-character">Character: <a href="{{ quote.character_obj.id }}.html">{{ quote.character_obj.name | e }}</a></span>
+                {% endif %}
+                {% if quote.quote_date %}
+                <time datetime="{{ quote.quote_date.isoformat() }}" data-local-date>{{ quote.quote_date }}</time>
+                {% endif %}
+              </figcaption>
+            </figure>
+          </div>
+        </li>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+</div>
+{% endblock %}

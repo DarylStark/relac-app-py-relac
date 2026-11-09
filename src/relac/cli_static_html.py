@@ -531,6 +531,18 @@ def create(  # noqa: PLR0912, PLR0915
                         f'literary_analysis_characters.{work.id}.html'
                     )
                     characters_path.write_text(characters_html)
+                if (
+                    work.literary_analysis.quote_objs
+                    and 'literary_analysis_quotes' in metadata.resource_pages
+                ):
+                    quotes_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_quotes']
+                    )
+                    quotes_html = quotes_template.render(work=work)
+                    quotes_path = output / (
+                        f'literary_analysis_quotes.{work.id}.html'
+                    )
+                    quotes_path.write_text(quotes_html)
 
     # Work editions
     if 'work_edition' in metadata.resource_pages:
