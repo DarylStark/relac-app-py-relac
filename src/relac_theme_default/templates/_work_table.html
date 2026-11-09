@@ -21,6 +21,7 @@
                 <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
                 <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Availability</th>
+                <th scope="col" class="center fit-content">Literary analysis</th>
             </tr>
         </thead>
         <tbody>
@@ -77,5 +78,14 @@
             {{ work.availability.value | enum_label }}
         </span>
     </td>
+    {% if work.literary_analysis %}
+    <td class="center fit-content" data-sort-value="1" data-filter-values='["Yes"]'>
+        <span class="availability-badge availability-owned">Yes</span>
+    </td>
+    {% else %}
+    <td class="center fit-content" data-sort-value="0" data-filter-values='["No"]'>
+        <span class="availability-badge availability-not-owned">No</span>
+    </td>
+    {% endif %}
 </tr>
 {% endmacro %}

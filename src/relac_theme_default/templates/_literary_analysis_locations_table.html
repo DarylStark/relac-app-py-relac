@@ -11,14 +11,20 @@
           <th scope="col">Name</th>
           <th scope="col">Country</th>
           <th scope="col">Description</th>
+          <th scope="col">Works</th>
         </tr>
       </thead>
       <tbody>
         {% for location in locations %}
-        <tr>
+        <tr data-href="{{ location.id }}.html">
           <td><a href="{{ location.id }}.html">{{ location.name | e }}</a></td>
           <td>{% if location.country %}{{ location.country | country }}{% endif %}</td>
           <td>{{ location.description | e if location.description else '' }}</td>
+          <td>
+            {% for work in location.work_objs %}
+            {% if not loop.first %}, {% endif %}<a href="{{ work.id }}.html">{{ work.title | e }}</a>
+            {% endfor %}
+          </td>
         </tr>
         {% endfor %}
       </tbody>

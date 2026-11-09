@@ -523,6 +523,30 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     )
 
     assert result.exit_code == 0, result.exception or result.output
+    works_html = (tmp_path / 'works.html').read_text()
+    assert (
+        '<th scope="col" class="center fit-content">Literary analysis</th>'
+        in works_html
+    )
+    assert works_html.index('>Availability</th>') < works_html.index(
+        '>Literary analysis</th>'
+    )
+    stoner_row = works_html.split(
+        '<tr data-href="work.john_williams__stoner.html">', 1
+    )[1].split('</tr>', 1)[0]
+    assert 'data-sort-value="1" data-filter-values=' in stoner_row
+    assert (
+        '<span class="availability-badge availability-owned">Yes</span>'
+        in stoner_row
+    )
+    augustus_row = works_html.split(
+        '<tr data-href="work.john_williams__augustus.html">', 1
+    )[1].split('</tr>', 1)[0]
+    assert 'data-sort-value="0" data-filter-values=' in augustus_row
+    assert (
+        '<span class="availability-badge availability-not-owned">No</span>'
+        in augustus_row
+    )
     stoner_analysis_path = (
         tmp_path / 'literary_analysis.work.john_williams__stoner.html'
     )
@@ -693,6 +717,34 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     assert (
         'href="literary_analysis_locations.work.john_williams__stoner.html">'
         'Locations</a>' in characters_html
+    )
+    characters_index_path = tmp_path / 'characters.html'
+    assert characters_index_path.exists()
+    characters_index_html = characters_index_path.read_text()
+    assert '<title>Characters |' in characters_index_html
+    assert (
+        '<a href="character.william_stoner.html">William Stoner</a>'
+        in characters_index_html
+    )
+    assert (
+        '<a href="work.john_williams__stoner.html">Stoner</a>'
+        in characters_index_html
+    )
+    assert (
+        'href="characters.html" class="active" aria-current="page">'
+        'Characters</a>' in characters_index_html
+    )
+    locations_index_path = tmp_path / 'locations.html'
+    assert locations_index_path.exists()
+    locations_index_html = locations_index_path.read_text()
+    assert '<title>Locations |' in locations_index_html
+    assert (
+        '<a href="location.university_missouri.html">'
+        'University of Missouri</a>' in locations_index_html
+    )
+    assert (
+        '<a href="work.john_williams__stoner.html">Stoner</a>'
+        in locations_index_html
     )
     character_path = tmp_path / 'character.william_stoner.html'
     assert character_path.exists()

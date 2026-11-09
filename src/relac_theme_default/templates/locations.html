@@ -1,0 +1,12 @@
+{% extends "_base.html" %}
+{% set active_page = "locations" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_literary_analysis_locations_table.html" import literary_analysis_locations_table %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([("Works", "works.html"), ("Locations", none)]) }}
+  {{ literary_analysis_locations_table(locations) }}
+</div>
+{% endblock %}

@@ -419,6 +419,18 @@ def create(  # noqa: PLR0912, PLR0915
         out_path = output / 'contributors.html'
         out_path.write_text(html)
 
+    if 'characters' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['characters'])
+        html = template.render(characters=db.get_characters())
+        out_path = output / 'characters.html'
+        out_path.write_text(html)
+
+    if 'locations' in metadata.index_pages:
+        template = env.get_template(metadata.index_pages['locations'])
+        html = template.render(locations=db.get_locations())
+        out_path = output / 'locations.html'
+        out_path.write_text(html)
+
     if 'labels' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['labels'])
         html = template.render(

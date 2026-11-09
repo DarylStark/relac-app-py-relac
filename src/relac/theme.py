@@ -19,6 +19,8 @@ class RelacTheme:
             'works',
             'work_editions',
             'contributors',
+            'characters',
+            'locations',
             'labels',
             'collections',
             'lists',

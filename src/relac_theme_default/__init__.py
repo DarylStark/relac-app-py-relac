@@ -35,6 +35,8 @@ relac_theme = RelacTheme(
         'work_editions': 'work_editions.html',
         'series': 'series.html',
         'contributors': 'contributors.html',
+        'characters': 'characters.html',
+        'locations': 'locations.html',
         'labels': 'labels.html',
         'collections': 'collections.html',
         'lists': 'lists.html',
