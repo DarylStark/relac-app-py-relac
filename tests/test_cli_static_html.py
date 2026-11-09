@@ -467,6 +467,10 @@ def test_static_html_create_generates_reading_session_detail(
     assert '<title>Literary analysis: Stoner |' in stoner_analysis_html
     assert '<em>good</em>' in stoner_analysis_html
     assert '<em>and</em>' in stoner_analysis_html
+    assert '<dt>Chronology</dt>' in stoner_analysis_html
+    assert '<dd>Linear</dd>' in stoner_analysis_html
+    assert '<dt>Pacing</dt>' in stoner_analysis_html
+    assert '<dd>Contemplative</dd>' in stoner_analysis_html
     assert 'class="literary-analysis-layout"' in stoner_analysis_html
     assert 'card literary-analysis-menu-card' in stoner_analysis_html
     assert (

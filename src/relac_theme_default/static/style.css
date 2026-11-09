@@ -1525,6 +1525,18 @@ div.content .literary-analysis-layout > .card:not(.small)
     margin: 0;
 }
 
+.detail-metadata.literary-analysis-metadata
+{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    margin: 22px 0 0;
+}
+
+.literary-analysis-metadata + .literary-analysis-section
+{
+    margin-top: 28px;
+}
+
 .literary-analysis-section + .literary-analysis-section
 {
     margin-top: 28px;

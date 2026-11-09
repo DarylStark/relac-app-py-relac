@@ -24,6 +24,18 @@
         <p class="detail-kind">Literary analysis</p>
         <h2 class="detail-title" id="analysis-title">{{ work.title }}</h2>
       </header>
+      {% if work.literary_analysis.structure %}
+      <dl class="detail-metadata literary-analysis-metadata">
+        <div class="detail-fact">
+          <dt>Chronology</dt>
+          <dd>{{ work.literary_analysis.structure.chronology.value | enum_label }}</dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Pacing</dt>
+          <dd>{{ work.literary_analysis.structure.pacing.value | enum_label }}</dd>
+        </div>
+      </dl>
+      {% endif %}
       {% if work.literary_analysis.work_summary %}
       {{ literary_analysis_section("work-summary", "Summary", work.literary_analysis.work_summary) }}
       {% endif %}

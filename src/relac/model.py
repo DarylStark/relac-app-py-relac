@@ -191,11 +191,39 @@ class WorkStructure(Enum):
     MANUAL = 'manual'
 
 
+class WorkChronology(Enum):
+    """Work chronology."""
+
+    LINEAR = 'linear'
+    NON_LINEAR = 'non-linear'
+    FRAMED = 'framed'
+    DUAL_TIMELINE = 'dual-timeline'
+
+
+class WorkPacing(Enum):
+    """Work pacing."""
+
+    GRADUAL_BUILD = 'gradual-build'
+    FAST_PACED = 'fast-paced'
+    IN_MEDIA_RES = 'in-media-res'
+    CYCLICAL = 'cyclical'
+    CONTEMPLATIVE = 'contemplative'
+    FRONT_LOADED = 'front-loaded'
+
+
+class StoryStructure(BaseModel):
+    """Structure for the literary work."""
+
+    chronology: WorkChronology
+    pacing: WorkPacing
+
+
 class LiteraryAnalysis(BaseModel):
     """Model for a works literary analysis."""
 
     work_summary: str | None = None
     work_analysis: str | None = None
+    structure: StoryStructure | None = None
 
 
 class Work(LabelledResource):

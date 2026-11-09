@@ -25,6 +25,9 @@ work.john_williams__stoner:
   literary_analysis:
     work_summary: "This is a *good* book about Stoner."
     work_analysis: "Depression _and_ loneliness."
+    structure:
+      chronology: linear
+      pacing: contemplative
 
 work_edition.john_williams__stoner__original:
   title: Stoner
