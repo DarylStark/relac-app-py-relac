@@ -459,6 +459,38 @@ def test_static_html_create_generates_reading_session_detail(
     )
 
     assert result.exit_code == 0, result.exception or result.output
+    stoner_analysis_path = (
+        tmp_path / 'literary_analysis.work.john_williams__stoner.html'
+    )
+    assert stoner_analysis_path.exists()
+    stoner_analysis_html = stoner_analysis_path.read_text()
+    assert '<title>Literary analysis: Stoner |' in stoner_analysis_html
+    assert '<em>good</em>' in stoner_analysis_html
+    assert '<em>and</em>' in stoner_analysis_html
+    assert 'class="literary-analysis-layout"' in stoner_analysis_html
+    assert 'card literary-analysis-menu-card' in stoner_analysis_html
+    assert (
+        '<span class="is-active" aria-current="page">Work analysis</span>'
+        in stoner_analysis_html
+    )
+    assert 'href="#work-summary"' not in stoner_analysis_html
+    assert 'href="#work-analysis"' not in stoner_analysis_html
+    stoner_work_html = (
+        tmp_path / 'work.john_williams__stoner.html'
+    ).read_text()
+    assert (
+        'class="detail-action" '
+        'href="literary_analysis.work.john_williams__stoner.html">'
+        'Read literary analysis</a>' in stoner_work_html
+    )
+    augustus_analysis_path = (
+        tmp_path / 'literary_analysis.work.john_williams__augustus.html'
+    )
+    assert not augustus_analysis_path.exists()
+    augustus_work_html = (
+        tmp_path / 'work.john_williams__augustus.html'
+    ).read_text()
+    assert 'Read literary analysis' not in augustus_work_html
     session_pages = list(tmp_path.glob('reading_session.*.html'))
     assert session_pages
     assert '<title>Reading session:' in session_pages[0].read_text()

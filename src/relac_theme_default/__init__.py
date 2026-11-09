@@ -15,6 +15,7 @@ relac_theme = RelacTheme(
         'contributor': 'contributor.html',
         'label': 'label.html',
         'work': 'work.html',
+        'literary_analysis': 'literary_analysis.html',
         'work_edition': 'work_edition.html',
         'collection': 'collection.html',
         'list': 'list.html',

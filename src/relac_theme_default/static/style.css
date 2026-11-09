@@ -1419,6 +1419,157 @@ div.card .detail-premise p:last-child
     margin-bottom: 0;
 }
 
+.detail-actions
+{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.detail-action
+{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 9px 14px;
+    border: 1px solid var(--accent-text);
+    border-radius: 5px;
+    color: var(--accent-text);
+    background: var(--surface);
+    font-size: 14px;
+    font-weight: 550;
+    text-decoration: none;
+}
+
+.detail-action:hover
+{
+    background: var(--hover-surface);
+}
+
+.detail-action:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.literary-analysis-layout
+{
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(180px, 0.32fr) minmax(0, 1fr);
+    align-items: start;
+    gap: 14px;
+}
+
+@media (max-width: 760px)
+{
+    .literary-analysis-layout
+    {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+div.content .literary-analysis-layout > .card:not(.small)
+{
+    grid-column: auto;
+}
+
+.literary-analysis-menu-card
+{
+    min-width: 0;
+}
+
+.literary-analysis-menu ul
+{
+    display: grid;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.literary-analysis-menu a,
+.literary-analysis-menu .is-active
+{
+    display: block;
+    padding: 9px 10px;
+    border-left: 2px solid transparent;
+    border-radius: 3px;
+    color: var(--muted);
+    text-decoration: none;
+}
+
+.literary-analysis-menu a:hover,
+.literary-analysis-menu .is-active
+{
+    border-left-color: var(--accent-text);
+    color: var(--text-strong);
+    background: var(--hover-surface);
+}
+
+.literary-analysis-menu a:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.literary-analysis-header
+{
+    margin-bottom: 24px;
+}
+
+.literary-analysis-header .detail-title
+{
+    margin: 0;
+}
+
+.literary-analysis-section + .literary-analysis-section
+{
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+}
+
+.literary-analysis-section h3
+{
+    margin: 0 0 12px;
+    color: var(--text-strong);
+    font-size: 18px;
+    font-weight: 550;
+}
+
+.literary-analysis-prose
+{
+    max-width: 78ch;
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+div.card .literary-analysis-prose > p:first-child,
+div.card .literary-analysis-prose > p:last-child
+{
+    margin: 0 0 1em;
+    color: var(--text);
+    font-size: inherit;
+    font-weight: 400;
+    font-variant-numeric: normal;
+    line-height: inherit;
+}
+
+div.card .literary-analysis-prose > p:last-child
+{
+    margin-bottom: 0;
+}
+
+.literary-analysis-empty
+{
+    margin: 0;
+    color: var(--muted);
+}
+
 .detail-small,
 .detail-unspecified
 {

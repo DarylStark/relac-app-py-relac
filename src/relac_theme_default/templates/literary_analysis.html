@@ -1,0 +1,39 @@
+{% extends "_base.html" %}
+{% set active_page = "literary-analysis" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_literary_analysis.html" import literary_analysis_section %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([
+      ("Works", "works.html"),
+      (work.title, work.id ~ ".html"),
+      ("Literary analysis", none)
+  ]) }}
+  <div class="literary-analysis-layout">
+    <div class="card literary-analysis-menu-card">
+      <nav class="literary-analysis-menu" aria-label="Work analysis pages">
+        <ul>
+          <li><span class="is-active" aria-current="page">Work analysis</span></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="card literary-analysis-card" role="article" aria-labelledby="analysis-title">
+      <header class="literary-analysis-header">
+        <p class="detail-kind">Literary analysis</p>
+        <h2 class="detail-title" id="analysis-title">{{ work.title }}</h2>
+      </header>
+      {% if work.literary_analysis.work_summary %}
+      {{ literary_analysis_section("work-summary", "Summary", work.literary_analysis.work_summary) }}
+      {% endif %}
+      {% if work.literary_analysis.work_analysis %}
+      {{ literary_analysis_section("work-analysis", "Analysis", work.literary_analysis.work_analysis) }}
+      {% endif %}
+      {% if not work.literary_analysis.work_summary and not work.literary_analysis.work_analysis %}
+      <p class="literary-analysis-empty">No literary analysis has been written for this work yet.</p>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

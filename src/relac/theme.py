@@ -40,6 +40,7 @@ class RelacTheme:
             'owner',
             'series',
             'reading_session',
+            'literary_analysis',
         ],
         str,
     ] = field(default_factory=dict)
