@@ -473,6 +473,19 @@ def create(  # noqa: PLR0912, PLR0915
                 analysis_html = analysis_template.render(work=work)
                 analysis_path = output / f'literary_analysis.{work.id}.html'
                 analysis_path.write_text(analysis_html)
+                if (
+                    work.literary_analysis.setting
+                    and work.literary_analysis.setting.location_objs
+                    and 'literary_analysis_locations' in metadata.resource_pages
+                ):
+                    locations_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_locations']
+                    )
+                    locations_html = locations_template.render(work=work)
+                    locations_path = output / (
+                        f'literary_analysis_locations.{work.id}.html'
+                    )
+                    locations_path.write_text(locations_html)
 
     # Work editions
     if 'work_edition' in metadata.resource_pages:

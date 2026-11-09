@@ -441,7 +441,7 @@ def test_book_collection_rating_renders_in_table_and_detail() -> None:
     assert 'rating-value--unrated">Unrated</span>' in unrated_detail
 
 
-def test_static_html_create_generates_reading_session_detail(
+def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     tmp_path: Path,
 ) -> None:
     """Generate a dedicated HTML page for each reading session."""
@@ -465,12 +465,51 @@ def test_static_html_create_generates_reading_session_detail(
     assert stoner_analysis_path.exists()
     stoner_analysis_html = stoner_analysis_path.read_text()
     assert '<title>Literary analysis: Stoner |' in stoner_analysis_html
+    assert (
+        '<span aria-current="page">Work Analysis</span>' in stoner_analysis_html
+    )
+    assert '<a href="works.html">Work</a>' in stoner_analysis_html
+    assert (
+        '<a href="literary_analysis.work.john_williams__stoner.html">'
+        'Literary Analysis</a>' in stoner_analysis_html
+    )
     assert '<em>good</em>' in stoner_analysis_html
     assert '<em>and</em>' in stoner_analysis_html
     assert '<dt>Chronology</dt>' in stoner_analysis_html
     assert '<dd>Linear</dd>' in stoner_analysis_html
     assert '<dt>Pacing</dt>' in stoner_analysis_html
     assert '<dd>Contemplative</dd>' in stoner_analysis_html
+    assert '<dt>Time period</dt>' in stoner_analysis_html
+    assert '<dd>1900 - 1950</dd>' in stoner_analysis_html
+    assert (
+        'href="literary_analysis_locations.work.john_williams__stoner.html">'
+        'Locations</a>' in stoner_analysis_html
+    )
+    locations_path = (
+        tmp_path / 'literary_analysis_locations.work.john_williams__stoner.html'
+    )
+    assert locations_path.exists()
+    locations_html = locations_path.read_text()
+    assert '<title>Locations: Stoner |' in locations_html
+    assert '<a href="works.html">Work</a>' in locations_html
+    assert (
+        '<a href="literary_analysis.work.john_williams__stoner.html">'
+        'Literary Analysis</a>' in locations_html
+    )
+    assert '<th scope="col">Name</th>' in locations_html
+    assert '<th scope="col">Country</th>' in locations_html
+    assert '<th scope="col">Description</th>' in locations_html
+    assert 'University of Missouri' in locations_html
+    assert 'United States' in locations_html
+    assert 'Missouri' in locations_html
+    assert (
+        '<span class="is-active" aria-current="page">Locations</span>'
+        in locations_html
+    )
+    assert (
+        'href="literary_analysis.work.john_williams__stoner.html">'
+        'Work analysis</a>' in locations_html
+    )
     assert 'class="literary-analysis-layout"' in stoner_analysis_html
     assert 'card literary-analysis-menu-card' in stoner_analysis_html
     assert (

@@ -8,12 +8,14 @@ from relac.model import (
     BookPublisher,
     Contributor,
     Label,
+    Location,
     Owner,
     ReadingList,
     ReadingSession,
     RelacConfig,
     ResourceBase,
     Series,
+    StorySetting,
     Work,
     WorkEdition,
 )
@@ -36,6 +38,7 @@ class Database:
         self._owners: dict[str, Owner] = {}
         self._series: dict[str, Series] = {}
         self._reading_sessions: dict[str, ReadingSession] = {}
+        self._locations: dict[str, Location] = {}
 
     def _id_exists[ResourceModel: ResourceBase](
         self, id: str, collection: dict[str, ResourceModel]
@@ -98,6 +101,12 @@ class Database:
             obj.label_objs = self._get_labels(obj.labels)
             for label in obj.label_objs:
                 label.work_objs.append(obj)
+
+            if (
+                obj.literary_analysis is not None
+                and obj.literary_analysis.setting is not None
+            ):
+                self._converge_story_setting(obj.literary_analysis.setting)
 
     def _converge_books(self) -> None:  # noqa: PLR0912
         """Converge all books."""
@@ -263,6 +272,16 @@ class Database:
             for label in contributor.label_objs:
                 label.owner_objs.append(contributor)
 
+    def _converge_story_setting(self, obj: StorySetting) -> None:
+        """Converge StorySetting objects."""
+        for location_id in obj.locations or []:
+            location_obj = self._locations.get(location_id)
+            if location_obj is None:
+                raise ValueError(
+                    f'Location with id "{location_id}" doesn\'t exist'
+                )
+            obj.location_objs.append(location_obj)
+
     def converge(self) -> None:
         """Converge all objects."""
         self._converge_relac_config()
@@ -374,3 +393,11 @@ class Database:
             # TODO: Custom error
             raise ValueError('Relac config is not set.')
         return self._relac_config
+
+    def add_location(self, id: str, obj: Location) -> None:
+        """Add a location to the database."""
+        self._add_object(id, obj, self._locations)
+
+    def get_locations(self) -> list[Location]:
+        """Get all locations in the database."""
+        return list(self._locations.values())

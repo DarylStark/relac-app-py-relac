@@ -12,6 +12,16 @@ contributor.john_williams:
 #-------------------------------------------------------------------------------
 # Works and work editions
 #-------------------------------------------------------------------------------
+location.university_missouri:
+  name: University of Missouri
+  description: A University in Missouri
+  country: US
+
+location.missouri:
+  name: Missouri
+  country: US
+  description: A American state.
+
 work.john_williams__stoner:
   title: Stoner
   <<: *template_work
@@ -28,6 +38,11 @@ work.john_williams__stoner:
     structure:
       chronology: linear
       pacing: contemplative
+    setting:
+      time_period: "1900 - 1950"
+      locations:
+        - location.university_missouri
+        - location.missouri
 
 work_edition.john_williams__stoner__original:
   title: Stoner

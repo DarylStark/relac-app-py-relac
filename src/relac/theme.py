@@ -41,6 +41,7 @@ class RelacTheme:
             'series',
             'reading_session',
             'literary_analysis',
+            'literary_analysis_locations',
         ],
         str,
     ] = field(default_factory=dict)

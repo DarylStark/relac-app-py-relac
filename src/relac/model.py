@@ -102,7 +102,6 @@ class Contributor(LabelledResource):
     translator_work_edition_objs: list[WorkEdition] = Field(
         default_factory=list
     )
-    # label_objs: list[Label] = Field(default_factory=list)
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -218,12 +217,31 @@ class StoryStructure(BaseModel):
     pacing: WorkPacing
 
 
+class Location(ResourceBase):
+    """Model for a location."""
+
+    name: str
+    country: str | None = None
+    description: str | None = None
+
+
+class StorySetting(BaseModel):
+    """The setting for a story."""
+
+    time_period: str | None = None
+    locations: list[str] | None = None
+
+    # Relation (real objects)
+    location_objs: list[Location] = Field(default_factory=list)
+
+
 class LiteraryAnalysis(BaseModel):
     """Model for a works literary analysis."""
 
     work_summary: str | None = None
     work_analysis: str | None = None
     structure: StoryStructure | None = None
+    setting: StorySetting | None = None
 
 
 class Work(LabelledResource):

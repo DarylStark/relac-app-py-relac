@@ -1527,7 +1527,6 @@ div.content .literary-analysis-layout > .card:not(.small)
 
 .detail-metadata.literary-analysis-metadata
 {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
     margin: 22px 0 0;
 }
