@@ -71,7 +71,7 @@ def _code_to_country(country_code: str) -> str:
     return country.name if country else country_code
 
 
-def _build_search_index(
+def _build_search_index(  # noqa: PLR0912
     db: Database,
 ) -> dict[str, list[dict[str, str | list[str]]]]:
     """Build the client-side search data for every linked resource."""
@@ -153,6 +153,15 @@ def _build_search_index(
             [detail for detail in details if detail],
             labels=[label.name for label in work.label_objs],
         )
+        if work.id and work.literary_analysis:
+            for chapter in work.literary_analysis.chapters:
+                if chapter.title:
+                    add_entry(
+                        'Chapter',
+                        f'literary_analysis_chapter.{work.id}.{chapter.number}',
+                        f'{chapter.number}. {chapter.title}',
+                        [f'Work: {work.title}'],
+                    )
 
     for contributor in db.get_contributors():
         details = [
@@ -165,6 +174,40 @@ def _build_search_index(
             contributor.name,
             [detail for detail in details if detail],
             labels=[label.name for label in contributor.label_objs],
+        )
+
+    for character in db.get_characters():
+        work_titles = [
+            link.work_obj.title
+            for link in character.work_character_objs
+            if link.work_obj
+        ]
+        details = [
+            f'Birthplace: {character.birthplace}',
+            f'Birth country: {character.birthcountry}',
+            f'Works: {", ".join(work_titles)}' if work_titles else '',
+        ]
+        add_entry(
+            'Character',
+            character.id,
+            character.name,
+            [detail for detail in details if detail],
+        )
+
+    for location in db.get_locations():
+        work_titles = [work.title for work in location.work_objs]
+        details = [
+            f'Country: {location.country}' if location.country else '',
+            f'Description: {location.description}'
+            if location.description
+            else '',
+            f'Works: {", ".join(work_titles)}' if work_titles else '',
+        ]
+        add_entry(
+            'Location',
+            location.id,
+            location.name,
+            [detail for detail in details if detail],
         )
 
     for edition in db.get_work_editions():

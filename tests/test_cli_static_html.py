@@ -19,8 +19,12 @@ from relac.model import (
     Availability,
     Book,
     BookCollection,
+    ChapterAnalysis,
+    Character,
     Contributor,
     Label,
+    LiteraryAnalysis,
+    Location,
     Owner,
     OwnerType,
     Rating,
@@ -33,6 +37,7 @@ from relac.model import (
     Series,
     SeriesItem,
     Work,
+    WorkCharacter,
     WorkEdition,
     WorkStructure,
     WorkType,
@@ -189,6 +194,65 @@ def test_build_search_index_includes_reading_session_details() -> None:
     assert 'Test Book' in entry['searchText']
     assert 'Great story' in entry['searchText']
     assert '2026-01-01' in entry['searchText']
+
+
+def test_build_search_index_includes_characters_locations_and_titled_chapters() -> (  # noqa: E501
+    None
+):
+    """Index characters, locations, and only titled chapter analyses."""
+    database = Database()
+    work = Work(
+        id='the_tide',
+        title='The Tide',
+        authors=[],
+        literary_analysis=LiteraryAnalysis(
+            chapters=[
+                ChapterAnalysis(number=1, title='First Light'),
+                ChapterAnalysis(number=2),
+            ]
+        ),
+    )
+    character = Character(
+        id='the_narrator',
+        name='The Narrator',
+        birthplace='Old Harbor',
+        birthcountry='US',
+        work_character_objs=[
+            WorkCharacter(character='the_narrator', work_obj=work)
+        ],
+    )
+    location = Location(
+        id='old_harbor',
+        name='Old Harbor',
+        country='US',
+        description='A coastal town',
+        work_objs=[work],
+    )
+    database.add_work('the_tide', work)
+    database.add_character('the_narrator', character)
+    database.add_location('old_harbor', location)
+
+    entries = _build_search_index(database)['items']
+    character_entry = next(
+        item for item in entries if item['type'] == 'Character'
+    )
+    location_entry = next(
+        item for item in entries if item['type'] == 'Location'
+    )
+    chapter_entries = [item for item in entries if item['type'] == 'Chapter']
+
+    assert character_entry['href'] == 'the_narrator.html'
+    assert character_entry['title'] == 'The Narrator'
+    assert 'The Tide' in character_entry['searchText']
+    assert location_entry['href'] == 'old_harbor.html'
+    assert location_entry['title'] == 'Old Harbor'
+    assert 'A coastal town' in location_entry['searchText']
+    assert len(chapter_entries) == 1
+    assert chapter_entries[0]['href'] == (
+        'literary_analysis_chapter.the_tide.1.html'
+    )
+    assert chapter_entries[0]['title'] == '1. First Light'
+    assert 'The Tide' in chapter_entries[0]['searchText']
 
 
 def test_reading_session_table_shows_ongoing_end_date() -> None:
