@@ -587,6 +587,18 @@ def create(  # noqa: PLR0912, PLR0915
                     )
                     characters_path.write_text(characters_html)
                 if (
+                    work.literary_analysis.motifs
+                    and 'literary_analysis_motifs' in metadata.resource_pages
+                ):
+                    motifs_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_motifs']
+                    )
+                    motifs_html = motifs_template.render(work=work)
+                    motifs_path = output / (
+                        f'literary_analysis_motifs.{work.id}.html'
+                    )
+                    motifs_path.write_text(motifs_html)
+                if (
                     work.literary_analysis.quote_objs
                     and 'literary_analysis_quotes' in metadata.resource_pages
                 ):

@@ -583,6 +583,10 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         'Characters</a>' in stoner_analysis_html
     )
     assert (
+        'href="literary_analysis_motifs.work.john_williams__stoner.html">'
+        'Motifs</a>' in stoner_analysis_html
+    )
+    assert (
         'href="literary_analysis_chapter.work.john_williams__stoner.1.html">'
         '1. First chapter</a>' in stoner_analysis_html
     )
@@ -722,6 +726,23 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     assert (
         'href="literary_analysis_locations.work.john_williams__stoner.html">'
         'Locations</a>' in characters_html
+    )
+    motifs_path = (
+        tmp_path / 'literary_analysis_motifs.work.john_williams__stoner.html'
+    )
+    assert motifs_path.exists()
+    motifs_html = motifs_path.read_text()
+    assert '<title>Motifs: Stoner |' in motifs_html
+    assert '<th scope="col">Name</th>' in motifs_html
+    assert '<th scope="col">Type</th>' in motifs_html
+    assert '<th scope="col">Symbolizes</th>' in motifs_html
+    assert '<th scope="col">Description</th>' in motifs_html
+    assert 'Value of a unremarkable life' in motifs_html
+    assert 'Thematic' in motifs_html
+    assert 'The distance between people' in motifs_html
+    assert (
+        '<span class="is-active" aria-current="page">Motifs</span>'
+        in motifs_html
     )
     characters_index_path = tmp_path / 'characters.html'
     assert characters_index_path.exists()
