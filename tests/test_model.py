@@ -8,6 +8,7 @@ from relac.database import Database
 from relac.model import (
     Availability,
     Book,
+    BookBinding,
     BookCollection,
     Character,
     CharacterRole,
@@ -29,6 +30,21 @@ from relac.model import (
     WorkCharacter,
     WorkEdition,
 )
+
+
+@pytest.mark.parametrize(
+    'binding',
+    [
+        BookBinding.PDF,
+        BookBinding.PDF_WATERMARK,
+        BookBinding.PDF_DRM,
+    ],
+)
+def test_book_accepts_pdf_bindings(binding: BookBinding) -> None:
+    """Accept each PDF binding value when constructing a book."""
+    book = Book(isbn13=9781234567897, title='Test Book', binding=binding.value)
+
+    assert book.binding is binding
 
 
 def test_book_collection_owned_percentage() -> None:
