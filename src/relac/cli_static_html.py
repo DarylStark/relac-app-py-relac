@@ -146,6 +146,19 @@ def _build_search_index(  # noqa: PLR0912
             f'Category: {_format_enum_label(work.work_type.value)}'
             if work.work_type
             else '',
+            (
+                'Genres: '
+                + ', '.join(
+                    [
+                        _format_enum_label(
+                            work.genre.primary.value.replace('_', '-')
+                        ),
+                        *work.genre.subgenres,
+                    ]
+                )
+                if work.genre
+                else ''
+            ),
             f'Editions: {", ''".join(e.title for e in work.edition_objs)}',
         ]
         add_entry(

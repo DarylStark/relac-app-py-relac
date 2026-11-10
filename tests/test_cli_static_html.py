@@ -24,6 +24,7 @@ from relac.model import (
     ChapterAnalysis,
     Character,
     Contributor,
+    GenreClassification,
     Label,
     LiteraryAnalysis,
     Location,
@@ -31,6 +32,7 @@ from relac.model import (
     Owner,
     OwnerType,
     Perspective,
+    PrimaryGenre,
     Rating,
     ReadingList,
     ReadingListItem,
@@ -239,6 +241,35 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     )
     assert label_entry['href'] == 'science_fiction.html'
     assert label_entry['title'] == 'Science Fiction'
+
+
+def test_build_search_index_includes_work_genres() -> None:
+    """Include a work's primary genre and subgenres in search metadata."""
+    database = Database()
+    work = Work(
+        id='literary_work',
+        title='Literary Work',
+        authors=[],
+        genre=GenreClassification(
+            primary=PrimaryGenre.LITERARY_FICTION,
+            subgenres=['campus novel', 'bildungsroman'],
+        ),
+    )
+    database.add_work('literary_work', work)
+
+    entry = next(
+        item
+        for item in _build_search_index(database)['items']
+        if item['type'] == 'Work'
+    )
+
+    assert (
+        'Genres: Literary fiction, campus novel, bildungsroman'
+        in entry['details']
+    )
+    assert 'Literary fiction' in entry['searchText']
+    assert 'campus novel' in entry['searchText']
+    assert 'bildungsroman' in entry['searchText']
 
 
 def test_build_search_index_includes_reading_session_details() -> None:
@@ -1071,6 +1102,10 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
         work_structure=WorkStructure.UNSPECIFIED,
         work_type=WorkType.UNSPECIFIED,
         premise='First **bold** line\n\nSecond <b>line</b>',
+        genre=GenreClassification(
+            primary=PrimaryGenre.LITERARY_FICTION,
+            subgenres=['campus novel', 'bildungsroman'],
+        ),
     )
     illustrator = Contributor(id='illustrator', name='Test Illustrator')
     translator = Contributor(id='translator', name='Test Translator')
@@ -1168,7 +1203,15 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
         config=config,
     )
     assert 'data-sort-value="8.5"' in work_table_html
+    assert (
+        '<th scope="col" class="fit-content">Primary genre</th>'
+        in work_table_html
+    )
+    assert 'Literary fiction' in work_table_html
     assert '<dt>Rating</dt>' in work_detail_html
+    assert '<dt>Genre</dt>' in work_detail_html
+    assert 'Literary fiction' in work_detail_html
+    assert 'campus novel, bildungsroman' in work_detail_html
     assert '8.5' in work_detail_html
     assert '<p>First <strong>bold</strong> line</p>' in work_detail_html
     assert '<p>Second &lt;b&gt;line&lt;/b&gt;</p>' in work_detail_html
