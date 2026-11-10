@@ -28,6 +28,7 @@ character.william_stoner:
   deceased_date: 1956-05-05
   birthplace: Missouri
   birthcountry: US
+  description: "[file:william_stoner.md]"
 
 character.edith_elaine_bostwick:
   name: Edith Elaine Bostwick

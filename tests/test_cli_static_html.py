@@ -896,6 +896,13 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     character_html = character_path.read_text()
     assert '<title>Character: William Stoner |' in character_html
     assert 'Works using this character' in character_html
+    assert character_html.index('</dl>') < character_html.index(
+        'class="detail-premise" aria-label="Description"'
+    )
+    assert (
+        "<p>The novel's main character is a farm boy turned English professor."
+        in character_html
+    )
     assert (
         '<a href="work.john_williams__stoner.html">Stoner</a>' in character_html
     )
