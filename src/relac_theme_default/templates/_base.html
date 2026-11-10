@@ -125,5 +125,8 @@
     <script src="static/sortable-tables.js" defer></script>
     <script src="static/search.js" defer></script>
     <script src="static/theme.js" defer></script>
+    {% if active_page in ["literary-analysis", "literary-analysis-chapter"] %}
+    <script src="static/literary-analysis-width.js" defer></script>
+    {% endif %}
 </body>
 </html>
