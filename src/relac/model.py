@@ -627,8 +627,8 @@ class BookBinding(Enum):
 class Book(LabelledResource):
     """A book."""
 
-    isbn13: int
     title: str
+    isbn13: int | None = None
     publisher: str | None = None
     work_editions: list[str] = Field(default_factory=list)
     medium: BookMedium = BookMedium.UNSPECIFIED

@@ -1,0 +1,28 @@
+---
+#-------------------------------------------------------------------------------
+# Contributor
+#-------------------------------------------------------------------------------
+contributor.author_with_no_books:
+  name: Author without books
+#-------------------------------------------------------------------------------
+# Works and work editions
+#-------------------------------------------------------------------------------
+work.author_with_no_books__work1:
+  title: Mr. Harrigan's Phone
+  authors:
+    - contributor.author_with_no_books
+
+work_edition.author_with_no_books__work1__original:
+  title: My first work
+  work: work.author_with_no_books__work1
+  edition_type: original
+  language: nl
+#-------------------------------------------------------------------------------
+# Books
+#-------------------------------------------------------------------------------
+book.author_with_no_books__book1__no_isbn:
+  title: Als het bloedt
+  medium: paperback
+  work_editions:
+    - work_edition.author_with_no_books__work1__original
+#-------------------------------------------------------------------------------

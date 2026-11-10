@@ -44,6 +44,8 @@
             "approve": true,
             "matchCommandLine": true
         },
-        ".venv/bin/python": true
+        ".venv/bin/python": true,
+        ".venv/bin/pytest": true,
+        ".venv/bin/ruff": true
     }
 }
