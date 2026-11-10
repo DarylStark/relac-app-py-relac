@@ -59,6 +59,11 @@ def _format_enum_label(value: str) -> str:
     return labels.get(value, value.replace('-', ' ').capitalize())
 
 
+def _format_isbn(value: int | None) -> str:
+    """Format an ISBN for display, leaving missing values blank."""
+    return mask(str(value)) if value is not None else ''
+
+
 def _code_to_language(language_code: str) -> str:
     """Get the name for a language code."""
     lang = languages.get(alpha_2=language_code)
@@ -120,7 +125,11 @@ def _build_search_index(  # noqa: PLR0912
             f'Contributors: {contributors}' if contributors else '',
             f'Publisher: {publisher}' if publisher else '',
             f'Imprint: {imprint}' if imprint else '',
-            f'ISBN: {mask(str(book.isbn13))}',
+            (
+                f'ISBN: {_format_isbn(book.isbn13)}'
+                if book.isbn13 is not None
+                else ''
+            ),
             f'Medium: {_format_enum_label(book.medium.value)}',
             f'Binding: {_format_enum_label(book.binding.value)}',
             f'Works: {", ".join(e.title for e in book.work_edition_objs)}',
@@ -132,7 +141,7 @@ def _build_search_index(  # noqa: PLR0912
             book.id,
             book.title,
             details,
-            [str(book.isbn13)],
+            [str(book.isbn13)] if book.isbn13 is not None else [],
             [label.name for label in book.label_objs],
         )
 
@@ -379,7 +388,7 @@ def create(  # noqa: PLR0912, PLR0915
     )
 
     env = Environment(loader=FileSystemLoader(metadata.source_dir))
-    env.filters['isbn'] = lambda x: mask(str(x))
+    env.filters['isbn'] = _format_isbn
     env.filters['markdown'] = _render_markdown
     env.filters['enum_label'] = _format_enum_label
     env.filters['age'] = _calculate_age

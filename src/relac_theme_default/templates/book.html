@@ -74,10 +74,12 @@
               <span class="detail-small">{{ book_binding | enum_label }}</span>
             </dd>
           </div>
+          {% if book.isbn13 is not none %}
           <div class="detail-fact">
             <dt>ISBN</dt>
             <dd><code>{{ book.isbn13 | isbn }}</code></dd>
           </div>
+          {% endif %}
           <div class="detail-fact">
             <dt>Rating</dt>
             <dd>{{ format_rating(book.rating) }}</dd>

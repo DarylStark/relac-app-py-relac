@@ -51,8 +51,8 @@
           <div class="detail-fact">
             <dt>Structure and category</dt>
             <dd>
-                <span>{{ work.work_structure.value | enum_label }}</span>
-                <span class="detail-small">{{ work.work_type.value | enum_label }}</span>
+                <span>{{ work.work_structure.value | enum_label if work.work_structure else 'Unspecified' }}</span>
+                <span class="detail-small">{{ work.work_type.value | enum_label if work.work_type else 'Unspecified' }}</span>
             </dd>
           </div>
           {% if work.genre %}

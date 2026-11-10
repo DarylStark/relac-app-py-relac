@@ -68,9 +68,9 @@
         </pre>
     </td>
     <td class="right fit-content">
-        <pre>
-            {{ book.isbn13 | isbn }}
-        </pre>
+        {% if book.isbn13 is not none %}
+            <pre>{{ book.isbn13 | isbn }}</pre>
+        {% endif %}
     </td>
     <td class="right fit-content">
         <span class="availability-badge availability-{{ book.availability.value }}">

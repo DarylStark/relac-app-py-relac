@@ -13,6 +13,7 @@ from relac.cli_static_html import (
     _calculate_age,
     _code_to_country,
     _format_enum_label,
+    _format_isbn,
     _render_markdown,
 )
 from relac.database import Database
@@ -241,6 +242,24 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     )
     assert label_entry['href'] == 'science_fiction.html'
     assert label_entry['title'] == 'Science Fiction'
+
+
+def test_build_search_index_handles_book_without_isbn() -> None:
+    """Do not index a missing ISBN as text or display it as a detail."""
+    database = Database()
+    book = Book(id='missing_isbn', title='No ISBN Book')
+    database.add_book('missing_isbn', book)
+
+    book_entry = next(
+        item
+        for item in _build_search_index(database)['items']
+        if item['type'] == 'Book'
+    )
+
+    assert 'None' not in book_entry['searchText']
+    assert not any(
+        detail.startswith('ISBN:') for detail in book_entry['details']
+    )
 
 
 def test_build_search_index_includes_work_genres() -> None:
@@ -1091,7 +1110,7 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
     environment.filters['language'] = lambda language: language or ''
     environment.filters['age'] = _calculate_age
     environment.filters['country'] = lambda country: country
-    environment.filters['isbn'] = str
+    environment.filters['isbn'] = _format_isbn
     config = RelacConfig(title='Test Library')
     environment.globals['config'] = config  # ty: ignore[invalid-assignment]
 
@@ -1202,6 +1221,13 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
         reading_lists=[],
         config=config,
     )
+    unclassified_work_html = environment.get_template('work.html').render(
+        work=Work(
+            id='unclassified_work', title='Unclassified Work', authors=[]
+        ),
+        reading_lists=[],
+        config=config,
+    )
     assert 'data-sort-value="8.5"' in work_table_html
     assert (
         '<th scope="col" class="fit-content">Primary genre</th>'
@@ -1209,6 +1235,8 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
     )
     assert 'Literary fiction' in work_table_html
     assert '<dt>Rating</dt>' in work_detail_html
+    assert work_detail_html.count('Unspecified') >= 2
+    assert unclassified_work_html.count('Unspecified') >= 2
     assert '<dt>Genre</dt>' in work_detail_html
     assert 'Literary fiction' in work_detail_html
     assert 'campus novel, bildungsroman' in work_detail_html
@@ -1227,6 +1255,11 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
     session.book_obj = book
     book_html = environment.get_template('book.html').render(
         book=book,
+        config=config,
+    )
+    book_without_isbn = Book(id='missing_isbn', title='No ISBN Book')
+    book_without_isbn_html = environment.get_template('book.html').render(
+        book=book_without_isbn,
         config=config,
     )
     reading_session_detail_html = environment.get_template(
@@ -1286,7 +1319,7 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
         < reading_session_detail_html.index('6.5')
     )
     books_html = environment.get_template('books.html').render(
-        books=[book],
+        books=[book, book_without_isbn],
         config=config,
     )
     assert (
@@ -1294,6 +1327,15 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
         ' data-sort-type="number">Rating</th>' in books_html
     )
     assert 'data-sort-value="6.5"' in books_html
+    assert '<dt>ISBN</dt>' not in book_without_isbn_html
+    assert 'None' not in books_html
+    no_isbn_row = books_html.split('<tr data-href="missing_isbn.html">', 1)[
+        1
+    ].split('</tr>', 1)[0]
+    no_isbn_cell = re.findall(
+        r'<td class="right fit-content">(.*?)</td>', no_isbn_row, re.DOTALL
+    )[0]
+    assert no_isbn_cell.strip() == ''
     assert '<dt>Rating</dt>' in book_html
     assert '8.5' in book_html
     assert 'href="test_contributor.html">Test Contributor</a>' in book_html
