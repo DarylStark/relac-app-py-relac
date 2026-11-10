@@ -93,15 +93,23 @@ work.john_williams__stoner:
 
     chapters:
       - number: 1
+        part: 1
         title: "First chapter"
         summary: "First __chapter__ tells a lot"
         analysis: "Just an introduction to the story"
       - number: 2
+        part: 1
         title: "Second chapter"
         summary: "Movement to uni"
         analysis: "Falls in love with literature"
-      - number: 3
+      - number: 1
+        part: 2
         summary: "Titleless chapter"
+        analysis: "Just to see if it works"
+      - number: 2
+        part: 2
+        title: "Part 2"
+        summary: "Chapter 2 in part 2"
         analysis: "Just to see if it works"
     motifs:
       - name: "Value of a unremarkable life"

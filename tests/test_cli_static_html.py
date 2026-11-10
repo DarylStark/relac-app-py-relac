@@ -272,6 +272,7 @@ def test_build_search_index_includes_characters_locations_and_titled_chapters() 
             chapters=[
                 ChapterAnalysis(number=1, title='First Light'),
                 ChapterAnalysis(number=2),
+                ChapterAnalysis(number=1, part=1, title='Second Part'),
             ]
         ),
     )
@@ -310,12 +311,16 @@ def test_build_search_index_includes_characters_locations_and_titled_chapters() 
     assert location_entry['href'] == 'old_harbor.html'
     assert location_entry['title'] == 'Old Harbor'
     assert 'A coastal town' in location_entry['searchText']
-    assert len(chapter_entries) == 1
+    assert len(chapter_entries) == 2
     assert chapter_entries[0]['href'] == (
         'literary_analysis_chapter.the_tide.1.html'
     )
     assert chapter_entries[0]['title'] == '1. First Light'
     assert 'The Tide' in chapter_entries[0]['searchText']
+    assert chapter_entries[1]['href'] == (
+        'literary_analysis_chapter.the_tide.part-1.chapter-1.html'
+    )
+    assert chapter_entries[1]['title'] == 'Part 1: 1. Second Part'
 
 
 def test_reading_session_table_shows_ongoing_end_date() -> None:
@@ -650,22 +655,29 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         'Motifs</a>' in stoner_analysis_html
     )
     assert (
-        'href="literary_analysis_chapter.work.john_williams__stoner.1.html">'
+        'href="literary_analysis_chapter.work.john_williams__stoner.part-1.chapter-1.html">'
         '1. First chapter</a>' in stoner_analysis_html
     )
     assert (
-        'href="literary_analysis_chapter.work.john_williams__stoner.3.html">'
-        'Chapter 3</a>' in stoner_analysis_html
+        '<li class="literary-analysis-part">Part 1</li>' in stoner_analysis_html
+    )
+    assert (
+        '<li class="literary-analysis-part">Part 2</li>' in stoner_analysis_html
+    )
+    assert (
+        'href="literary_analysis_chapter.work.john_williams__stoner.part-2.chapter-1.html">'
+        'Chapter 1</a>' in stoner_analysis_html
     )
     chapter_path = (
-        tmp_path / 'literary_analysis_chapter.work.john_williams__stoner.1.html'
+        tmp_path / 'literary_analysis_chapter.work.'
+        'john_williams__stoner.part-1.chapter-1.html'
     )
     assert chapter_path.exists()
     chapter_html = chapter_path.read_text()
-    assert '<title>Chapter 1: First chapter: Stoner |' in chapter_html
+    assert '<title>Part 1: 1. First chapter: Stoner |' in chapter_html
     assert (
-        '<h2 class="detail-title" id="chapter-title">1. First chapter</h2>'
-        in chapter_html
+        '<h2 class="detail-title" id="chapter-title">'
+        'Part 1: 1. First chapter</h2>' in chapter_html
     )
     assert '<strong>chapter</strong>' in chapter_html
     assert 'Chronology' not in chapter_html
@@ -678,31 +690,35 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         '<span aria-hidden="true">&larr;</span> Previous</span>' in chapter_html
     )
     assert (
-        '<a class="detail-action" aria-label="Next chapter: 2. Second chapter" '
-        'href="literary_analysis_chapter.work.john_williams__stoner.2.html">'
-        '2. Second chapter <span aria-hidden="true">&rarr;</span></a>'
+        '<a class="detail-action" aria-label="Next '
+        'chapter: Part 1: 2. Second chapter" '
+        'href="literary_analysis_chapter.work.'
+        'john_williams__stoner.part-1.chapter-2.html">'
+        'Part 1: 2. Second chapter <span aria-hidden="true">&rarr;</span></a>'
         in chapter_html
     )
     untitled_chapter_path = (
-        tmp_path / 'literary_analysis_chapter.work.john_williams__stoner.3.html'
+        tmp_path / 'literary_analysis_chapter.work'
+        '.john_williams__stoner.part-2.chapter-1.html'
     )
     assert untitled_chapter_path.exists()
     untitled_chapter_html = untitled_chapter_path.read_text()
-    assert '<title>Chapter 3: Stoner |' in untitled_chapter_html
+    assert '<title>Part 2: Chapter 1: Stoner |' in untitled_chapter_html
     assert (
-        '<h2 class="detail-title" id="chapter-title">Chapter 3</h2>'
+        '<h2 class="detail-title" id="chapter-title">Part 2: Chapter 1</h2>'
         in untitled_chapter_html
     )
     assert (
-        '<a class="detail-action" aria-label="Previous chapter: 2. '
+        '<a class="detail-action" aria-label="Previous chapter: Part 1: 2. '
         'Second chapter" '
-        'href="literary_analysis_chapter.work.john_williams__stoner.2.html">'
-        '<span aria-hidden="true">&larr;</span> 2. Second chapter</a>'
+        'href="literary_analysis_chapter.work.john_williams__stoner.part-1.chapter-2.html">'
+        '<span aria-hidden="true">&larr;</span> Part 1: 2. Second chapter</a>'
         in untitled_chapter_html
     )
     assert (
-        '<span class="detail-action" aria-disabled="true">'
-        'Next <span aria-hidden="true">&rarr;</span></span>'
+        '<a class="detail-action" aria-label="Next chapter: Part 2: 2. Part 2" '
+        'href="literary_analysis_chapter.work.john_williams__stoner.part-2.chapter-2.html">'
+        'Part 2: 2. Part 2 <span aria-hidden="true">&rarr;</span></a>'
         in untitled_chapter_html
     )
     locations_path = (

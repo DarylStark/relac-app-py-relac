@@ -32,7 +32,8 @@
     {% elif active_page == "literary-analysis-motifs" %}
         {% set page_title = ("Motifs: " ~ work.title) if work is defined else "Literary analysis motifs" %}
     {% elif active_page == "literary-analysis-chapter" %}
-        {% set page_title = (("Chapter " ~ chapter.number ~ ": " ~ chapter.title ~ ": " ~ work.title) if chapter.title else ("Chapter " ~ chapter.number ~ ": " ~ work.title)) if chapter is defined and work is defined else "Chapter analysis" %}
+        {% set chapter_part = ("Part " ~ chapter.part ~ ": ") if chapter is defined and chapter.part is not none else "" %}
+        {% set page_title = (chapter_part ~ ((chapter.number ~ ". " ~ chapter.title) if chapter.title else ("Chapter " ~ chapter.number)) ~ ": " ~ work.title) if chapter is defined and work is defined else "Chapter analysis" %}
     {% elif active_page == "works" %}
         {% set page_title = ("Edition: " ~ work_edition.title) if work_edition is defined else ("Work: " ~ work.title) if work is defined else "Works" %}
     {% elif active_page == "lists" %}

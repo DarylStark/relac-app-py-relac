@@ -1530,6 +1530,14 @@ div.content .literary-analysis-layout > .card:not(.small)
     border-left: 1px solid var(--line);
 }
 
+.literary-analysis-menu .literary-analysis-part
+{
+    margin: 8px 10px 0;
+    color: var(--text-strong);
+    font-size: 12px;
+    font-weight: 700;
+}
+
 .literary-analysis-menu a,
 .literary-analysis-menu summary,
 .literary-analysis-menu .is-active

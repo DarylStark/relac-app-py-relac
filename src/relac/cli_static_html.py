@@ -158,8 +158,13 @@ def _build_search_index(  # noqa: PLR0912
                 if chapter.title:
                     add_entry(
                         'Chapter',
-                        f'literary_analysis_chapter.{work.id}.{chapter.number}',
-                        f'{chapter.number}. {chapter.title}',
+                        f'literary_analysis_chapter.{work.id}.{chapter.page_id}',
+                        (
+                            f'Part {chapter.part}: '
+                            if chapter.part is not None
+                            else ''
+                        )
+                        + f'{chapter.number}. {chapter.title}',
                         [f'Work: {work.title}'],
                     )
 
@@ -557,7 +562,7 @@ def create(  # noqa: PLR0912, PLR0915
                         )
                         chapter_path = output / (
                             f'literary_analysis_chapter.{work.id}.'
-                            f'{chapter.number}.html'
+                            f'{chapter.page_id}.html'
                         )
                         chapter_path.write_text(chapter_html)
                 if (
