@@ -244,8 +244,8 @@ class Character(ResourceBase):
 
     name: str
     birthdate: date | None = None
-    birthplace: str
-    birthcountry: str
+    birthplace: str | None = None
+    birthcountry: str | None = None
     deceased_date: date | None = None
 
     # Relation (real objects)
@@ -291,9 +291,17 @@ class ChapterAnalysis(BaseModel):
     """Analysis for a chapter."""
 
     number: int
+    part: int | None = None
     title: str | None = None
     summary: str | None = None
     analysis: str | None = None
+
+    @property
+    def page_id(self) -> str:
+        """Get a page identifier that distinguishes chapters across parts."""
+        if self.part is None:
+            return str(self.number)
+        return f'part-{self.part}.chapter-{self.number}'
 
 
 class Quote(ResourceBase):

@@ -1530,6 +1530,14 @@ div.content .literary-analysis-layout > .card:not(.small)
     border-left: 1px solid var(--line);
 }
 
+.literary-analysis-menu .literary-analysis-part
+{
+    margin: 8px 10px 0;
+    color: var(--text-strong);
+    font-size: 12px;
+    font-weight: 700;
+}
+
 .literary-analysis-menu a,
 .literary-analysis-menu summary,
 .literary-analysis-menu .is-active
@@ -1630,10 +1638,13 @@ div.card .literary-analysis-prose > p:last-child
     margin-bottom: 0;
 }
 
-.literary-analysis-empty
+div.card p.literary-analysis-empty
 {
-    margin: 0;
-    color: var(--muted);
+    margin: 16px 0 0;
+    color: var(--text);
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.7;
 }
 
 .literary-quote-list
