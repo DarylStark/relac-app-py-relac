@@ -3,7 +3,7 @@
 
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_literary_analysis.html" import literary_analysis_section %}
-{% from "_literary_analysis_menu.html" import chapter_label, chapter_page_label, literary_analysis_menu %}
+{% from "_literary_analysis_menu.html" import chapter_label, chapter_page_label, chapter_navigation_label, literary_analysis_menu %}
 
 {% block content %}
 <div class="content">
@@ -42,12 +42,12 @@
       {% endfor %}
       <nav class="detail-actions chapter-navigation" aria-label="Chapter navigation">
         {% if neighbors.previous %}
-        <a class="detail-action" aria-label="Previous chapter: {{ chapter_page_label(neighbors.previous) }}" href="literary_analysis_chapter.{{ work.id }}.{{ neighbors.previous.page_id }}.html"><span aria-hidden="true">&larr;</span> {{ chapter_page_label(neighbors.previous) }}</a>
+        <a class="detail-action" aria-label="Previous chapter: {{ chapter_navigation_label(neighbors.previous, chapter) }}" href="literary_analysis_chapter.{{ work.id }}.{{ neighbors.previous.page_id }}.html"><span aria-hidden="true">&larr;</span> {{ chapter_navigation_label(neighbors.previous, chapter) }}</a>
         {% else %}
         <span class="detail-action" aria-disabled="true"><span aria-hidden="true">&larr;</span> Previous</span>
         {% endif %}
         {% if neighbors.next %}
-        <a class="detail-action" aria-label="Next chapter: {{ chapter_page_label(neighbors.next) }}" href="literary_analysis_chapter.{{ work.id }}.{{ neighbors.next.page_id }}.html">{{ chapter_page_label(neighbors.next) }} <span aria-hidden="true">&rarr;</span></a>
+        <a class="detail-action" aria-label="Next chapter: {{ chapter_navigation_label(neighbors.next, chapter) }}" href="literary_analysis_chapter.{{ work.id }}.{{ neighbors.next.page_id }}.html">{{ chapter_navigation_label(neighbors.next, chapter) }} <span aria-hidden="true">&rarr;</span></a>
         {% else %}
         <span class="detail-action" aria-disabled="true">Next <span aria-hidden="true">&rarr;</span></span>
         {% endif %}

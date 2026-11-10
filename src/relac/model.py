@@ -247,6 +247,7 @@ class Character(ResourceBase):
     birthplace: str | None = None
     birthcountry: str | None = None
     deceased_date: date | None = None
+    description: str | None = None
 
     # Relation (real objects)
     work_character_objs: list[WorkCharacter] = Field(default_factory=list)

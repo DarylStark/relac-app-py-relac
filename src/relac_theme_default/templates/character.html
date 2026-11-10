@@ -39,6 +39,11 @@
         </div>
       </dl>
     </section>
+    {% if character.description %}
+    <section class="detail-premise" aria-label="Description">
+      {{ character.description | markdown }}
+    </section>
+    {% endif %}
   </div>
 
   {% if character.work_character_objs %}

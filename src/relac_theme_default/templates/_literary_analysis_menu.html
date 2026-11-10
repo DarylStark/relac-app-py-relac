@@ -6,6 +6,10 @@
 {% if chapter.part is not none %}Part {{ chapter.part }}: {% endif %}{{ chapter_label(chapter) }}
 {%- endmacro %}
 
+{% macro chapter_navigation_label(chapter, current_chapter) -%}
+{% if chapter.part is not none and chapter.part != current_chapter.part %}Part {{ chapter.part }}: {% endif %}{{ chapter_label(chapter) }}
+{%- endmacro %}
+
 {% macro literary_analysis_menu(work, active_page, current_chapter=none) %}
 <div class="card literary-analysis-menu-card">
   <nav class="literary-analysis-menu" aria-label="Work analysis pages">
@@ -24,11 +28,13 @@
           <ul class="literary-analysis-submenu">
             {% set part_state = namespace(value=none, in_part=false) %}
             {% for chapter in work.literary_analysis.chapters %}
-            {% if chapter.part is not none and (not part_state.in_part or part_state.value != chapter.part) %}
-            <li class="literary-analysis-part">Part {{ chapter.part }}</li>
+            {% if chapter.part is none %}
+            {% if part_state.in_part %}
+          </ul>
+        </details>
+      </li>
+            {% set part_state.in_part = false %}
             {% endif %}
-            {% set part_state.value = chapter.part %}
-            {% set part_state.in_part = chapter.part is not none %}
             <li>
               {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.page_id == chapter.page_id %}
               <span class="is-active" aria-current="page">{{ chapter_label(chapter) }}</span>
@@ -36,7 +42,34 @@
               <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.page_id }}.html">{{ chapter_label(chapter) }}</a>
               {% endif %}
             </li>
+            {% else %}
+            {% if not part_state.in_part or part_state.value != chapter.part %}
+            {% if part_state.in_part %}
+          </ul>
+        </details>
+      </li>
+            {% endif %}
+      <li class="literary-analysis-part">
+        <details{% if current_chapter and current_chapter.part is not none and current_chapter.part == chapter.part %} open{% endif %}>
+          <summary>Part {{ chapter.part }}</summary>
+          <ul class="literary-analysis-submenu">
+            {% set part_state.value = chapter.part %}
+            {% set part_state.in_part = true %}
+            {% endif %}
+            <li>
+              {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.page_id == chapter.page_id %}
+              <span class="is-active" aria-current="page">{{ chapter_label(chapter) }}</span>
+              {% else %}
+              <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.page_id }}.html">{{ chapter_label(chapter) }}</a>
+              {% endif %}
+            </li>
+            {% endif %}
             {% endfor %}
+            {% if part_state.in_part %}
+          </ul>
+        </details>
+      </li>
+            {% endif %}
           </ul>
         </details>
       </li>

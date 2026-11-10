@@ -1,5 +1,6 @@
 """Tests for static HTML template helpers."""
 
+import re
 from datetime import date
 from pathlib import Path
 
@@ -678,12 +679,8 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         'href="literary_analysis_chapter.work.john_williams__stoner.part-1.chapter-1.html">'
         '1. First chapter</a>' in stoner_analysis_html
     )
-    assert (
-        '<li class="literary-analysis-part">Part 1</li>' in stoner_analysis_html
-    )
-    assert (
-        '<li class="literary-analysis-part">Part 2</li>' in stoner_analysis_html
-    )
+    assert '<summary>Part 1</summary>' in stoner_analysis_html
+    assert '<summary>Part 2</summary>' in stoner_analysis_html
     assert (
         'href="literary_analysis_chapter.work.john_williams__stoner.part-2.chapter-1.html">'
         'Chapter 1</a>' in stoner_analysis_html
@@ -705,16 +702,20 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         '<span class="is-active" aria-current="page">1. First chapter</span>'
         in chapter_html
     )
+    assert re.search(
+        r'<details open>\s*<summary>Part 1</summary>', chapter_html
+    )
+    assert re.search(r'<details>\s*<summary>Part 2</summary>', chapter_html)
     assert (
         '<span class="detail-action" aria-disabled="true">'
         '<span aria-hidden="true">&larr;</span> Previous</span>' in chapter_html
     )
     assert (
         '<a class="detail-action" aria-label="Next '
-        'chapter: Part 1: 2. Second chapter" '
+        'chapter: 2. Second chapter" '
         'href="literary_analysis_chapter.work.'
         'john_williams__stoner.part-1.chapter-2.html">'
-        'Part 1: 2. Second chapter <span aria-hidden="true">&rarr;</span></a>'
+        '2. Second chapter <span aria-hidden="true">&rarr;</span></a>'
         in chapter_html
     )
     untitled_chapter_path = (
@@ -736,9 +737,9 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
         in untitled_chapter_html
     )
     assert (
-        '<a class="detail-action" aria-label="Next chapter: Part 2: 2. Part 2" '
+        '<a class="detail-action" aria-label="Next chapter: 2. Part 2" '
         'href="literary_analysis_chapter.work.john_williams__stoner.part-2.chapter-2.html">'
-        'Part 2: 2. Part 2 <span aria-hidden="true">&rarr;</span></a>'
+        '2. Part 2 <span aria-hidden="true">&rarr;</span></a>'
         in untitled_chapter_html
     )
     locations_path = (
@@ -895,6 +896,13 @@ def test_static_html_create_generates_reading_session_detail(  # noqa: PLR0915
     character_html = character_path.read_text()
     assert '<title>Character: William Stoner |' in character_html
     assert 'Works using this character' in character_html
+    assert character_html.index('</dl>') < character_html.index(
+        'class="detail-premise" aria-label="Description"'
+    )
+    assert (
+        "<p>The novel's main character is a farm boy turned English professor."
+        in character_html
+    )
     assert (
         '<a href="work.john_williams__stoner.html">Stoner</a>' in character_html
     )
