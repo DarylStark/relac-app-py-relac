@@ -16,6 +16,7 @@
                 <th scope="col">Author</th>
                 <th scope="col" class="fit-content">Structure</th>
                 <th scope="col" class="fit-content">Category</th>
+                <th scope="col" class="fit-content">Primary genre</th>
                 <th scope="col">Series</th>
                 <th scope="col" class="center fit-content">Editions</th>
                 <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
@@ -55,6 +56,7 @@
     </td>
     <td class="fit-content">{{ work_structure.replace('-', ' ').capitalize() }}</td>
     <td class="fit-content">{{ work_type.replace('-', ' ').capitalize() }}</td>
+    <td class="fit-content">{{ work.genre.primary.value.replace('_', '-') | enum_label if work.genre else '' }}</td>
     <td data-filter-values='{{ work.series_objs | map(attribute="name") | list | tojson }}'>
         {% for series in work.series_objs %}
             {% if not loop.first %}, {% endif %}<a href="{{ series.id }}.html">{{ series.name }}</a>

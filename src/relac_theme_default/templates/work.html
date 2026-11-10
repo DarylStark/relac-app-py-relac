@@ -55,6 +55,17 @@
                 <span class="detail-small">{{ work.work_type.value | enum_label }}</span>
             </dd>
           </div>
+          {% if work.genre %}
+          <div class="detail-fact">
+            <dt>Genre</dt>
+            <dd>
+                <span>{{ work.genre.primary.value.replace('_', '-') | enum_label }}</span>
+                {% if work.genre.subgenres %}
+                <span class="detail-small">{{ work.genre.subgenres | join(', ') }}</span>
+                {% endif %}
+            </dd>
+          </div>
+          {% endif %}
           <div class="detail-fact">
             <dt>Rating</dt>
             <dd>{{ format_rating(work.rating) }}</dd>
