@@ -244,8 +244,8 @@ class Character(ResourceBase):
 
     name: str
     birthdate: date | None = None
-    birthplace: str
-    birthcountry: str
+    birthplace: str | None = None
+    birthcountry: str | None = None
     deceased_date: date | None = None
 
     # Relation (real objects)
