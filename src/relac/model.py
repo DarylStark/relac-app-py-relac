@@ -375,6 +375,24 @@ class LiteraryAnalysis(BaseModel):
     quote_objs: list[Quote] = Field(default_factory=list)
 
 
+class PrimaryGenre(Enum):
+    """Enum for the primary genre of a work."""
+
+    CRIME_THRILLER = 'crime_thriller'
+    LITERARY_FICTION = 'literary_fiction'
+    SCI_FI_FANTASY = 'sci_fi_fantasy'
+    HORROR = 'horror'
+    HISTORICAL = 'historical'
+    NON_FICTION = 'non_fiction'
+
+
+class GenreClassification(BaseModel):
+    """Classifications for genre's."""
+
+    primary: PrimaryGenre
+    subgenres: list[str] = Field(default_factory=list)
+
+
 class Work(LabelledResource):
     """Model for a work."""
 
@@ -383,6 +401,7 @@ class Work(LabelledResource):
     work_type: WorkType | None = None
     work_structure: WorkStructure | None = None
     premise: str | None = None
+    genre: GenreClassification | None = None
 
     literary_analysis: LiteraryAnalysis | None = None
 
