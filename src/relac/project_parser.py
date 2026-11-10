@@ -1,5 +1,6 @@
 """Module with the ProjectParser."""
 
+import re
 from collections.abc import Callable
 from pathlib import Path
 
@@ -60,11 +61,46 @@ class ProjectParser:
         output_str = output_str.replace('\n---\n', '')
         return output_str
 
+    def _get_file_contents(self, filename: str) -> str:
+        """Get the contents for a file."""
+        file_obj = Path(self._working_dir / filename)
+        if not file_obj.is_file():
+            raise TypeError(f'File "{file_obj}" not file')
+        return file_obj.read_text()
+
+    def inject_files(self, data: dict[str, object] | list[object]) -> None:
+        """Inject files into the data.
+
+        When a value is given in the form of [file:<filename>], the contents of
+        the filename gets injected for the value.
+        """
+        file_regex = (r'\[file:(?P<value>.+)\]', self._get_file_contents)
+
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if isinstance(value, dict | list):
+                    self.inject_files(value)
+                elif isinstance(value, str):
+                    regex = re.match(file_regex[0], value)
+                    if regex:
+                        data[key] = file_regex[1](regex.groups('value')[0])
+        else:
+            for index, value in enumerate(data):
+                if isinstance(value, dict | list):
+                    self.inject_files(value)
+                elif isinstance(value, str):
+                    regex = re.match(file_regex[0], value)
+                    if regex:
+                        data[index] = file_regex[1](regex.groups('value')[0])
+
     def _parse_yaml_str(self, yaml_data: str) -> None:
         """Parse one specific YAML file."""
         yaml = YAML(typ='safe')
 
         raw_data = yaml.load(yaml_data)
+        self.inject_files(raw_data)
+
+        pass
 
         object_parsers: dict[
             str, Callable[[str, dict[str, str]], ResourceBase]

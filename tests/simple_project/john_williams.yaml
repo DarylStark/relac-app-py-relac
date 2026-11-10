@@ -96,7 +96,7 @@ work.john_williams__stoner:
         part: 1
         title: "First chapter"
         summary: "First __chapter__ tells a lot"
-        analysis: "Just an introduction to the story"
+        analysis: "[file:john_williams__stoner__chapter_1__analyse.md]"
       - number: 2
         part: 1
         title: "Second chapter"
