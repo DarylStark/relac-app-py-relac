@@ -619,6 +619,9 @@ class BookBinding(Enum):
     EPUB = 'epub'
     EPUB_WATERMARK = 'epub-watermark'
     EPUB_DRM = 'epub-drm'
+    PDF = 'pdf'
+    PDF_WATERMARK = 'pdf-watermark'
+    PDF_DRM = 'pdf-drm'
 
 
 class Book(LabelledResource):
