@@ -17,8 +17,11 @@
     {{ literary_analysis_menu(work, active_page, chapter) }}
     <div class="card literary-analysis-card" role="article" aria-labelledby="chapter-title">
       <header class="literary-analysis-header">
-        <p class="detail-kind">Chapter analysis</p>
-        <h2 class="detail-title" id="chapter-title">{{ chapter_page_label(chapter) }}</h2>
+        <div>
+          <p class="detail-kind">Chapter analysis</p>
+          <h2 class="detail-title" id="chapter-title">{{ chapter_page_label(chapter) }}</h2>
+        </div>
+        <button class="literary-analysis-width-toggle" type="button" aria-label="Full-width text" aria-pressed="false" title="Switch to full-width text">Full width</button>
       </header>
       {% if chapter.summary %}
       {{ literary_analysis_section("chapter-summary", "Summary", chapter.summary) }}

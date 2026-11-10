@@ -35,6 +35,15 @@
         "/^python -m http\\.server 8765 --directory out$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        "/^python -m pytest tests/test_cli_static_html\\.py -q$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^python3 -m pytest tests/test_cli_static_html\\.py -q$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        ".venv/bin/python": true
     }
 }
