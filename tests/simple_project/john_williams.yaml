@@ -41,6 +41,9 @@ character.grace_stoner:
   birthplace: Missouri
   birthcountry: US
 
+character.no_birthdetails:
+  name: No birthdetails
+
 quote.without_joy:
   quote: "My God, to read without joy is stupid."
   contributor: contributor.john_williams

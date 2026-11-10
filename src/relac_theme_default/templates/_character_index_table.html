@@ -26,7 +26,7 @@
         {% endfor %}
         <tr data-href="{{ character.id }}.html">
           <td><a href="{{ character.id }}.html">{{ character.name | e }}</a></td>
-          <td>{{ character.birthplace | e }}</td>
+          <td>{{ character.birthplace | default('', true) | e }}</td>
           <td>{{ character.birthcountry | country }}</td>
           <td data-filter-values='{{ works | map(attribute="title") | list | tojson }}'>
             {% for work in works %}

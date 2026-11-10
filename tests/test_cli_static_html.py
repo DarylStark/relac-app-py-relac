@@ -96,6 +96,26 @@ def test_rating_values_use_expected_color_category(
     assert f'>{expected_display}</span>' in rendered
 
 
+def test_character_index_table_shows_empty_birthplace_when_missing() -> None:
+    """Render a blank birthplace cell when the character has none."""
+    template_directory = (
+        Path(__file__).parents[1] / 'src' / 'relac_theme_default' / 'templates'
+    )
+    environment = Environment(loader=FileSystemLoader(template_directory))
+    environment.filters['country'] = _code_to_country
+    template = environment.get_template('_character_index_table.html')
+    character = Character(id='unknown_birthplace', name='Unknown Birthplace')
+
+    rendered = template.module.character_index_table([character])  # ty: ignore[unresolved-attribute]
+
+    assert (
+        '<td><a href="unknown_birthplace.html">Unknown Birthplace</a></td>'
+        in rendered
+    )
+    assert '<td></td>' in rendered
+    assert 'None' not in rendered
+
+
 @pytest.mark.parametrize(
     ('availability', 'expected'),
     [

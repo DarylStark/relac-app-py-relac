@@ -65,8 +65,10 @@ def _code_to_language(language_code: str) -> str:
     return lang.name if lang else language_code
 
 
-def _code_to_country(country_code: str) -> str:
+def _code_to_country(country_code: str | None) -> str:
     """Get the name for a country code."""
+    if not country_code:
+        return ''
     country = countries.get(alpha_2=country_code)
     return country.name if country else country_code
 
