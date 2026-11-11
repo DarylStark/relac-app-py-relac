@@ -2,8 +2,10 @@
 
 import statistics
 from collections.abc import Callable, Iterable
+from dataclasses import dataclass
 from datetime import date, timedelta
 from enum import Enum
+from typing import ClassVar, Literal
 
 from pydantic import BaseModel, Field
 
@@ -70,10 +72,26 @@ def _aggregate_availability(
     return ResourceAvailability.UNAVAILABLE
 
 
-class ResourceBase(BaseModel):
+@dataclass
+class ResolvableField:
+    """Field that can be resolved."""
+
+    source_field: str
+    destination_field: str
+    type: Literal['many-to-many', 'one-to-many']
+    populates_back: str
+
+
+class WithResolvableFields:
+    """Base class for models with resolvable fields."""
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = []
+
+
+class ResourceBase(BaseModel, WithResolvableFields):
     """Base model for resources."""
 
-    id: str | None = Field(default=None)
+    id: str | None = Field(default=None, exclude=False)
 
 
 class LabelledResource(ResourceBase):
@@ -123,6 +141,11 @@ class Contributor(LabelledResource):
     translator_work_edition_objs: list[WorkEdition] = Field(
         default_factory=list, exclude=True
     )
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('labels', 'label_objs', 'many-to-many', 'book_objs'),
+    ]
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -343,6 +366,17 @@ class Quote(ResourceBase):
     contributor_obj: Contributor | None = Field(default=None, exclude=True)
     character_obj: Character | None = Field(default=None, exclude=True)
     work_obj: Work | None = Field(default=None, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'contributor', 'contributor_obj', 'one-to-many', 'quote_objs'
+        ),
+        ResolvableField(
+            'character', 'character_obj', 'one-to-many', 'quote_objs'
+        ),
+        ResolvableField('work', 'work_obj', 'one-to-many', 'quote_objs'),
+    ]
 
 
 class MotifType(Enum):

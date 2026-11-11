@@ -2,7 +2,7 @@
 
 import pytest
 
-from relac.model import Contributor, ResourceBase
+from relac.model import Contributor, Label, ResourceBase
 from relac.relac_database import RelacDatabase
 
 
@@ -48,11 +48,34 @@ def test_adding_more_contribs_same_id() -> None:
         db.add_object(contrib_id, contrib)
 
 
-def test_adding_incorrect_data() -> None:
-    """Test if we are not allowed to add wrong data."""
+def test_resolving_fields_many_to_many() -> None:
+    """Test if we can resolve fields."""
 
     class IncorrectModel(ResourceBase): ...
 
     db = RelacDatabase()
-    with pytest.raises(TypeError):
-        db.add_object('incorrect', IncorrectModel())
+    db.add_object('label.test_label_1', Label(name='test_label_1'))
+    db.add_object('label.test_label_2', Label(name='test_label_2'))
+    db.add_object('label.test_label_3', Label(name='test_label_3'))
+    db.add_object(
+        'contributor.john_williams',
+        Contributor(
+            name='test_label',
+            labels=[
+                'label.test_label_1',
+                'label.test_label_2',
+                'label.test_label_3',
+            ],
+        ),
+    )
+    db.resolve_all()
+
+    contributors = db.get_all(Contributor)
+    assert len(contributors['contributor.john_williams'].label_objs) == 3
+    assert (
+        contributors['contributor.john_williams'].label_objs[0].name
+        == 'test_label_1'
+    )
+
+    labels = db.get_all(Label)
+    assert len(labels['label.test_label_1'].book_objs) == 1
