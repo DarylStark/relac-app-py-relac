@@ -80,7 +80,9 @@ class LabelledResource(ResourceBase):
     """Base model for labelled resources."""
 
     labels: list[str] | None = None
-    label_objs: list[Label] = Field(default_factory=list)
+
+    # Relation (real objects)
+    label_objs: list[Label] = Field(default_factory=list, exclude=True)
 
 
 class RelacConfig(BaseModel):
@@ -90,7 +92,7 @@ class RelacConfig(BaseModel):
     owner: str | None = None
 
     # Relation (real objects)
-    owner_obj: Owner | None = None
+    owner_obj: Owner | None = Field(default=None, exclude=True)
 
 
 class ContributorState(Enum):
@@ -110,17 +112,16 @@ class Contributor(LabelledResource):
     birthdate: date | None = None
     deceased_date: date | None = None
     countries: list[str] = Field(default_factory=list)
-    # labels: list[str] | None = None
 
     # Relation (real objects)
-    work_objs: list[Work] = Field(default_factory=list)
-    book_objs: list[Book] = Field(default_factory=list)
-    quote_objs: list[Quote] = Field(default_factory=list)
+    work_objs: list[Work] = Field(default_factory=list, exclude=True)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+    quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
     illustrator_work_edition_objs: list[WorkEdition] = Field(
-        default_factory=list
+        default_factory=list, exclude=True
     )
     translator_work_edition_objs: list[WorkEdition] = Field(
-        default_factory=list
+        default_factory=list, exclude=True
     )
 
     def _get_works_with_specific_reading_state(
@@ -246,7 +247,7 @@ class Location(ResourceBase):
     description: str | None = None
 
     # Relation (real objects)
-    work_objs: list[Work] = Field(default_factory=list)
+    work_objs: list[Work] = Field(default_factory=list, exclude=True)
 
 
 class StorySetting(BaseModel):
@@ -256,7 +257,7 @@ class StorySetting(BaseModel):
     locations: list[str] | None = None
 
     # Relation (real objects)
-    location_objs: list[Location] = Field(default_factory=list)
+    location_objs: list[Location] = Field(default_factory=list, exclude=True)
 
 
 @_register_model('character')
@@ -271,8 +272,10 @@ class Character(ResourceBase):
     description: str | None = None
 
     # Relation (real objects)
-    work_character_objs: list[WorkCharacter] = Field(default_factory=list)
-    quote_objs: list[Quote] = Field(default_factory=list)
+    work_character_objs: list[WorkCharacter] = Field(
+        default_factory=list, exclude=True
+    )
+    quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
 
 
 class CharacterRole(Enum):
@@ -305,8 +308,8 @@ class WorkCharacter(BaseModel):
     story_arc: StoryArc | None = None
 
     # Relation (real objects)
-    character_obj: Character | None = None
-    work_obj: Work | None = None
+    character_obj: Character | None = Field(default=None, exclude=True)
+    work_obj: Work | None = Field(default=None, exclude=True)
 
 
 class ChapterAnalysis(BaseModel):
@@ -337,9 +340,9 @@ class Quote(ResourceBase):
     work: str | None = None
 
     # Relation (real objects)
-    contributor_obj: Contributor | None = None
-    character_obj: Character | None = None
-    work_obj: Work | None = None
+    contributor_obj: Contributor | None = Field(default=None, exclude=True)
+    character_obj: Character | None = Field(default=None, exclude=True)
+    work_obj: Work | None = Field(default=None, exclude=True)
 
 
 class MotifType(Enum):
@@ -377,7 +380,7 @@ class Narrator(BaseModel):
     notes: str | None = None
 
     # Relation (real objects)
-    character_obj: Character | None = None
+    character_obj: Character | None = Field(default=None, exclude=True)
 
 
 class LiteraryAnalysis(BaseModel):
@@ -394,7 +397,7 @@ class LiteraryAnalysis(BaseModel):
     narrator: Narrator | None = None
 
     # Relation (real objects)
-    quote_objs: list[Quote] = Field(default_factory=list)
+    quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
 
 
 class PrimaryGenre(Enum):
@@ -429,10 +432,10 @@ class Work(LabelledResource):
     literary_analysis: LiteraryAnalysis | None = None
 
     # Relation (real objects)
-    author_objs: list[Contributor] = Field(default_factory=list)
-    edition_objs: list[WorkEdition] = Field(default_factory=list)
-    book_objs: list[Book] = Field(default_factory=list)
-    series_objs: list[Series] = Field(default_factory=list)
+    author_objs: list[Contributor] = Field(default_factory=list, exclude=True)
+    edition_objs: list[WorkEdition] = Field(default_factory=list, exclude=True)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+    series_objs: list[Series] = Field(default_factory=list, exclude=True)
 
     # Properties
     @property
@@ -520,11 +523,17 @@ class WorkEdition(LabelledResource):
     translators: list[str] | None = None
 
     # Relations (real objects)
-    work_obj: Work | None = None
-    book_objs: list[Book] = Field(default_factory=list)
-    reading_session_objs: list[ReadingSession] = Field(default_factory=list)
-    illustrator_objs: list[Contributor] = Field(default_factory=list)
-    translator_objs: list[Contributor] = Field(default_factory=list)
+    work_obj: Work | None = Field(default=None, exclude=True)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+    reading_session_objs: list[ReadingSession] = Field(
+        default_factory=list, exclude=True
+    )
+    illustrator_objs: list[Contributor] = Field(
+        default_factory=list, exclude=True
+    )
+    translator_objs: list[Contributor] = Field(
+        default_factory=list, exclude=True
+    )
 
     # Properties
     @property
@@ -591,7 +600,7 @@ class BookCollection(LabelledResource):
     books: list[str] = Field(default_factory=list)
 
     # Relations (real objects)
-    book_objs: list[Book] = Field(default_factory=list)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
 
     def owned_percentage(self, owner: Owner | None) -> float:
         """Get the percentage of books owned by the specified owner."""
@@ -621,7 +630,7 @@ class BookPublisher(ResourceBase):
     imprint: str | None = None
 
     # Relations (real objects)
-    book_objs: list[Book] = Field(default_factory=list)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
 
 
 class BookMedium(Enum):
@@ -663,12 +672,20 @@ class Book(LabelledResource):
     owners: list[str] | None = None
 
     # Relationships (real objects)
-    work_edition_objs: list[WorkEdition] = Field(default_factory=list)
-    contributor_objs: list[Contributor] = Field(default_factory=list)
-    publisher_obj: BookPublisher = Field(default_factory=list)
-    collection_objs: list[BookCollection] = Field(default_factory=list)
-    owner_objs: list[Owner] = Field(default_factory=list)
-    reading_session_objs: list[ReadingSession] = Field(default_factory=list)
+    work_edition_objs: list[WorkEdition] = Field(
+        default_factory=list, exclude=True
+    )
+    contributor_objs: list[Contributor] = Field(
+        default_factory=list, exclude=True
+    )
+    publisher_obj: BookPublisher = Field(default_factory=list, exclude=True)
+    collection_objs: list[BookCollection] = Field(
+        default_factory=list, exclude=True
+    )
+    owner_objs: list[Owner] = Field(default_factory=list, exclude=True)
+    reading_session_objs: list[ReadingSession] = Field(
+        default_factory=list, exclude=True
+    )
 
     # Properties
     @property
@@ -788,8 +805,8 @@ class ReadingSession(LabelledResource):
     book_rating: Rating | None = None
 
     # Relationships (real objects)
-    work_edition_obj: WorkEdition | None = None
-    book_obj: Book | None = None
+    work_edition_obj: WorkEdition | None = Field(default=None, exclude=True)
+    book_obj: Book | None = Field(default=None, exclude=True)
 
     @property
     def effective_enddate(self) -> date | None:
@@ -826,15 +843,25 @@ class Label(ResourceBase):
     name: str
 
     # Relationships (real objects)
-    contributor_objs: list[Contributor] = Field(default_factory=list)
-    work_objs: list[Work] = Field(default_factory=list)
-    work_edition_objs: list[WorkEdition] = Field(default_factory=list)
-    series_objs: list[Series] = Field(default_factory=list)
-    reading_list_objs: list[ReadingList] = Field(default_factory=list)
-    reading_session_objs: list[ReadingSession] = Field(default_factory=list)
-    book_objs: list[Book] = Field(default_factory=list)
-    owner_objs: list[Owner] = Field(default_factory=list)
-    book_collection_objs: list[BookCollection] = Field(default_factory=list)
+    contributor_objs: list[Contributor] = Field(
+        default_factory=list, exclude=True
+    )
+    work_objs: list[Work] = Field(default_factory=list, exclude=True)
+    work_edition_objs: list[WorkEdition] = Field(
+        default_factory=list, exclude=True
+    )
+    series_objs: list[Series] = Field(default_factory=list, exclude=True)
+    reading_list_objs: list[ReadingList] = Field(
+        default_factory=list, exclude=True
+    )
+    reading_session_objs: list[ReadingSession] = Field(
+        default_factory=list, exclude=True
+    )
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+    owner_objs: list[Owner] = Field(default_factory=list, exclude=True)
+    book_collection_objs: list[BookCollection] = Field(
+        default_factory=list, exclude=True
+    )
 
 
 class ReadingListItem(BaseModel):
@@ -844,7 +871,7 @@ class ReadingListItem(BaseModel):
     work: str
 
     # Relationships (real objects)
-    work_obj: Work | None = None
+    work_obj: Work | None = Field(default=None, exclude=True)
 
 
 @_register_model('reading_list')
@@ -948,7 +975,7 @@ class Owner(LabelledResource):
     availability: Availability = Availability.NOT_AVAILABLE
 
     # Relationships (real objects)
-    book_objs: list[Book] = Field(default_factory=list)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
 
 
 class SeriesItem(BaseModel):
@@ -958,7 +985,7 @@ class SeriesItem(BaseModel):
     work: str
 
     # Relationships (real objects)
-    work_obj: Work | None = None
+    work_obj: Work | None = Field(default=None, exclude=True)
 
 
 @_register_model('series')
