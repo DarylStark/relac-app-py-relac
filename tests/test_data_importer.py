@@ -3,7 +3,7 @@
 import pytest
 
 from relac.data_importer import DataImporter
-from relac.model import Contributor
+from relac.model import Book, Contributor
 from relac.relac_database import RelacDatabase
 
 
@@ -19,6 +19,18 @@ def test_importing_contributors() -> None:
 
     assert len(in_db) == 1
     assert in_db['contributor.john_williams'].name == 'John Williams'
+
+
+def test_importing_books() -> None:
+    """Test if we can import a book."""
+    db = RelacDatabase()
+    importer = DataImporter(db)
+    importer.import_data({'book.stoner': {'title': 'Stoner'}})
+
+    in_db = db.get_all(Book)
+
+    assert len(in_db) == 1
+    assert in_db['book.stoner'].title == 'Stoner'
 
 
 def test_importing_multiple_contributors() -> None:

@@ -1,11 +1,29 @@
 """Module with the models for the application."""
 
 import statistics
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
 from datetime import date, timedelta
 from enum import Enum
 
 from pydantic import BaseModel, Field
+
+relac_models: dict[str, type[ResourceBase]] = {}
+
+
+def _register_model[TResource: ResourceBase](
+    type_name: str,
+) -> Callable[[type[TResource]], type[TResource]]:
+    """Decorator to register a model for data."""
+
+    def model_decorator(class_: type[TResource]) -> type[TResource]:
+        if type_name in relac_models:
+            raise ValueError(
+                f'Model with type_name "{type_name}" is already registered.'
+            )
+        relac_models[type_name] = class_
+        return class_
+
+    return model_decorator
 
 
 class ResourceAvailability(Enum):
@@ -83,6 +101,7 @@ class ContributorState(Enum):
     DECEASED = 'deceased'
 
 
+@_register_model('contributor')
 class Contributor(LabelledResource):
     """Model for a contributor."""
 
@@ -218,6 +237,7 @@ class StoryStructure(BaseModel):
     pacing: WorkPacing
 
 
+@_register_model('location')
 class Location(ResourceBase):
     """Model for a location."""
 
@@ -239,6 +259,7 @@ class StorySetting(BaseModel):
     location_objs: list[Location] = Field(default_factory=list)
 
 
+@_register_model('character')
 class Character(ResourceBase):
     """A character in a story."""
 
@@ -305,6 +326,7 @@ class ChapterAnalysis(BaseModel):
         return f'part-{self.part}.chapter-{self.number}'
 
 
+@_register_model('quote')
 class Quote(ResourceBase):
     """A quote from a contributor."""
 
@@ -393,6 +415,7 @@ class GenreClassification(BaseModel):
     subgenres: list[str] = Field(default_factory=list)
 
 
+@_register_model('work')
 class Work(LabelledResource):
     """Model for a work."""
 
@@ -484,6 +507,7 @@ class WorkEditionType(Enum):
     ANNOTATED = 'annotated'  # With study notes
 
 
+@_register_model('work_edition')
 class WorkEdition(LabelledResource):
     """A edition for a work."""
 
@@ -559,6 +583,7 @@ class WorkEdition(LabelledResource):
         return statistics.mean(ratings)
 
 
+@_register_model('collection')
 class BookCollection(LabelledResource):
     """A collection of books."""
 
@@ -588,6 +613,7 @@ class BookCollection(LabelledResource):
         return statistics.mean(rated_ratings)
 
 
+@_register_model('publisher')
 class BookPublisher(ResourceBase):
     """Model for a publisher."""
 
@@ -624,6 +650,7 @@ class BookBinding(Enum):
     PDF_DRM = 'pdf-drm'
 
 
+@_register_model('book')
 class Book(LabelledResource):
     """A book."""
 
@@ -747,6 +774,7 @@ class Rating(BaseModel):
     note: str | None = None
 
 
+@_register_model('reading_session')
 class ReadingSession(LabelledResource):
     """A reading session."""
 
@@ -791,6 +819,7 @@ class ReadingSession(LabelledResource):
         return None if len(ratings) == 0 else statistics.mean(ratings)
 
 
+@_register_model('label')
 class Label(ResourceBase):
     """A label."""
 
@@ -808,7 +837,7 @@ class Label(ResourceBase):
     book_collection_objs: list[BookCollection] = Field(default_factory=list)
 
 
-class ReadingListItem(ResourceBase):
+class ReadingListItem(BaseModel):
     """A item in a reading list."""
 
     order: int
@@ -818,6 +847,7 @@ class ReadingListItem(ResourceBase):
     work_obj: Work | None = None
 
 
+@_register_model('reading_list')
 class ReadingList(LabelledResource):
     """A list of resources."""
 
@@ -909,6 +939,7 @@ class Availability(Enum):
     INDIRECTLY_AVAILABLE = 'indirectly'
 
 
+@_register_model('owner')
 class Owner(LabelledResource):
     """Model for a owner."""
 
@@ -920,7 +951,7 @@ class Owner(LabelledResource):
     book_objs: list[Book] = Field(default_factory=list)
 
 
-class SeriesItem(ResourceBase):
+class SeriesItem(BaseModel):
     """A item in a serie."""
 
     number: int
@@ -930,6 +961,7 @@ class SeriesItem(ResourceBase):
     work_obj: Work | None = None
 
 
+@_register_model('series')
 class Series(LabelledResource):
     """A serie of works."""
 
@@ -1003,4 +1035,4 @@ class Series(LabelledResource):
         return statistics.mean(rated_ratings)
 
 
-relac_models: dict[str, type[ResourceBase]] = {'contributor': Contributor}
+# relac_models: dict[str, type[ResourceBase]] = {'contributor': Contributor}
