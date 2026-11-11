@@ -2,9 +2,7 @@
 
 from typing import cast
 
-from relac.model import Contributor, ResourceBase
-
-_relac_objects: dict[str, type[ResourceBase]] = {'contributor': Contributor}
+from relac.model import ResourceBase, relac_models
 
 
 class DataStore[T: ResourceBase]:
@@ -36,7 +34,7 @@ class RelacDatabase:
         """Create empty dictionaries for the data."""
         self._data: dict[type[ResourceBase], DataStore] = {}
         # self._data[Contributor] = DataStore[Contributor]()
-        for relac_type in _relac_objects.values():
+        for relac_type in relac_models.values():
             self._data[relac_type] = DataStore[ResourceBase]()
 
     def add_object[T: ResourceBase](self, obj_id: str, obj: T) -> None:

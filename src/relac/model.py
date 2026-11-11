@@ -1001,3 +1001,6 @@ class Series(LabelledResource):
         if not rated_ratings:
             return None
         return statistics.mean(rated_ratings)
+
+
+relac_models: dict[str, type[ResourceBase]] = {'contributor': Contributor}
