@@ -1,4 +1,5 @@
 ---
+include: "_templates.yaml"
 #-------------------------------------------------------------------------------
 # Contributor
 #-------------------------------------------------------------------------------
@@ -106,7 +107,7 @@ work.john_williams__stoner:
         part: 1
         title: "First chapter"
         summary: "First __chapter__ tells a lot"
-        analysis: "[file:john_williams__stoner__chapter_1__analyse.md]"
+        analysis: "[file:stoner_ch1_analyse.md]"
       - number: 2
         part: 1
         title: "Second chapter"
