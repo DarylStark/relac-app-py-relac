@@ -129,7 +129,7 @@ def _build_search_index(  # noqa: PLR0912
             }
         )
 
-    for book in db.get_all(Book).values():
+    for book in db.get_all_values(Book):
         contributors = ', '.join(
             contributor.name for contributor in book.contributor_objs
         )
@@ -159,7 +159,7 @@ def _build_search_index(  # noqa: PLR0912
             [label.name for label in book.label_objs],
         )
 
-    for work in db.get_all(Work).values():
+    for work in db.get_all_values(Work):
         authors = ', '.join(author.name for author in work.author_objs)
         details = [
             f'Authors: {authors}' if authors else '',
@@ -206,7 +206,7 @@ def _build_search_index(  # noqa: PLR0912
                         [f'Work: {work.title}'],
                     )
 
-    for contributor in db.get_all(Contributor).values():
+    for contributor in db.get_all_values(Contributor):
         details = [
             f'Works: {", ".join(work.title for work in contributor.work_objs)}',
             f'Books: {", ".join(book.title for book in contributor.book_objs)}',
@@ -219,7 +219,7 @@ def _build_search_index(  # noqa: PLR0912
             labels=[label.name for label in contributor.label_objs],
         )
 
-    for character in db.get_all(Character).values():
+    for character in db.get_all_values(Character):
         work_titles = [link.title for link in character.work_objs if link]
         details = [
             f'Birthplace: {character.birthplace}',
@@ -233,7 +233,7 @@ def _build_search_index(  # noqa: PLR0912
             [detail for detail in details if detail],
         )
 
-    for location in db.get_all(Location).values():
+    for location in db.get_all_values(Location):
         work_titles = [work.title for work in location.work_objs]
         details = [
             f'Country: {location.country}' if location.country else '',
@@ -249,7 +249,7 @@ def _build_search_index(  # noqa: PLR0912
             [detail for detail in details if detail],
         )
 
-    for edition in db.get_all(WorkEdition).values():
+    for edition in db.get_all_values(WorkEdition):
         details = [
             f'Work: {edition.work_obj.title}' if edition.work_obj else '',
             f'Release date: {edition.release_date}'
@@ -269,7 +269,7 @@ def _build_search_index(  # noqa: PLR0912
             labels=[label.name for label in edition.label_objs],
         )
 
-    for collection in db.get_all(BookCollection).values():
+    for collection in db.get_all_values(BookCollection):
         details = [
             f'Books: {", ".join(book.title for book in collection.book_objs)}'
         ]
@@ -281,7 +281,7 @@ def _build_search_index(  # noqa: PLR0912
             labels=[label.name for label in collection.label_objs],
         )
 
-    for owner in db.get_all(Owner).values():
+    for owner in db.get_all_values(Owner):
         details = [
             f'Type: {_format_enum_label(owner.owner_type.value)}',
             f'Availability: {_format_enum_label(owner.availability.value)}',
@@ -295,7 +295,7 @@ def _build_search_index(  # noqa: PLR0912
             labels=[label.name for label in owner.label_objs],
         )
 
-    for reading_list in db.get_all(ReadingList).values():
+    for reading_list in db.get_all_values(ReadingList):
         work_titles = [
             item.work_obj.title for item in reading_list.works if item.work_obj
         ]
@@ -308,7 +308,7 @@ def _build_search_index(  # noqa: PLR0912
             labels=[label.name for label in reading_list.label_objs],
         )
 
-    for series in db.get_all(Series).values():
+    for series in db.get_all_values(Series):
         work_titles = [
             item.work_obj.title for item in series.works if item.work_obj
         ]
@@ -321,7 +321,7 @@ def _build_search_index(  # noqa: PLR0912
             labels=[label.name for label in series.label_objs],
         )
 
-    for reading_session in db.get_all(ReadingSession).values():
+    for reading_session in db.get_all_values(ReadingSession):
         work_edition_title = (
             reading_session.work_edition_obj.title
             if reading_session.work_edition_obj
@@ -364,7 +364,7 @@ def _build_search_index(  # noqa: PLR0912
             labels=[label.name for label in reading_session.label_objs],
         )
 
-    for label in db.get_all(Label).values():
+    for label in db.get_all_values(Label):
         add_entry('Label', label.id, label.name, [])
 
     return {'items': entries}
@@ -421,7 +421,7 @@ def create(  # noqa: PLR0912, PLR0915
     if 'books' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['books'])
         html = template.render(
-            books=db.get_all(Book).values(),
+            books=db.get_all_values(Book),
         )
         out_path = output / 'books.html'
         out_path.write_text(html)
@@ -429,7 +429,7 @@ def create(  # noqa: PLR0912, PLR0915
     if 'works' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['works'])
         html = template.render(
-            works=db.get_all(Work).values(),
+            works=db.get_all_values(Work),
         )
         out_path = output / 'works.html'
         out_path.write_text(html)
@@ -437,7 +437,7 @@ def create(  # noqa: PLR0912, PLR0915
     if 'work_editions' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['work_editions'])
         html = template.render(
-            work_editions=db.get_all(WorkEdition).values(),
+            work_editions=db.get_all_values(WorkEdition),
         )
         out_path = output / 'work-editions.html'
         out_path.write_text(html)
@@ -445,7 +445,7 @@ def create(  # noqa: PLR0912, PLR0915
     if 'series' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['series'])
         html = template.render(
-            series=db.get_all(Series).values(),
+            series=db.get_all_values(Series),
         )
         out_path = output / 'series.html'
         out_path.write_text(html)
@@ -453,27 +453,27 @@ def create(  # noqa: PLR0912, PLR0915
     if 'contributors' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['contributors'])
         html = template.render(
-            contributors=db.get_all(Contributor).values(),
+            contributors=db.get_all_values(Contributor),
         )
         out_path = output / 'contributors.html'
         out_path.write_text(html)
 
     if 'characters' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['characters'])
-        html = template.render(characters=db.get_all(Character).values())
+        html = template.render(characters=db.get_all_values(Character))
         out_path = output / 'characters.html'
         out_path.write_text(html)
 
     if 'locations' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['locations'])
-        html = template.render(locations=db.get_all(Location).values())
+        html = template.render(locations=db.get_all_values(Location))
         out_path = output / 'locations.html'
         out_path.write_text(html)
 
     if 'labels' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['labels'])
         html = template.render(
-            labels=db.get_all(Label).values(),
+            labels=db.get_all_values(Label),
         )
         out_path = output / 'labels.html'
         out_path.write_text(html)
@@ -481,7 +481,7 @@ def create(  # noqa: PLR0912, PLR0915
     if 'owners' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['owners'])
         html = template.render(
-            owners=db.get_all(Owner).values(),
+            owners=db.get_all_values(Owner),
         )
         out_path = output / 'owners.html'
         out_path.write_text(html)
@@ -489,7 +489,7 @@ def create(  # noqa: PLR0912, PLR0915
     if 'collections' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['collections'])
         html = template.render(
-            collections=db.get_all(BookCollection).values(),
+            collections=db.get_all_values(BookCollection),
         )
         out_path = output / 'collections.html'
         out_path.write_text(html)
@@ -497,7 +497,7 @@ def create(  # noqa: PLR0912, PLR0915
     if 'lists' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['lists'])
         html = template.render(
-            lists=db.get_all(ReadingList).values(),
+            lists=db.get_all_values(ReadingList),
         )
         out_path = output / 'lists.html'
         out_path.write_text(html)
@@ -505,14 +505,14 @@ def create(  # noqa: PLR0912, PLR0915
     if 'reading_sessions' in metadata.index_pages:
         template = env.get_template(metadata.index_pages['reading_sessions'])
         html = template.render(
-            reading_sessions=db.get_all(ReadingSession).values(),
+            reading_sessions=db.get_all_values(ReadingSession),
         )
         out_path = output / 'reading-sessions.html'
         out_path.write_text(html)
 
     # Books
     if 'book' in metadata.resource_pages:
-        for book in db.get_all(Book).values():
+        for book in db.get_all_values(Book):
             template = env.get_template(metadata.resource_pages['book'])
             html = template.render(book=book)
             out_path = output / f'{book.id}.html'
@@ -520,7 +520,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Contributors
     if 'contributor' in metadata.resource_pages:
-        for contributor in db.get_all(Contributor).values():
+        for contributor in db.get_all_values(Contributor):
             template = env.get_template(metadata.resource_pages['contributor'])
             html = template.render(contributor=contributor)
             out_path = output / f'{contributor.id}.html'
@@ -528,7 +528,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Locations
     if 'location' in metadata.resource_pages:
-        for location in db.get_all(Location).values():
+        for location in db.get_all_values(Location):
             template = env.get_template(metadata.resource_pages['location'])
             html = template.render(location=location)
             out_path = output / f'{location.id}.html'
@@ -536,7 +536,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Characters
     if 'character' in metadata.resource_pages:
-        for character in db.get_all(Character).values():
+        for character in db.get_all_values(Character):
             template = env.get_template(metadata.resource_pages['character'])
             html = template.render(character=character)
             out_path = output / f'{character.id}.html'
@@ -544,7 +544,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Labels
     if 'label' in metadata.resource_pages:
-        for label in db.get_all(Label).values():
+        for label in db.get_all_values(Label):
             template = env.get_template(metadata.resource_pages['label'])
             html = template.render(label=label)
             out_path = output / f'{label.id}.html'
@@ -552,7 +552,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Owners
     if 'owner' in metadata.resource_pages:
-        for owner in db.get_all(Owner).values():
+        for owner in db.get_all_values(Owner):
             template = env.get_template(metadata.resource_pages['owner'])
             html = template.render(owner=owner)
             out_path = output / f'{owner.id}.html'
@@ -560,8 +560,8 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Works
     if 'work' in metadata.resource_pages:
-        reading_lists = db.get_all(ReadingList).values()
-        for work in db.get_all(Work).values():
+        reading_lists = db.get_all_values(ReadingList)
+        for work in db.get_all_values(Work):
             template = env.get_template(metadata.resource_pages['work'])
             matching_reading_lists = [
                 reading_list
@@ -652,7 +652,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Work editions
     if 'work_edition' in metadata.resource_pages:
-        for work_edition in db.get_all(WorkEdition).values():
+        for work_edition in db.get_all_values(WorkEdition):
             template = env.get_template(metadata.resource_pages['work_edition'])
             html = template.render(work_edition=work_edition)
             out_path = output / f'{work_edition.id}.html'
@@ -660,7 +660,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Collections
     if 'collection' in metadata.resource_pages:
-        for collection in db.get_all(BookCollection).values():
+        for collection in db.get_all_values(BookCollection):
             template = env.get_template(metadata.resource_pages['collection'])
             html = template.render(collection=collection)
             out_path = output / f'{collection.id}.html'
@@ -668,7 +668,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Lists
     if 'list' in metadata.resource_pages:
-        for lst in db.get_all(ReadingList).values():
+        for lst in db.get_all_values(ReadingList):
             template = env.get_template(metadata.resource_pages['list'])
             html = template.render(list=lst)
             out_path = output / f'{lst.id}.html'
@@ -676,7 +676,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Series
     if 'series' in metadata.resource_pages:
-        for series in db.get_all(Series).values():
+        for series in db.get_all_values(Series):
             template = env.get_template(metadata.resource_pages['series'])
             html = template.render(series=series)
             out_path = output / f'{series.id}.html'
@@ -684,7 +684,7 @@ def create(  # noqa: PLR0912, PLR0915
 
     # Reading sessions
     if 'reading_session' in metadata.resource_pages:
-        for reading_session in db.get_all(ReadingSession).values():
+        for reading_session in db.get_all_values(ReadingSession):
             template = env.get_template(
                 metadata.resource_pages['reading_session']
             )
