@@ -4,14 +4,14 @@ from typing import Any
 
 from relac.exceptions import UnknownObjectTypeError
 
+from .database import Database
 from .model import ResourceBase, relac_models
-from .relac_database import RelacDatabase
 
 
 class DataImporter:
     """Imports data from a `data` dictionary into the database."""
 
-    def __init__(self, database: RelacDatabase) -> None:
+    def __init__(self, database: Database) -> None:
         """Set values."""
         self._database = database
 

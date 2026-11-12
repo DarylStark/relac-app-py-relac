@@ -4,6 +4,7 @@ from typing import ClassVar
 
 import pytest
 
+from relac.database import Database, DataStore
 from relac.exceptions import (
     DuplicateIdError,
     ObjectNotFoundError,
@@ -22,12 +23,11 @@ from relac.model import (
     Work,
     WorkCharacter,
 )
-from relac.relac_database import DataStore, RelacDatabase
 
 
 def test_adding_one_contributor() -> None:
     """Test if we can add one contributor."""
-    db = RelacDatabase()
+    db = Database()
     contrib_id = 'contributor.testcontrib'
     contrib = Contributor(name='TestContrib')
 
@@ -40,7 +40,7 @@ def test_adding_one_contributor() -> None:
 
 def test_adding_more_contributors() -> None:
     """Test if we can add more then one contributor."""
-    db = RelacDatabase()
+    db = Database()
 
     for idx in range(0, 10):
         contrib_id = f'contributor.testcontrib_{idx}'
@@ -57,7 +57,7 @@ def test_adding_more_contribs_same_id() -> None:
 
     Should raise an error
     """
-    db = RelacDatabase()
+    db = Database()
     contrib_id = 'contributor.testcontrib'
     contrib = Contributor(name='TestContrib')
 
@@ -72,7 +72,7 @@ def test_resolving_fields_many_to_many() -> None:
 
     class IncorrectModel(ResourceBase): ...
 
-    db = RelacDatabase()
+    db = Database()
     db.add_object('label.test_label_1', Label(name='test_label_1'))
     db.add_object('label.test_label_2', Label(name='test_label_2'))
     db.add_object('label.test_label_3', Label(name='test_label_3'))
@@ -115,7 +115,7 @@ def test_resolving_fields_one_to_many() -> None:
             )
         ]
 
-    db = RelacDatabase()
+    db = Database()
     contributor = Contributor(name='TestContrib', labels=[])
     quote = QuoteReference(contributor='contributor.testcontrib')
     db.add_object('contributor.testcontrib', contributor)
@@ -130,7 +130,7 @@ def test_resolving_fields_one_to_many() -> None:
 
 def test_resolving_nested_work_character_relationships() -> None:
     """Resolve character IDs and the owning work for nested appearances."""
-    db = RelacDatabase()
+    db = Database()
     character = Character(id='character.test', name='Test Character')
     work_character = WorkCharacter(character='character.test')
     work = Work(
@@ -152,14 +152,14 @@ def test_resolving_nested_work_character_relationships() -> None:
 
 def test_retrieving_invalid_relac_config() -> None:
     """Test if we get an error when retrieving invalid RelacConfig."""
-    db = RelacDatabase()
+    db = Database()
     with pytest.raises(RelacConfigNotSetError):
         db.get_relac_config()
 
 
 def test_retrieving_invalid_relac_id() -> None:
     """Test if we get an error when retrieving invalid RelacConfig."""
-    db = RelacDatabase()
+    db = Database()
     db.add_object('relac.wrong_id', RelacConfig(title='test_config'))
     with pytest.raises(RelacConfigNotSetError):
         db.get_relac_config()
@@ -167,7 +167,7 @@ def test_retrieving_invalid_relac_id() -> None:
 
 def test_retrieving_valid_relac_config() -> None:
     """Test if we get the correct RelacConfig."""
-    db = RelacDatabase()
+    db = Database()
     db.add_object('relac', RelacConfig(title='test_config'))
     config = db.get_relac_config()
     assert config.title == 'test_config'
@@ -178,20 +178,20 @@ def test_adding_invalid_object_type() -> None:
 
     class TestClass(ResourceBase): ...
 
-    db = RelacDatabase()
+    db = Database()
     with pytest.raises(UnknownObjectTypeAddedError):
         db.add_object('testclass.test', TestClass())
 
 
 def test_retrieving_invalid_object_type() -> None:
     """Test if we get an error when retrieving invalid object types."""
-    db = RelacDatabase()
+    db = Database()
     with pytest.raises(UnknownObjectTypeRequestedError):
         db.get_one('testclass.test')
 
 
 def test_retrieving_non_existing_object() -> None:
     """Test if we get an error when retrieving a non-existing object."""
-    db = RelacDatabase()
+    db = Database()
     with pytest.raises(ObjectNotFoundError):
         db.get_one('contributor.non_existing')

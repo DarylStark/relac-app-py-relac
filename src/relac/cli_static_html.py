@@ -14,6 +14,7 @@ from markupsafe import Markup
 from pycountry import countries, languages
 from typer import Context, Option, Typer
 
+from relac.database import Database
 from relac.model import (
     Book,
     BookCollection,
@@ -28,7 +29,6 @@ from relac.model import (
     Work,
     WorkEdition,
 )
-from relac.relac_database import RelacDatabase
 from relac.theme import RelacTheme
 
 _MARKDOWN = MarkdownIt('commonmark', {'html': False})
@@ -93,7 +93,7 @@ def _code_to_country(country_code: str | None) -> str:
 
 
 def _build_search_index(  # noqa: PLR0912
-    db: RelacDatabase,
+    db: Database,
 ) -> dict[str, list[dict[str, str | list[str]]]]:
     """Build the client-side search data for every linked resource."""
     entries: list[dict[str, str | list[str]]] = []
@@ -381,7 +381,7 @@ def create(  # noqa: PLR0912, PLR0915
     ),
 ) -> None:
     """Create the Static HTML page."""
-    db: RelacDatabase = ctx.obj.database
+    db: Database = ctx.obj.database
 
     theme_module = 'relac_theme_default'  # TODO: Make this configurable
 

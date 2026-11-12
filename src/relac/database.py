@@ -41,7 +41,7 @@ class DataStore[T: ResourceBase]:
     def _resolve_item(
         self,
         item: ResourceBase,
-        database: RelacDatabase,
+        database: Database,
         parent_item: ResourceBase | None = None,
     ) -> None:
         """Resolve the resolvable items for a object."""
@@ -63,7 +63,7 @@ class DataStore[T: ResourceBase]:
                     parent_item if parent_item else item,
                 )
 
-    def resolve_all(self, database: RelacDatabase) -> None:
+    def resolve_all(self, database: Database) -> None:
         """Resolve all fields in all objects."""
         items_with_resolvable = [
             v
@@ -77,7 +77,7 @@ class DataStore[T: ResourceBase]:
         self,
         item: ResourceBase,
         field: ResolvableField,
-        database: RelacDatabase,
+        database: Database,
         parent_item: ResourceBase | None = None,
     ) -> None:
         obj_id = getattr(item, field.source_field)
@@ -112,7 +112,7 @@ class DataStore[T: ResourceBase]:
         self,
         item: ResourceBase,
         field: ResolvableField,
-        database: RelacDatabase,
+        database: Database,
         parent_item: ResourceBase | None = None,
     ) -> None:
         obj_value = getattr(item, field.source_field, None)
@@ -128,7 +128,7 @@ class DataStore[T: ResourceBase]:
         self,
         item: ResourceBase,
         field: ResolvableField,
-        database: RelacDatabase,
+        database: Database,
         parent_item: ResourceBase | None = None,
     ) -> None:
         """Resolve one field on an object."""
@@ -139,7 +139,7 @@ class DataStore[T: ResourceBase]:
         self._resolve_field_many_to_many(item, field, database, parent_item)
 
 
-class RelacDatabase:
+class Database:
     """The database with the real objects."""
 
     def __init__(self) -> None:

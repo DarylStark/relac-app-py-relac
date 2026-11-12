@@ -1,7 +1,7 @@
 """Module with the Relac class."""
 
 from .data_importer import DataImporter
-from .relac_database import RelacDatabase
+from .database import Database
 from .repo_loader import RepoLoader
 
 
@@ -11,7 +11,7 @@ class Relac:
     def __init__(self, repo_loader: RepoLoader) -> None:
         """Configure the class."""
         self._repo_loader = repo_loader
-        self._database = RelacDatabase()
+        self._database = Database()
         self._importer = DataImporter(self._database)
 
     def import_data(self) -> None:
@@ -21,6 +21,6 @@ class Relac:
         self._database.resolve_all()
 
     @property
-    def database(self) -> RelacDatabase:
+    def database(self) -> Database:
         """Property for the database."""
         return self._database

@@ -16,6 +16,7 @@ from relac.cli_static_html import (
     _format_isbn,
     _render_markdown,
 )
+from relac.database import Database
 from relac.main import app
 from relac.model import (
     Availability,
@@ -47,7 +48,6 @@ from relac.model import (
     WorkStructure,
     WorkType,
 )
-from relac.relac_database import RelacDatabase
 
 
 def test_calculate_age_before_birthday() -> None:
@@ -198,7 +198,7 @@ def test_unset_narrator_reliability_is_not_displayed() -> None:
 
 def test_build_search_index_includes_book_metadata_and_url() -> None:
     """Include book labels, ID, related contributor, ISBN, and URL."""
-    database = RelacDatabase()
+    database = Database()
     contributor = Contributor(id='jane_doe', name='Jane Doe')
     label = Label(id='science_fiction', name='Science Fiction')
     book = Book(
@@ -245,7 +245,7 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
 
 def test_build_search_index_handles_book_without_isbn() -> None:
     """Do not index a missing ISBN as text or display it as a detail."""
-    database = RelacDatabase()
+    database = Database()
     book = Book(id='missing_isbn', title='No ISBN Book')
     database.add_object('missing_isbn', book)
 
@@ -263,7 +263,7 @@ def test_build_search_index_handles_book_without_isbn() -> None:
 
 def test_build_search_index_includes_work_genres() -> None:
     """Include a work's primary genre and subgenres in search metadata."""
-    database = RelacDatabase()
+    database = Database()
     work = Work(
         id='literary_work',
         title='Literary Work',
@@ -292,7 +292,7 @@ def test_build_search_index_includes_work_genres() -> None:
 
 def test_build_search_index_includes_reading_session_details() -> None:
     """Include reading-session metadata and its detail-page URL in search."""
-    database = RelacDatabase()
+    database = Database()
     book = Book(
         id='test_book',
         isbn13=9781234567897,
@@ -333,7 +333,7 @@ def test_build_search_index_includes_characters_locations_and_titled_chapters() 
     None
 ):
     """Index characters, locations, and only titled chapter analyses."""
-    database = RelacDatabase()
+    database = Database()
     work = Work(
         id='the_tide',
         title='The Tide',
@@ -1439,7 +1439,7 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
 
 def test_build_search_index_includes_owner_metadata_and_url() -> None:
     """Include an owner's type, availability, books, and page URL."""
-    database = RelacDatabase()
+    database = Database()
     book = Book(
         id='glass_hotel',
         isbn13=9781982137984,
@@ -1479,7 +1479,7 @@ def test_build_search_index_includes_owner_metadata_and_url() -> None:
 
 def test_build_search_index_includes_series_and_url() -> None:
     """Include series names and generated detail page URLs."""
-    database = RelacDatabase()
+    database = Database()
     series = Series(id='the_housemaid', name='The Housemaid')
     database.add_object('the_housemaid', series)
 
