@@ -2,7 +2,7 @@
 
 from typing import cast
 
-from relac.model import ResourceBase, relac_models
+from relac.model import ResolvableField, ResourceBase, relac_models
 
 
 class DataStore[T: ResourceBase]:
@@ -32,39 +32,46 @@ class DataStore[T: ResourceBase]:
 
     def resolve_all(self, database: RelacDatabase) -> None:
         """Resolve all fields in all objects."""
-        for item in self._data.values():
-            resolvable_fields = item.resolvable_fields
-            for field in resolvable_fields:
-                source_field = getattr(item, field.source_field)
-                destination_field = getattr(item, field.destination_field)
+        items_with_resolvable = [
+            v for v in self._data.values() if 'resolvable_fields' in dir(v)
+        ]
+        for item in items_with_resolvable:
+            for field in getattr(item, 'resolvable_fields', []):
+                self._resolve_field(item, field, database)
 
-                source_type = field.type.split('-', maxsplit=3)[0]
-                destination_type = field.type.split('-', maxsplit=3)[2]
+    def _resolve_field_many_to_many(
+        self,
+        item: ResourceBase,
+        field: ResolvableField,
+        database: RelacDatabase,
+    ) -> None:
+        related_obj = database.get_one(getattr(item, field.source_field))
+        setattr(item, field.destination_field, related_obj)
+        getattr(related_obj, field.populates_back).append(item)
 
-                if source_type == 'many':
-                    for obj_id in source_field:
-                        related_obj = database.get_one(obj_id)
-                        destination_field.append(related_obj)
+    def _resolve_field_on_to_many(
+        self,
+        item: ResourceBase,
+        field: ResolvableField,
+        database: RelacDatabase,
+    ) -> None:
+        for obj_id in getattr(item, field.source_field):
+            related_obj = database.get_one(obj_id)
+            getattr(item, field.destination_field).append(related_obj)
+            getattr(related_obj, field.populates_back).append(item)
 
-                        if destination_type == 'many':
-                            backpopulates_field = getattr(
-                                related_obj, field.populates_back
-                            )
-                            backpopulates_field.append(item)
-                        if destination_type == 'one':
-                            setattr(related_obj, field.populates_back, item)
+    def _resolve_field(
+        self,
+        item: ResourceBase,
+        field: ResolvableField,
+        database: RelacDatabase,
+    ) -> None:
+        """Resolve one field on an object."""
+        if field.type == 'one-to-many':
+            self._resolve_field_many_to_many(item, field, database)
+            return
 
-                if source_type == 'one':
-                    related_obj = database.get_one(source_field)
-                    setattr(item, destination_field, related_obj)
-
-                    if destination_type == 'many':
-                        backpopulates_field = getattr(
-                            related_obj, field.populates_back
-                        )
-                        backpopulates_field.append(item)
-                    if destination_type == 'one':
-                        setattr(related_obj, field.populates_back, item)
+        self._resolve_field_on_to_many(item, field, database)
 
 
 class RelacDatabase:

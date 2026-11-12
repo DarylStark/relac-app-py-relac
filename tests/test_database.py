@@ -1,9 +1,16 @@
 """Tests for the database."""
 
+from typing import ClassVar
+
 import pytest
 
-from relac.model import Contributor, Label, ResourceBase
-from relac.relac_database import RelacDatabase
+from relac.model import (
+    Contributor,
+    Label,
+    ResolvableField,
+    ResourceBase,
+)
+from relac.relac_database import DataStore, RelacDatabase
 
 
 def test_adding_one_contributor() -> None:
@@ -79,3 +86,31 @@ def test_resolving_fields_many_to_many() -> None:
 
     labels = db.get_all(Label)
     assert len(labels['label.test_label_1'].book_objs) == 1
+
+
+def test_resolving_fields_one_to_many() -> None:
+    """Test if one-to-many fields resolve in both directions."""
+
+    class QuoteReference(ResourceBase):
+        contributor: str
+        contributor_obj: Contributor | None = None
+        resolvable_fields: ClassVar[list[ResolvableField]] = [
+            ResolvableField(
+                'contributor',
+                'contributor_obj',
+                'one-to-many',
+                'quote_objs',
+            )
+        ]
+
+    db = RelacDatabase()
+    contributor = Contributor(name='TestContrib', labels=[])
+    quote = QuoteReference(contributor='contributor.testcontrib')
+    db.add_object('contributor.testcontrib', contributor)
+    quotes = DataStore[QuoteReference]()
+    quotes.add('quote.testquote', quote)
+
+    quotes.resolve_all(db)
+
+    assert quote.contributor_obj is contributor
+    assert contributor.quote_objs == [quote]

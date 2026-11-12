@@ -82,13 +82,7 @@ class ResolvableField:
     populates_back: str
 
 
-class WithResolvableFields:
-    """Base class for models with resolvable fields."""
-
-    resolvable_fields: ClassVar[list[ResolvableField]] = []
-
-
-class ResourceBase(BaseModel, WithResolvableFields):
+class ResourceBase(BaseModel):
     """Base model for resources."""
 
     id: str | None = Field(default=None, exclude=False)
