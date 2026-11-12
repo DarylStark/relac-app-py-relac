@@ -78,8 +78,8 @@ class ResolvableField:
 
     source_field: str
     destination_field: str
-    type: Literal['many-to-many', 'one-to-many']
-    populates_back: str
+    type: Literal['many-to-many', 'one-to-many', 'one-to-none']
+    populates_back: str | None = None
 
 
 class ResourceBase(BaseModel):
@@ -91,7 +91,7 @@ class ResourceBase(BaseModel):
 class LabelledResource(ResourceBase):
     """Base model for labelled resources."""
 
-    labels: list[str] | None = None
+    labels: list[str] = Field(default_factory=list)
 
     # Relation (real objects)
     label_objs: list[Label] = Field(default_factory=list, exclude=True)
@@ -138,7 +138,9 @@ class Contributor(LabelledResource):
 
     # Resolve definitions
     resolvable_fields: ClassVar[list[ResolvableField]] = [
-        ResolvableField('labels', 'label_objs', 'many-to-many', 'book_objs'),
+        ResolvableField(
+            'labels', 'label_objs', 'many-to-many', 'contributor_objs'
+        ),
     ]
 
     def _get_works_with_specific_reading_state(
@@ -289,10 +291,17 @@ class Character(ResourceBase):
     description: str | None = None
 
     # Relation (real objects)
-    work_character_objs: list[WorkCharacter] = Field(
-        default_factory=list, exclude=True
-    )
+    work_objs: list[Work] = Field(default_factory=list, exclude=True)
     quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
+
+    @property
+    def work_character_objs(self) -> list[WorkCharacter]:
+        """Get all Work Character objects for this character."""
+        rv: list[WorkCharacter] = list()
+        for work_obj in self.work_objs:
+            if work_obj.literary_analysis:
+                rv.extend(work_obj.literary_analysis.characters or [])
+        return rv
 
 
 class CharacterRole(Enum):
@@ -327,6 +336,13 @@ class WorkCharacter(BaseModel):
     # Relation (real objects)
     character_obj: Character | None = Field(default=None, exclude=True)
     work_obj: Work | None = Field(default=None, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'character', 'character_obj', 'one-to-many', 'work_objs'
+        )
+    ]
 
 
 class ChapterAnalysis(BaseModel):
@@ -410,6 +426,10 @@ class Narrator(BaseModel):
     # Relation (real objects)
     character_obj: Character | None = Field(default=None, exclude=True)
 
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('character', 'character_obj', 'one-to-none')
+    ]
+
 
 class LiteraryAnalysis(BaseModel):
     """Model for a works literary analysis."""
@@ -426,6 +446,11 @@ class LiteraryAnalysis(BaseModel):
 
     # Relation (real objects)
     quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('quotes', 'quote_objs', 'many-to-many', 'work_objs'),
+    ]
+    resolvable_children: ClassVar[tuple[str, ...]] = ('characters', 'narrator')
 
 
 class PrimaryGenre(Enum):
@@ -464,6 +489,13 @@ class Work(LabelledResource):
     edition_objs: list[WorkEdition] = Field(default_factory=list, exclude=True)
     book_objs: list[Book] = Field(default_factory=list, exclude=True)
     series_objs: list[Series] = Field(default_factory=list, exclude=True)
+    quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('authors', 'author_objs', 'many-to-many', 'work_objs')
+    ]
+    resolvable_children: ClassVar[tuple[str, ...]] = ('literary_analysis',)
 
     # Properties
     @property
@@ -563,6 +595,23 @@ class WorkEdition(LabelledResource):
         default_factory=list, exclude=True
     )
 
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('work', 'work_obj', 'one-to-many', 'edition_objs'),
+        ResolvableField(
+            'illustrators',
+            'illustrator_objs',
+            'many-to-many',
+            'illustrator_work_edition_objs',
+        ),
+        ResolvableField(
+            'translators',
+            'translator_objs',
+            'many-to-many',
+            'translator_work_edition_objs',
+        ),
+    ]
+
     # Properties
     @property
     def availability(self) -> ResourceAvailability:
@@ -629,6 +678,10 @@ class BookCollection(LabelledResource):
 
     # Relations (real objects)
     book_objs: list[Book] = Field(default_factory=list, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('books', 'book_objs', 'many-to-many', 'collection_objs')
+    ]
 
     def owned_percentage(self, owner: Owner | None) -> float:
         """Get the percentage of books owned by the specified owner."""
@@ -714,6 +767,16 @@ class Book(LabelledResource):
     reading_session_objs: list[ReadingSession] = Field(
         default_factory=list, exclude=True
     )
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'publisher', 'publisher_obj', 'one-to-many', 'book_objs'
+        ),
+        ResolvableField(
+            'work_editions', 'work_edition_objs', 'many-to-many', 'book_objs'
+        ),
+        ResolvableField('owners', 'owner_objs', 'many-to-many', 'book_objs'),
+    ]
 
     # Properties
     @property
@@ -836,6 +899,18 @@ class ReadingSession(LabelledResource):
     work_edition_obj: WorkEdition | None = Field(default=None, exclude=True)
     book_obj: Book | None = Field(default=None, exclude=True)
 
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'work_edition',
+            'work_edition_obj',
+            'one-to-many',
+            'reading_session_objs',
+        ),
+        ResolvableField(
+            'book', 'book_obj', 'one-to-many', 'reading_session_objs'
+        ),
+    ]
+
     @property
     def effective_enddate(self) -> date | None:
         """Get the end date, using today for an active reading session."""
@@ -901,6 +976,11 @@ class ReadingListItem(BaseModel):
     # Relationships (real objects)
     work_obj: Work | None = Field(default=None, exclude=True)
 
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('work', 'work_obj', 'one-to-none'),
+    ]
+
 
 @_register_model('reading_list')
 class ReadingList(LabelledResource):
@@ -908,6 +988,8 @@ class ReadingList(LabelledResource):
 
     name: str
     works: list[ReadingListItem] = Field(default_factory=list)
+
+    resolvable_children: ClassVar[tuple[str, ...]] = ('works',)
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -1014,6 +1096,12 @@ class SeriesItem(BaseModel):
 
     # Relationships (real objects)
     work_obj: Work | None = Field(default=None, exclude=True)
+    series_obj: Series | None = Field(default=None, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('work', 'work_obj', 'one-to-many', 'series_objs'),
+    ]
 
 
 @_register_model('series')
@@ -1022,6 +1110,8 @@ class Series(LabelledResource):
 
     name: str
     works: list[SeriesItem] = Field(default_factory=list)
+
+    resolvable_children: ClassVar[tuple[str, ...]] = ('works',)
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState

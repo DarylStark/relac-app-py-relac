@@ -323,10 +323,9 @@ class Database:
         obj.character_obj = character_obj
         obj.work_obj = work_obj
         if not any(
-            work_character is obj
-            for work_character in character_obj.work_character_objs
+            work_character is obj for work_character in character_obj.work_objs
         ):
-            character_obj.work_character_objs.append(obj)
+            character_obj.work_objs.append(obj)
 
     def _converge_quotes(self) -> None:
         """Converge Owners objects."""

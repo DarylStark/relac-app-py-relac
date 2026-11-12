@@ -352,9 +352,7 @@ def test_build_search_index_includes_characters_locations_and_titled_chapters() 
         name='The Narrator',
         birthplace='Old Harbor',
         birthcountry='US',
-        work_character_objs=[
-            WorkCharacter(character='the_narrator', work_obj=work)
-        ],
+        work_objs=[WorkCharacter(character='the_narrator', work_obj=work)],
     )
     location = Location(
         id='old_harbor',

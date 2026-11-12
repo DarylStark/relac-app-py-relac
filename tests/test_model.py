@@ -266,11 +266,11 @@ def test_character_resolves_work_appearances() -> None:
         database.add_work(f'work-{index}', work)
     database.converge()
 
-    assert len(character.work_character_objs) == 2
+    assert len(character.work_objs) == 2
     assert all(
         work_character is expected_link
         for work_character, expected_link in zip(
-            character.work_character_objs, work_characters, strict=True
+            character.work_objs, work_characters, strict=True
         )
     )
     assert all(

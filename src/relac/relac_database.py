@@ -30,48 +30,86 @@ class DataStore[T: ResourceBase]:
         """Retrieve all objects from the database."""
         return self._data
 
+    def _resolve_item(
+        self,
+        item: ResourceBase,
+        database: RelacDatabase,
+        parent_item: ResourceBase | None = None,
+    ) -> None:
+        """Resolve the resolvable items for a object."""
+        for field in getattr(item, 'resolvable_fields', []):
+            self._resolve_field(item, field, database, parent_item)
+        for obj in getattr(item, 'resolvable_children', []):
+            values = getattr(item, obj)
+            if not isinstance(values, list):
+                values = [values]
+            for obj_to_resolve in values:
+                self._resolve_item(
+                    obj_to_resolve,
+                    database,
+                    parent_item if parent_item else item,
+                )
+
     def resolve_all(self, database: RelacDatabase) -> None:
         """Resolve all fields in all objects."""
         items_with_resolvable = [
-            v for v in self._data.values() if 'resolvable_fields' in dir(v)
+            v
+            for v in self._data.values()
+            if 'resolvable_fields' in dir(v) or 'resolvable_children' in dir(v)
         ]
         for item in items_with_resolvable:
-            for field in getattr(item, 'resolvable_fields', []):
-                self._resolve_field(item, field, database)
+            self._resolve_item(item, database)
+
+    def _resolve_field_one_to_many(
+        self,
+        item: ResourceBase,
+        field: ResolvableField,
+        database: RelacDatabase,
+        parent_item: ResourceBase | None = None,
+    ) -> None:
+        obj_id = getattr(item, field.source_field)
+        if obj_id is None:
+            return
+
+        related_obj = database.get_one(obj_id)
+        setattr(item, field.destination_field, related_obj)
+        if field.populates_back:
+            if parent_item:
+                item = parent_item
+            getattr(related_obj, field.populates_back).append(item)
 
     def _resolve_field_many_to_many(
         self,
         item: ResourceBase,
         field: ResolvableField,
         database: RelacDatabase,
+        parent_item: ResourceBase | None = None,
     ) -> None:
-        related_obj = database.get_one(getattr(item, field.source_field))
-        setattr(item, field.destination_field, related_obj)
-        getattr(related_obj, field.populates_back).append(item)
+        obj_value = getattr(item, field.source_field, None)
+        if not obj_value:
+            return
 
-    def _resolve_field_on_to_many(
-        self,
-        item: ResourceBase,
-        field: ResolvableField,
-        database: RelacDatabase,
-    ) -> None:
-        for obj_id in getattr(item, field.source_field):
+        for obj_id in obj_value:
             related_obj = database.get_one(obj_id)
             getattr(item, field.destination_field).append(related_obj)
-            getattr(related_obj, field.populates_back).append(item)
+            if field.populates_back:
+                if parent_item:
+                    item = parent_item
+                getattr(related_obj, field.populates_back).append(item)
 
     def _resolve_field(
         self,
         item: ResourceBase,
         field: ResolvableField,
         database: RelacDatabase,
+        parent_item: ResourceBase | None = None,
     ) -> None:
         """Resolve one field on an object."""
-        if field.type == 'one-to-many':
-            self._resolve_field_many_to_many(item, field, database)
+        if field.type in ('one-to-many', 'one-to-none'):
+            self._resolve_field_one_to_many(item, field, database, parent_item)
             return
 
-        self._resolve_field_on_to_many(item, field, database)
+        self._resolve_field_many_to_many(item, field, database, parent_item)
 
 
 class RelacDatabase:

@@ -4,6 +4,8 @@ from pathlib import Path
 
 from typer import Context, Option, Typer
 
+from relac.yaml_repo_loader import YamlRepoLoader
+
 from .cli_static_html import cli_static_html
 from .relac import Relac
 
@@ -20,7 +22,9 @@ def context(
     ),
 ) -> None:
     """Default context for all CLI operations."""
-    ctx.obj = Relac(project_path=project_path)
+    repo_loader = YamlRepoLoader(repo_path=project_path)
+    ctx.obj = Relac(repo_loader=repo_loader)
+    ctx.obj.import_data()
 
 
 def main() -> None:

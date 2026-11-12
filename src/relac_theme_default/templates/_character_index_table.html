@@ -18,7 +18,7 @@
         {% for character in characters %}
         {% set works = [] %}
         {% set work_ids = [] %}
-        {% for appearance in character.work_character_objs %}
+        {% for appearance in character.work_objs %}
         {% if appearance.work_obj and appearance.work_obj.id not in work_ids %}
         {% set _ = work_ids.append(appearance.work_obj.id) %}
         {% set _ = works.append(appearance.work_obj) %}
