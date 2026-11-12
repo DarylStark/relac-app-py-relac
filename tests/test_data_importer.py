@@ -3,6 +3,7 @@
 import pytest
 
 from relac.data_importer import DataImporter
+from relac.exceptions import DuplicateIdError, UnknownObjectTypeError
 from relac.model import Book, Contributor
 from relac.relac_database import RelacDatabase
 
@@ -58,7 +59,7 @@ def test_importing_double_id() -> None:
     importer.import_data(
         {'contributor.john_williams': {'name': 'John Williams'}}
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(DuplicateIdError):
         importer.import_data(
             {'contributor.john_williams': {'name': 'John Williams'}}
         )
@@ -68,7 +69,7 @@ def test_importing_unknown_model() -> None:
     """Test if we get an error when importing a unknown model."""
     db = RelacDatabase()
     importer = DataImporter(db)
-    with pytest.raises(ValueError):
+    with pytest.raises(UnknownObjectTypeError):
         importer.import_data(
             {'non_existing_object.john_williams': {'name': 'John Williams'}}
         )

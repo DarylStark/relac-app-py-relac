@@ -2,6 +2,12 @@
 
 from typing import cast
 
+from relac.exceptions import (
+    DuplicateIdError,
+    RelacConfigNotSetError,
+    UnknownObjectTypeAddedError,
+    UnknownObjectTypeRequestedError,
+)
 from relac.model import RelacConfig, ResolvableField, ResourceBase, relac_models
 
 
@@ -15,10 +21,7 @@ class DataStore[T: ResourceBase]:
     def add(self, obj_id: str, obj: T) -> None:
         """Add a object to the datastore."""
         if self._data.get(obj_id) is not None:
-            # TODO: Custom error
-            raise ValueError(
-                f'Object with id "{obj_id}" is already in the database'
-            )
+            raise DuplicateIdError(obj_id)
 
         self._data[obj_id] = obj
 
@@ -47,6 +50,7 @@ class DataStore[T: ResourceBase]:
 
         for field in getattr(item, 'resolvable_fields', []):
             self._resolve_field(item, field, database, parent_item)
+
         for obj in getattr(item, 'resolvable_children', []):
             values = getattr(item, obj)
             if not isinstance(values, list):
@@ -152,15 +156,13 @@ class RelacDatabase:
             if relac_config is not None:
                 return relac_config
 
-        # TODO: Custom exception
-        raise ValueError('Config not set yet')
+        raise RelacConfigNotSetError()
 
     def add_object[T: ResourceBase](self, obj_id: str, obj: T) -> None:
         """Add the object to the database."""
         obj_type = type(obj)
         if obj_type not in self._data:
-            # TODO: Custom error
-            raise TypeError(f'Type {obj_type} is not a valid type')
+            raise UnknownObjectTypeAddedError(obj_id, obj_type.__name__)
 
         self._data[obj_type].add(obj_id, obj)
 
@@ -173,11 +175,12 @@ class RelacDatabase:
         """Get one object on ID."""
         obj_type = relac_models.get(obj_id.split('.', maxsplit=1)[0])
         if obj_type is None:
-            # TODO: Custom error
-            raise ValueError('Unknown object')
+            raise UnknownObjectTypeRequestedError(obj_id)
+
         obj = self._data[obj_type].get_one(obj_id)
         if obj is None:
             raise ValueError('Unknown object')
+
         return obj
 
     def resolve_all(self) -> None:

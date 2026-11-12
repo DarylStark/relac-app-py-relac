@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from relac.exceptions import UnknownObjectTypeError
+
 from .model import ResourceBase, relac_models
 from .relac_database import RelacDatabase
 
@@ -27,8 +29,7 @@ class DataImporter:
             obj_type = obj_id.split('.', maxsplit=1)[0]
             model = relac_models.get(obj_type)
             if not model:
-                # TODO: Custom exception
-                raise ValueError(f'Unknown object type: "{obj_type}".')
+                raise UnknownObjectTypeError(obj_id, obj_type)
 
             obj = self._parse_object(model, obj_data)
             obj.id = obj_id

@@ -4,6 +4,7 @@ from typing import ClassVar
 
 import pytest
 
+from relac.exceptions import DuplicateIdError
 from relac.model import (
     Character,
     Contributor,
@@ -55,7 +56,7 @@ def test_adding_more_contribs_same_id() -> None:
 
     db.add_object(contrib_id, contrib)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(DuplicateIdError):
         db.add_object(contrib_id, contrib)
 
 
