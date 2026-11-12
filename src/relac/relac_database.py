@@ -2,7 +2,7 @@
 
 from typing import cast
 
-from relac.model import ResolvableField, ResourceBase, relac_models
+from relac.model import RelacConfig, ResolvableField, ResourceBase, relac_models
 
 
 class DataStore[T: ResourceBase]:
@@ -30,6 +30,10 @@ class DataStore[T: ResourceBase]:
         """Retrieve all objects from the database."""
         return self._data
 
+    def __len__(self) -> int:
+        """Get the length of the store."""
+        return len(self._data)
+
     def _resolve_item(
         self,
         item: ResourceBase,
@@ -37,6 +41,10 @@ class DataStore[T: ResourceBase]:
         parent_item: ResourceBase | None = None,
     ) -> None:
         """Resolve the resolvable items for a object."""
+        for field in getattr(item, 'resolvable_parent_fields', ()):
+            if parent_item is not None:
+                setattr(item, field, parent_item)
+
         for field in getattr(item, 'resolvable_fields', []):
             self._resolve_field(item, field, database, parent_item)
         for obj in getattr(item, 'resolvable_children', []):
@@ -73,10 +81,27 @@ class DataStore[T: ResourceBase]:
 
         related_obj = database.get_one(obj_id)
         setattr(item, field.destination_field, related_obj)
-        if field.populates_back:
-            if parent_item:
-                item = parent_item
-            getattr(related_obj, field.populates_back).append(item)
+        self._populate_back_reference(item, related_obj, field, parent_item)
+
+    def _populate_back_reference(
+        self,
+        item: ResourceBase,
+        related_obj: ResourceBase,
+        field: ResolvableField,
+        parent_item: ResourceBase | None,
+    ) -> None:
+        if field.populates_back is None:
+            return
+
+        back_reference = parent_item if parent_item is not None else item
+        destination = related_obj
+        path = field.populates_back.split('.')
+        for path_part in path[:-1]:
+            destination = getattr(destination, path_part)
+            if destination is None:
+                return
+
+        getattr(destination, path[-1]).append(back_reference)
 
     def _resolve_field_many_to_many(
         self,
@@ -92,10 +117,7 @@ class DataStore[T: ResourceBase]:
         for obj_id in obj_value:
             related_obj = database.get_one(obj_id)
             getattr(item, field.destination_field).append(related_obj)
-            if field.populates_back:
-                if parent_item:
-                    item = parent_item
-                getattr(related_obj, field.populates_back).append(item)
+            self._populate_back_reference(item, related_obj, field, parent_item)
 
     def _resolve_field(
         self,
@@ -118,8 +140,20 @@ class RelacDatabase:
     def __init__(self) -> None:
         """Create empty dictionaries for the data."""
         self._data: dict[type[ResourceBase], DataStore] = {}
+        self._config: RelacConfig | None = None
         for relac_type in relac_models.values():
             self._data[relac_type] = DataStore[ResourceBase]()
+
+    def get_relac_config(self) -> RelacConfig:
+        """Retrieve the Relac config."""
+        configs = self._data.get(RelacConfig)
+        if configs:
+            relac_config = configs.get_one('relac')
+            if relac_config is not None:
+                return relac_config
+
+        # TODO: Custom exception
+        raise ValueError('Config not set yet')
 
     def add_object[T: ResourceBase](self, obj_id: str, obj: T) -> None:
         """Add the object to the database."""

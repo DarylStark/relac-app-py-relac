@@ -5,10 +5,14 @@ from typing import ClassVar
 import pytest
 
 from relac.model import (
+    Character,
     Contributor,
     Label,
+    LiteraryAnalysis,
     ResolvableField,
     ResourceBase,
+    Work,
+    WorkCharacter,
 )
 from relac.relac_database import DataStore, RelacDatabase
 
@@ -85,7 +89,7 @@ def test_resolving_fields_many_to_many() -> None:
     )
 
     labels = db.get_all(Label)
-    assert len(labels['label.test_label_1'].book_objs) == 1
+    assert len(labels['label.test_label_1'].contributor_objs) == 1
 
 
 def test_resolving_fields_one_to_many() -> None:
@@ -114,3 +118,25 @@ def test_resolving_fields_one_to_many() -> None:
 
     assert quote.contributor_obj is contributor
     assert contributor.quote_objs == [quote]
+
+
+def test_resolving_nested_work_character_relationships() -> None:
+    """Resolve character IDs and the owning work for nested appearances."""
+    db = RelacDatabase()
+    character = Character(id='character.test', name='Test Character')
+    work_character = WorkCharacter(character='character.test')
+    work = Work(
+        id='work.test',
+        title='Test Work',
+        authors=[],
+        literary_analysis=LiteraryAnalysis(characters=[work_character]),
+    )
+    db.add_object('character.test', character)
+    db.add_object('work.test', work)
+
+    db.resolve_all()
+
+    assert work_character.character_obj is character
+    assert work_character.work_obj is work
+    assert character.work_objs == [work]
+    assert character.work_character_objs == [work_character]

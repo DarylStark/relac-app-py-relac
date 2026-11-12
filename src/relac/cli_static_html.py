@@ -5,6 +5,7 @@ import shutil
 from datetime import date
 from importlib import import_module
 from pathlib import Path
+from typing import cast
 
 from isbnlib import mask
 from jinja2 import Environment, FileSystemLoader
@@ -23,7 +24,6 @@ from relac.model import (
     Owner,
     ReadingList,
     ReadingSession,
-    RelacConfig,
     Series,
     Work,
     WorkEdition,
@@ -404,10 +404,7 @@ def create(  # noqa: PLR0912, PLR0915
     env.filters['age'] = _calculate_age
     env.filters['language'] = _code_to_language
     env.filters['country'] = _code_to_country
-    # env.globals['config'] = db.get_relac_config()
-    env.globals['config'] = RelacConfig(
-        title='TEST LIBRARY'
-    )  # TODO: Real object
+    cast(dict[str, object], env.globals)['config'] = db.get_relac_config()
 
     # Copy static folder
     if metadata.static_folder:

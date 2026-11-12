@@ -25,9 +25,6 @@ class DataImporter:
         """Import data from a dict into the database."""
         for obj_id, obj_data in data.items():
             obj_type = obj_id.split('.', maxsplit=1)[0]
-            if obj_type == 'relac':
-                # TODO: Parse Relac object
-                continue
             model = relac_models.get(obj_type)
             if not model:
                 # TODO: Custom exception

@@ -62,6 +62,35 @@ class YamlRepoLoader(RepoLoader):
         contents = self._preprocess_includes(contents)
         return contents
 
+    def _inject_files(self, data: object) -> None:
+        """Replace file references in parsed YAML data with their contents."""
+        if isinstance(data, dict):
+            for key, value in data.items():
+                if isinstance(value, str):
+                    match = re.fullmatch(r'\[file:(?P<filename>.+)\]', value)
+                    if match:
+                        file = self._path / match.group('filename')
+                        if not file.is_file():
+                            raise YamlLoadingError(
+                                str(file), f'File "{file}" not found.'
+                            )
+                        data[key] = file.read_text(encoding='utf-8')
+                else:
+                    self._inject_files(value)
+        elif isinstance(data, list):
+            for index, value in enumerate(data):
+                if isinstance(value, str):
+                    match = re.fullmatch(r'\[file:(?P<filename>.+)\]', value)
+                    if match:
+                        file = self._path / match.group('filename')
+                        if not file.is_file():
+                            raise YamlLoadingError(
+                                str(file), f'File "{file}" not found.'
+                            )
+                        data[index] = file.read_text(encoding='utf-8')
+                else:
+                    self._inject_files(value)
+
     def _parse_file(self, file: Path, *, parser: YAML) -> list[dict]:
         """Parse a specific file."""
         try:
@@ -70,11 +99,14 @@ class YamlRepoLoader(RepoLoader):
             raise YamlLoadingError(str(file), exc.args[0]) from exc
 
         try:
-            return list(parser.load_all(contents))
+            documents = list(parser.load_all(contents))
         except MarkedYAMLError as exc:
             raise YamlLoadingError(
                 filename=str(file), error=exc.problem
             ) from exc
+        for document in documents:
+            self._inject_files(document)
+        return documents
 
     def _check_duplicate_keys(self, data: dict[str, list[dict]]) -> None:
         """Check if there are duplicate keys."""
