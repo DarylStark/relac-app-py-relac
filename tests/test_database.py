@@ -4,12 +4,19 @@ from typing import ClassVar
 
 import pytest
 
-from relac.exceptions import DuplicateIdError
+from relac.exceptions import (
+    DuplicateIdError,
+    ObjectNotFoundError,
+    RelacConfigNotSetError,
+    UnknownObjectTypeAddedError,
+    UnknownObjectTypeRequestedError,
+)
 from relac.model import (
     Character,
     Contributor,
     Label,
     LiteraryAnalysis,
+    RelacConfig,
     ResolvableField,
     ResourceBase,
     Work,
@@ -141,3 +148,50 @@ def test_resolving_nested_work_character_relationships() -> None:
     assert work_character.work_obj is work
     assert character.work_objs == [work]
     assert character.work_character_objs == [work_character]
+
+
+def test_retrieving_invalid_relac_config() -> None:
+    """Test if we get an error when retrieving invalid RelacConfig."""
+    db = RelacDatabase()
+    with pytest.raises(RelacConfigNotSetError):
+        db.get_relac_config()
+
+
+def test_retrieving_invalid_relac_id() -> None:
+    """Test if we get an error when retrieving invalid RelacConfig."""
+    db = RelacDatabase()
+    db.add_object('relac.wrong_id', RelacConfig(title='test_config'))
+    with pytest.raises(RelacConfigNotSetError):
+        db.get_relac_config()
+
+
+def test_retrieving_valid_relac_config() -> None:
+    """Test if we get the correct RelacConfig."""
+    db = RelacDatabase()
+    db.add_object('relac', RelacConfig(title='test_config'))
+    config = db.get_relac_config()
+    assert config.title == 'test_config'
+
+
+def test_adding_invalid_object_type() -> None:
+    """Test if we get an error when adding a invalid object type."""
+
+    class TestClass(ResourceBase): ...
+
+    db = RelacDatabase()
+    with pytest.raises(UnknownObjectTypeAddedError):
+        db.add_object('testclass.test', TestClass())
+
+
+def test_retrieving_invalid_object_type() -> None:
+    """Test if we get an error when retrieving invalid object types."""
+    db = RelacDatabase()
+    with pytest.raises(UnknownObjectTypeRequestedError):
+        db.get_one('testclass.test')
+
+
+def test_retrieving_non_existing_object() -> None:
+    """Test if we get an error when retrieving a non-existing object."""
+    db = RelacDatabase()
+    with pytest.raises(ObjectNotFoundError):
+        db.get_one('contributor.non_existing')

@@ -4,6 +4,7 @@ from typing import cast
 
 from relac.exceptions import (
     DuplicateIdError,
+    ObjectNotFoundError,
     RelacConfigNotSetError,
     UnknownObjectTypeAddedError,
     UnknownObjectTypeRequestedError,
@@ -179,7 +180,7 @@ class RelacDatabase:
 
         obj = self._data[obj_type].get_one(obj_id)
         if obj is None:
-            raise ValueError('Unknown object')
+            raise ObjectNotFoundError(obj_id)
 
         return obj
 
