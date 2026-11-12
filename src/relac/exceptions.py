@@ -82,3 +82,15 @@ class ObjectNotFoundError(DatabaseError):
         super().__init__(
             f'Unknown object requested from the database: "{obj_id}".'
         )
+
+
+class ModelError(RelacError):
+    """Base class for errors with the database."""
+
+
+class DoubleModelNameError(ModelError):
+    """Error when a user tries to register a already existing model."""
+
+    def __init__(self, model_name: str) -> None:
+        """Call the baseclass with the correct message."""
+        super().__init__(f'Model name already registered: "{model_name}".')

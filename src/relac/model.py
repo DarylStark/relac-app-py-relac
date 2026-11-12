@@ -9,20 +9,20 @@ from typing import ClassVar, Literal
 
 from pydantic import BaseModel, Field
 
+from relac.exceptions import DoubleModelNameError
+
 relac_models: dict[str, type[ResourceBase]] = {}
 
 
-def _register_model[TResource: ResourceBase](
-    type_name: str,
+def register_model[TResource: ResourceBase](
+    model_name: str,
 ) -> Callable[[type[TResource]], type[TResource]]:
     """Decorator to register a model for data."""
 
     def model_decorator(class_: type[TResource]) -> type[TResource]:
-        if type_name in relac_models:
-            raise ValueError(
-                f'Model with type_name "{type_name}" is already registered.'
-            )
-        relac_models[type_name] = class_
+        if model_name in relac_models:
+            raise DoubleModelNameError(model_name)
+        relac_models[model_name] = class_
         return class_
 
     return model_decorator
@@ -97,7 +97,7 @@ class LabelledResource(ResourceBase):
     label_objs: list[Label] = Field(default_factory=list, exclude=True)
 
 
-@_register_model('relac')
+@register_model('relac')
 class RelacConfig(ResourceBase):
     """Model for Relac configuration."""
 
@@ -121,7 +121,7 @@ class ContributorState(Enum):
     DECEASED = 'deceased'
 
 
-@_register_model('contributor')
+@register_model('contributor')
 class Contributor(LabelledResource):
     """Model for a contributor."""
 
@@ -263,7 +263,7 @@ class StoryStructure(BaseModel):
     pacing: WorkPacing
 
 
-@_register_model('location')
+@register_model('location')
 class Location(ResourceBase):
     """Model for a location."""
 
@@ -291,7 +291,7 @@ class StorySetting(BaseModel):
     ]
 
 
-@_register_model('character')
+@register_model('character')
 class Character(ResourceBase):
     """A character in a story."""
 
@@ -375,7 +375,7 @@ class ChapterAnalysis(BaseModel):
         return f'part-{self.part}.chapter-{self.number}'
 
 
-@_register_model('quote')
+@register_model('quote')
 class Quote(ResourceBase):
     """A quote from a contributor."""
 
@@ -493,7 +493,7 @@ class GenreClassification(BaseModel):
     subgenres: list[str] = Field(default_factory=list)
 
 
-@_register_model('work')
+@register_model('work')
 class Work(LabelledResource):
     """Model for a work."""
 
@@ -593,7 +593,7 @@ class WorkEditionType(Enum):
     ANNOTATED = 'annotated'  # With study notes
 
 
-@_register_model('work_edition')
+@register_model('work_edition')
 class WorkEdition(LabelledResource):
     """A edition for a work."""
 
@@ -695,7 +695,7 @@ class WorkEdition(LabelledResource):
         return statistics.mean(ratings)
 
 
-@_register_model('collection')
+@register_model('collection')
 class BookCollection(LabelledResource):
     """A collection of books."""
 
@@ -734,7 +734,7 @@ class BookCollection(LabelledResource):
         return statistics.mean(rated_ratings)
 
 
-@_register_model('publisher')
+@register_model('publisher')
 class BookPublisher(ResourceBase):
     """Model for a publisher."""
 
@@ -771,7 +771,7 @@ class BookBinding(Enum):
     PDF_DRM = 'pdf-drm'
 
 
-@_register_model('book')
+@register_model('book')
 class Book(LabelledResource):
     """A book."""
 
@@ -914,7 +914,7 @@ class Rating(BaseModel):
     note: str | None = None
 
 
-@_register_model('reading_session')
+@register_model('reading_session')
 class ReadingSession(LabelledResource):
     """A reading session."""
 
@@ -974,7 +974,7 @@ class ReadingSession(LabelledResource):
         return None if len(ratings) == 0 else statistics.mean(ratings)
 
 
-@_register_model('label')
+@register_model('label')
 class Label(ResourceBase):
     """A label."""
 
@@ -1017,7 +1017,7 @@ class ReadingListItem(BaseModel):
     ]
 
 
-@_register_model('reading_list')
+@register_model('reading_list')
 class ReadingList(LabelledResource):
     """A list of resources."""
 
@@ -1117,7 +1117,7 @@ class Availability(Enum):
     INDIRECTLY_AVAILABLE = 'indirectly'
 
 
-@_register_model('owner')
+@register_model('owner')
 class Owner(LabelledResource):
     """Model for a owner."""
 
@@ -1149,7 +1149,7 @@ class SeriesItem(BaseModel):
     ]
 
 
-@_register_model('series')
+@register_model('series')
 class Series(LabelledResource):
     """A serie of works."""
 
