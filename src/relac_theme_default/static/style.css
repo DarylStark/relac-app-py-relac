@@ -1485,6 +1485,19 @@ div.card .detail-premise p:last-child
     gap: 14px;
 }
 
+.literary-analysis-layout.work-detail-only
+{
+    grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1024px)
+{
+    .literary-analysis-layout.work-page-layout
+    {
+        align-items: stretch;
+    }
+}
+
 @media (max-width: 760px)
 {
     .literary-analysis-layout

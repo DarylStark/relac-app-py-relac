@@ -486,8 +486,7 @@ class Character(ResourceBase):
         """Get all Work Character objects for this character."""
         rv: list[WorkCharacter] = list()
         for work_obj in self.work_objs:
-            if work_obj.literary_analysis:
-                rv.extend(work_obj.literary_analysis.characters or [])
+            rv.extend(work_obj.characters)
         return rv
 
 
@@ -513,7 +512,7 @@ class StoryArc(Enum):
 
 
 class WorkCharacter(BaseModel):
-    """A link between a character and a LiteraryAnalysis."""
+    """A character appearing in a work."""
 
     character: str
     roles: list[CharacterRole] = Field(default_factory=list)
@@ -577,7 +576,7 @@ class Quote(ResourceBase):
             'work',
             'work_obj',
             'one-to-many',
-            'literary_analysis.quote_objs',
+            'quote_objs',
         ),
     ]
 
@@ -624,32 +623,6 @@ class Narrator(BaseModel):
     ]
 
 
-class LiteraryAnalysis(BaseModel):
-    """Model for a works literary analysis."""
-
-    work_summary: str | None = None
-    work_analysis: str | None = None
-    structure: StoryStructure | None = None
-    setting: StorySetting | None = None
-    characters: list[WorkCharacter] = Field(default_factory=list)
-    chapters: list[ChapterAnalysis] = Field(default_factory=list)
-    quotes: list[str] = Field(default_factory=list)
-    motifs: list[Motif] = Field(default_factory=list)
-    narrator: Narrator | None = None
-
-    # Relation (real objects)
-    quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
-
-    resolvable_fields: ClassVar[list[ResolvableField]] = [
-        ResolvableField('quotes', 'quote_objs', 'many-to-many', 'work_objs'),
-    ]
-    resolvable_children: ClassVar[tuple[str, ...]] = (
-        'characters',
-        'narrator',
-        'setting',
-    )
-
-
 class PrimaryGenre(Enum):
     """Enum for the primary genre of a work."""
 
@@ -678,8 +651,15 @@ class Work(LabelledResource):
     work_structure: WorkStructure | None = None
     premise: str | None = None
     genre: GenreClassification | None = None
-
-    literary_analysis: LiteraryAnalysis | None = None
+    work_summary: str | None = None
+    work_analysis: str | None = None
+    structure: StoryStructure | None = None
+    setting: StorySetting | None = None
+    characters: list[WorkCharacter] = Field(default_factory=list)
+    chapters: list[ChapterAnalysis] = Field(default_factory=list)
+    quotes: list[str] = Field(default_factory=list)
+    motifs: list[Motif] = Field(default_factory=list)
+    narrator: Narrator | None = None
 
     # Relation (real objects)
     author_objs: list[Contributor] = Field(default_factory=list, exclude=True)
@@ -692,8 +672,13 @@ class Work(LabelledResource):
     resolvable_fields: ClassVar[list[ResolvableField]] = [
         ResolvableField('labels', 'label_objs', 'many-to-many', 'work_objs'),
         ResolvableField('authors', 'author_objs', 'many-to-many', 'work_objs'),
+        ResolvableField('quotes', 'quote_objs', 'many-to-many'),
     ]
-    resolvable_children: ClassVar[tuple[str, ...]] = ('literary_analysis',)
+    resolvable_children: ClassVar[tuple[str, ...]] = (
+        'characters',
+        'narrator',
+        'setting',
+    )
 
     @override
     def _get_details(self) -> list[str]:
@@ -717,7 +702,7 @@ class Work(LabelledResource):
     @override
     def _get_extra_data(self) -> list[SearchIndexData] | None:
         """Get titled chapter entries associated with this work."""
-        if self.id is None or self.literary_analysis is None:
+        if self.id is None:
             return None
 
         return [
@@ -733,7 +718,7 @@ class Work(LabelledResource):
                 details=[search_detail('Work', self.title)],
                 search_terms=[self.title],
             )
-            for chapter in self.literary_analysis.chapters
+            for chapter in self.chapters
             if chapter.title
         ]
 

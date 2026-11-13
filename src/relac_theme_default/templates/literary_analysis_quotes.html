@@ -8,14 +8,13 @@
 {% block content %}
 <div class="content">
   {{ breadcrumbs([
-      ("Work", "works.html"),
+      ("Works", "works.html"),
       (work.title, work.id ~ ".html"),
-      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
       ("Quotes", none)
   ]) }}
   <div class="literary-analysis-layout">
     {{ literary_analysis_menu(work, active_page) }}
-    {{ quote_cards(work.literary_analysis.quote_objs) }}
+    {{ quote_cards(work.quote_objs) }}
   </div>
 </div>
 {% endblock %}

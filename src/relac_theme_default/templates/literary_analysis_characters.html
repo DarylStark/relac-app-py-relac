@@ -8,16 +8,15 @@
 {% block content %}
 <div class="content">
   {{ breadcrumbs([
-      ("Work", "works.html"),
+      ("Works", "works.html"),
       (work.title, work.id ~ ".html"),
-      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
       ("Characters", none)
   ]) }}
   <div class="literary-analysis-layout">
     {{ literary_analysis_menu(work, active_page) }}
     <div class="literary-analysis-content">
-      {% if work.literary_analysis.narrator %}
-      {% set narrator = work.literary_analysis.narrator %}
+      {% if work.narrator %}
+      {% set narrator = work.narrator %}
       <div class="card literary-analysis-card" role="article" aria-labelledby="narrator-title">
         <header class="literary-analysis-header">
           <p class="detail-kind">Narrator</p>
@@ -54,7 +53,9 @@
         {% endif %}
       </div>
       {% endif %}
-      {{ literary_analysis_characters_table(work.literary_analysis.characters) }}
+      {% if work.characters %}
+      {{ literary_analysis_characters_table(work.characters) }}
+      {% endif %}
     </div>
   </div>
 </div>

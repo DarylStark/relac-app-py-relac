@@ -16,7 +16,6 @@ from relac.model import (
     Character,
     Contributor,
     Label,
-    LiteraryAnalysis,
     RelacConfig,
     ResolvableField,
     ResourceBase,
@@ -137,7 +136,7 @@ def test_resolving_nested_work_character_relationships() -> None:
         id='work.test',
         title='Test Work',
         authors=[],
-        literary_analysis=LiteraryAnalysis(characters=[work_character]),
+        characters=[work_character],
     )
     db.add_object('character.test', character)
     db.add_object('work.test', work)

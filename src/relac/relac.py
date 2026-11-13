@@ -199,9 +199,6 @@ class Relac:
                     out_path.write_text(html)
 
         # Works
-        # We leave this garbage code in for now since we are going to refactor
-        # the complete Work Analysis anyway. After we have refactored that, it
-        # will be re-written.
         if 'work' in metadata.resource_pages:
             reading_lists = self.database.get_all_values(ReadingList)
             for work in self.database.get_all_values(Work):
@@ -216,87 +213,85 @@ class Relac:
                 )
                 out_path = output / f'{work.id}.html'
                 out_path.write_text(html)
+
                 if (
-                    work.literary_analysis
-                    and 'literary_analysis' in metadata.resource_pages
-                ):
+                    work.work_summary
+                    or work.work_analysis
+                    or work.structure
+                    or (work.setting and work.setting.time_period)
+                ) and 'literary_analysis' in metadata.resource_pages:
                     analysis_template = env.get_template(
                         metadata.resource_pages['literary_analysis']
                     )
                     analysis_html = analysis_template.render(work=work)
                     analysis_path = output / f'literary_analysis.{work.id}.html'
                     analysis_path.write_text(analysis_html)
-                    if (
-                        work.literary_analysis.chapters
-                        and 'literary_analysis_chapter'
-                        in metadata.resource_pages
-                    ):
-                        chapter_template = env.get_template(
-                            metadata.resource_pages['literary_analysis_chapter']
+
+                if (
+                    work.chapters
+                    and 'literary_analysis_chapter' in metadata.resource_pages
+                ):
+                    chapter_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_chapter']
+                    )
+                    for chapter in work.chapters:
+                        chapter_html = chapter_template.render(
+                            work=work, chapter=chapter
                         )
-                        for chapter in work.literary_analysis.chapters:
-                            chapter_html = chapter_template.render(
-                                work=work, chapter=chapter
-                            )
-                            chapter_path = output / (
-                                f'literary_analysis_chapter.{work.id}.'
-                                f'{chapter.page_id}.html'
-                            )
-                            chapter_path.write_text(chapter_html)
-                    if (
-                        work.literary_analysis.setting
-                        and work.literary_analysis.setting.location_objs
-                        and 'literary_analysis_locations'
-                        in metadata.resource_pages
-                    ):
-                        locations_template = env.get_template(
-                            metadata.resource_pages[
-                                'literary_analysis_locations'
-                            ]
+                        chapter_path = output / (
+                            f'literary_analysis_chapter.{work.id}.'
+                            f'{chapter.page_id}.html'
                         )
-                        locations_html = locations_template.render(work=work)
-                        locations_path = output / (
-                            f'literary_analysis_locations.{work.id}.html'
-                        )
-                        locations_path.write_text(locations_html)
-                    if (
-                        work.literary_analysis.characters
-                        and 'literary_analysis_characters'
-                        in metadata.resource_pages
-                    ):
-                        characters_template = env.get_template(
-                            metadata.resource_pages[
-                                'literary_analysis_characters'
-                            ]
-                        )
-                        characters_html = characters_template.render(work=work)
-                        characters_path = output / (
-                            f'literary_analysis_characters.{work.id}.html'
-                        )
-                        characters_path.write_text(characters_html)
-                    if (
-                        work.literary_analysis.motifs
-                        and 'literary_analysis_motifs'
-                        in metadata.resource_pages
-                    ):
-                        motifs_template = env.get_template(
-                            metadata.resource_pages['literary_analysis_motifs']
-                        )
-                        motifs_html = motifs_template.render(work=work)
-                        motifs_path = output / (
-                            f'literary_analysis_motifs.{work.id}.html'
-                        )
-                        motifs_path.write_text(motifs_html)
-                    if (
-                        work.literary_analysis.quote_objs
-                        and 'literary_analysis_quotes'
-                        in metadata.resource_pages
-                    ):
-                        quotes_template = env.get_template(
-                            metadata.resource_pages['literary_analysis_quotes']
-                        )
-                        quotes_html = quotes_template.render(work=work)
-                        quotes_path = output / (
-                            f'literary_analysis_quotes.{work.id}.html'
-                        )
-                        quotes_path.write_text(quotes_html)
+                        chapter_path.write_text(chapter_html)
+
+                if (
+                    work.setting
+                    and work.setting.location_objs
+                    and 'literary_analysis_locations' in metadata.resource_pages
+                ):
+                    locations_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_locations']
+                    )
+                    locations_html = locations_template.render(work=work)
+                    locations_path = output / (
+                        f'literary_analysis_locations.{work.id}.html'
+                    )
+                    locations_path.write_text(locations_html)
+
+                if (
+                    work.characters or work.narrator
+                ) and 'literary_analysis_characters' in metadata.resource_pages:
+                    characters_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_characters']
+                    )
+                    characters_html = characters_template.render(work=work)
+                    characters_path = output / (
+                        f'literary_analysis_characters.{work.id}.html'
+                    )
+                    characters_path.write_text(characters_html)
+
+                if (
+                    work.motifs
+                    and 'literary_analysis_motifs' in metadata.resource_pages
+                ):
+                    motifs_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_motifs']
+                    )
+                    motifs_html = motifs_template.render(work=work)
+                    motifs_path = output / (
+                        f'literary_analysis_motifs.{work.id}.html'
+                    )
+                    motifs_path.write_text(motifs_html)
+
+                if (
+                    work.quote_objs
+                    and 'literary_analysis_quotes' in metadata.resource_pages
+                ):
+                    quotes_template = env.get_template(
+                        metadata.resource_pages['literary_analysis_quotes']
+                    )
+                    quotes_html = quotes_template.render(work=work)
+                    quotes_path = output / (
+                        f'literary_analysis_quotes.{work.id}.html'
+                    )
+                    quotes_path.write_text(quotes_html)
