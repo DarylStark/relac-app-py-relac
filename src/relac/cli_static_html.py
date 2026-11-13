@@ -124,148 +124,62 @@ def create(  # noqa: PLR0912, PLR0915
     out_path = output / 'index.html'
     out_path.write_text(html)
 
-    # Index pages
-    if 'books' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['books'])
-        html = template.render(
-            books=db.get_all_values(Book),
-        )
-        out_path = output / 'books.html'
-        out_path.write_text(html)
+    index_pages = {
+        'books': Book,
+        'works': Work,
+        'work_editions': WorkEdition,
+        'series': Series,
+        'contributors': Contributor,
+        'characters': Character,
+        'locations': Location,
+        'labels': Label,
+        'owners': Owner,
+        'collections': BookCollection,
+        'lists': ReadingList,
+        'reading_sessions': ReadingSession,
+    }
 
-    if 'works' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['works'])
-        html = template.render(
-            works=db.get_all_values(Work),
-        )
-        out_path = output / 'works.html'
-        out_path.write_text(html)
-
-    if 'work_editions' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['work_editions'])
-        html = template.render(
-            work_editions=db.get_all_values(WorkEdition),
-        )
-        out_path = output / 'work-editions.html'
-        out_path.write_text(html)
-
-    if 'series' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['series'])
-        html = template.render(
-            series=db.get_all_values(Series),
-        )
-        out_path = output / 'series.html'
-        out_path.write_text(html)
-
-    if 'contributors' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['contributors'])
-        html = template.render(
-            contributors=db.get_all_values(Contributor),
-        )
-        out_path = output / 'contributors.html'
-        out_path.write_text(html)
-
-    if 'characters' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['characters'])
-        html = template.render(characters=db.get_all_values(Character))
-        out_path = output / 'characters.html'
-        out_path.write_text(html)
-
-    if 'locations' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['locations'])
-        html = template.render(locations=db.get_all_values(Location))
-        out_path = output / 'locations.html'
-        out_path.write_text(html)
-
-    if 'labels' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['labels'])
-        html = template.render(
-            labels=db.get_all_values(Label),
-        )
-        out_path = output / 'labels.html'
-        out_path.write_text(html)
-
-    if 'owners' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['owners'])
-        html = template.render(
-            owners=db.get_all_values(Owner),
-        )
-        out_path = output / 'owners.html'
-        out_path.write_text(html)
-
-    if 'collections' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['collections'])
-        html = template.render(
-            collections=db.get_all_values(BookCollection),
-        )
-        out_path = output / 'collections.html'
-        out_path.write_text(html)
-
-    if 'lists' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['lists'])
-        html = template.render(
-            lists=db.get_all_values(ReadingList),
-        )
-        out_path = output / 'lists.html'
-        out_path.write_text(html)
-
-    if 'reading_sessions' in metadata.index_pages:
-        template = env.get_template(metadata.index_pages['reading_sessions'])
-        html = template.render(
-            reading_sessions=db.get_all_values(ReadingSession),
-        )
-        out_path = output / 'reading-sessions.html'
-        out_path.write_text(html)
-
-    # Books
-    if 'book' in metadata.resource_pages:
-        for book in db.get_all_values(Book):
-            template = env.get_template(metadata.resource_pages['book'])
-            html = template.render(book=book)
-            out_path = output / f'{book.id}.html'
+    # Add index pages
+    for index_page, obj_type in index_pages.items():
+        if index_page in metadata.index_pages:
+            template = env.get_template(metadata.index_pages[index_page])
+            html = template.render(**{index_page: db.get_all_values(obj_type)})
+            out_path = output / f'{index_page.replace("_", "-")}.html'
             out_path.write_text(html)
 
-    # Contributors
-    if 'contributor' in metadata.resource_pages:
-        for contributor in db.get_all_values(Contributor):
-            template = env.get_template(metadata.resource_pages['contributor'])
-            html = template.render(contributor=contributor)
-            out_path = output / f'{contributor.id}.html'
-            out_path.write_text(html)
+    ###############
 
-    # Locations
-    if 'location' in metadata.resource_pages:
-        for location in db.get_all_values(Location):
-            template = env.get_template(metadata.resource_pages['location'])
-            html = template.render(location=location)
-            out_path = output / f'{location.id}.html'
-            out_path.write_text(html)
+    detail_pages = {
+        'book': Book,
+        'work_edition': WorkEdition,
+        'series': Series,
+        'contributor': Contributor,
+        'character': Character,
+        'location': Location,
+        'label': Label,
+        'owner': Owner,
+        'collection': BookCollection,
+        'list': ReadingList,
+        'reading_session': ReadingSession,
+    }
 
-    # Characters
-    if 'character' in metadata.resource_pages:
-        for character in db.get_all_values(Character):
-            template = env.get_template(metadata.resource_pages['character'])
-            html = template.render(character=character)
-            out_path = output / f'{character.id}.html'
-            out_path.write_text(html)
+    for detail_page, obj_type in detail_pages.items():
+        if detail_page in metadata.resource_pages:
+            for resource in db.get_all_values(obj_type):
+                if resource.id is None:
+                    continue
 
-    # Labels
-    if 'label' in metadata.resource_pages:
-        for label in db.get_all_values(Label):
-            template = env.get_template(metadata.resource_pages['label'])
-            html = template.render(label=label)
-            out_path = output / f'{label.id}.html'
-            out_path.write_text(html)
-
-    # Owners
-    if 'owner' in metadata.resource_pages:
-        for owner in db.get_all_values(Owner):
-            template = env.get_template(metadata.resource_pages['owner'])
-            html = template.render(owner=owner)
-            out_path = output / f'{owner.id}.html'
-            out_path.write_text(html)
+                template = env.get_template(
+                    metadata.resource_pages[detail_page]
+                )
+                html = template.render(**{detail_page: db.get_one(resource.id)})
+                out_path = output / f'{resource.id}.html'
+                out_path.write_text(html)
 
     # Works
+    # We leave this garbage code in for now since we are going to refactor the
+    # complete Work Analysis anyway. After we have refactored that, it will
+    # be re-written.
     if 'work' in metadata.resource_pages:
         reading_lists = db.get_all_values(ReadingList)
         for work in db.get_all_values(Work):
@@ -356,45 +270,3 @@ def create(  # noqa: PLR0912, PLR0915
                         f'literary_analysis_quotes.{work.id}.html'
                     )
                     quotes_path.write_text(quotes_html)
-
-    # Work editions
-    if 'work_edition' in metadata.resource_pages:
-        for work_edition in db.get_all_values(WorkEdition):
-            template = env.get_template(metadata.resource_pages['work_edition'])
-            html = template.render(work_edition=work_edition)
-            out_path = output / f'{work_edition.id}.html'
-            out_path.write_text(html)
-
-    # Collections
-    if 'collection' in metadata.resource_pages:
-        for collection in db.get_all_values(BookCollection):
-            template = env.get_template(metadata.resource_pages['collection'])
-            html = template.render(collection=collection)
-            out_path = output / f'{collection.id}.html'
-            out_path.write_text(html)
-
-    # Lists
-    if 'list' in metadata.resource_pages:
-        for lst in db.get_all_values(ReadingList):
-            template = env.get_template(metadata.resource_pages['list'])
-            html = template.render(list=lst)
-            out_path = output / f'{lst.id}.html'
-            out_path.write_text(html)
-
-    # Series
-    if 'series' in metadata.resource_pages:
-        for series in db.get_all_values(Series):
-            template = env.get_template(metadata.resource_pages['series'])
-            html = template.render(series=series)
-            out_path = output / f'{series.id}.html'
-            out_path.write_text(html)
-
-    # Reading sessions
-    if 'reading_session' in metadata.resource_pages:
-        for reading_session in db.get_all_values(ReadingSession):
-            template = env.get_template(
-                metadata.resource_pages['reading_session']
-            )
-            html = template.render(reading_session=reading_session)
-            out_path = output / f'{reading_session.id}.html'
-            out_path.write_text(html)
