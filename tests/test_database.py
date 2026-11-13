@@ -29,6 +29,7 @@ from relac.model import (
     ResourceBase,
     Work,
     WorkCharacter,
+    WorkEdition,
 )
 
 
@@ -155,6 +156,51 @@ def test_resolving_nested_work_character_relationships() -> None:
     assert work_character.work_obj is work
     assert character.work_objs == [work]
     assert character.work_character_objs == [work_character]
+
+
+def test_work_books_are_derived_from_its_editions() -> None:
+    """Include each book containing any edition of the work, only once."""
+    db = Database()
+    work = Work(
+        id='work.test',
+        title='Test Work',
+        authors=[],
+    )
+    first_edition = WorkEdition(
+        id='work_edition.test.first',
+        title='First Edition',
+        work='work.test',
+    )
+    second_edition = WorkEdition(
+        id='work_edition.test.second',
+        title='Second Edition',
+        work='work.test',
+    )
+    shared_book = Book(
+        id='book.shared',
+        title='Shared Book',
+        work_editions=[
+            'work_edition.test.first',
+            'work_edition.test.second',
+        ],
+    )
+    other_book = Book(
+        id='book.other',
+        title='Other Book',
+        work_editions=['work_edition.test.second'],
+    )
+    for obj_id, obj in (
+        ('work.test', work),
+        ('work_edition.test.first', first_edition),
+        ('work_edition.test.second', second_edition),
+        ('book.shared', shared_book),
+        ('book.other', other_book),
+    ):
+        db.add_object(obj_id, obj)
+
+    db.resolve_all()
+
+    assert work.book_objs == [shared_book, other_book]
 
 
 def test_book_availability_uses_active_loan_recipient() -> None:

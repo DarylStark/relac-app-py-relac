@@ -664,7 +664,6 @@ class Work(LabelledResource):
     # Relation (real objects)
     author_objs: list[Contributor] = Field(default_factory=list, exclude=True)
     edition_objs: list[WorkEdition] = Field(default_factory=list, exclude=True)
-    book_objs: list[Book] = Field(default_factory=list, exclude=True)
     series_objs: list[Series] = Field(default_factory=list, exclude=True)
     quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
 
@@ -723,6 +722,20 @@ class Work(LabelledResource):
         ]
 
     # Properties
+    @property
+    def book_objs(self) -> list[Book]:
+        """Get unique books that contain an edition of this work."""
+        books: list[Book] = []
+        seen_ids: set[str] = set()
+        for edition in self.edition_objs:
+            for book in edition.book_objs:
+                if book.id is not None and book.id in seen_ids:
+                    continue
+                books.append(book)
+                if book.id is not None:
+                    seen_ids.add(book.id)
+        return books
+
     @property
     def availability(self) -> ResourceAvailability:
         """Get the availability for this edition."""
