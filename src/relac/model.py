@@ -7,7 +7,7 @@ from datetime import date, timedelta
 from enum import Enum
 from typing import ClassVar, Literal, override
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from relac.data_helpers import (
     _code_to_language,
@@ -1006,6 +1006,82 @@ class BookBinding(Enum):
     PDF_DRM = 'pdf-drm'
 
 
+class BookOwnerLink(BaseModel):
+    """A link associated with a book ownership."""
+
+    title: str
+    url: str
+
+
+class BookOwnerLoan(BaseModel):
+    """A loan of a book by one owner to another owner."""
+
+    loaned_to: str
+    loaned_on: date | None = None
+    due_date: date | None = None
+    returned_on: date | None = None
+
+    loaned_to_obj: Owner | None = Field(default=None, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('loaned_to', 'loaned_to_obj', 'one-to-none')
+    ]
+
+
+class BookOwner(BaseModel):
+    """Ownership details for a book and an owner."""
+
+    owner: str
+    since: date | None = None
+    loans: list[BookOwnerLoan] = Field(default_factory=list)
+    link: BookOwnerLink | None = None
+
+    owner_obj: Owner | None = Field(default=None, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('owner', 'owner_obj', 'one-to-many', 'book_objs')
+    ]
+    resolvable_children: ClassVar[tuple[str, ...]] = ('loans',)
+
+    @model_validator(mode='before')
+    @classmethod
+    def migrate_legacy_loan_fields(cls, value: object) -> object:
+        """Convert the former single-loan fields into a loan record."""
+        if not isinstance(value, dict):
+            return value
+
+        normalized: dict[str, object] = {}
+        for key in value:
+            if not isinstance(key, str):
+                return value
+            normalized[key] = value[key]
+
+        legacy_fields = ('loaned_to', 'loaned_on', 'due_date')
+        if not any(field in normalized for field in legacy_fields):
+            return value
+        if 'loans' in normalized:
+            raise ValueError(
+                'Use either loans or the legacy single-loan fields, not both.'
+            )
+
+        legacy_loan = {
+            field: normalized.pop(field)
+            for field in legacy_fields
+            if field in normalized
+        }
+        if legacy_loan.get('loaned_to') is not None:
+            normalized['loans'] = [legacy_loan]
+        else:
+            normalized['loans'] = []
+
+        return normalized
+
+    @property
+    def active_loans(self) -> list[BookOwnerLoan]:
+        """Get the loans that have not yet been returned."""
+        return [loan for loan in self.loans if loan.returned_on is None]
+
+
 @register_model('book')
 class Book(LabelledResource):
     """A book."""
@@ -1016,7 +1092,21 @@ class Book(LabelledResource):
     work_editions: list[str] = Field(default_factory=list)
     medium: BookMedium = BookMedium.UNSPECIFIED
     binding: BookBinding = BookBinding.UNSPECIFIED
-    owners: list[str] | None = None
+    owners: list[BookOwner] = Field(default_factory=list)
+
+    @field_validator('owners', mode='before')
+    @classmethod
+    def normalize_owners(cls, owners: object) -> object:
+        """Accept legacy owner ID lists as well as detailed ownership data."""
+        if owners is None:
+            return []
+        if not isinstance(owners, list):
+            return owners
+
+        return [
+            {'owner': owner} if isinstance(owner, str) else owner
+            for owner in owners
+        ]
 
     @override
     def _get_details(self) -> list[str]:
@@ -1051,10 +1141,11 @@ class Book(LabelledResource):
     collection_objs: list[BookCollection] = Field(
         default_factory=list, exclude=True
     )
-    owner_objs: list[Owner] = Field(default_factory=list, exclude=True)
     reading_session_objs: list[ReadingSession] = Field(
         default_factory=list, exclude=True
     )
+
+    resolvable_children: ClassVar[tuple[str, ...]] = ('owners',)
 
     resolvable_fields: ClassVar[list[ResolvableField]] = [
         ResolvableField('labels', 'label_objs', 'many-to-many', 'book_objs'),
@@ -1064,7 +1155,6 @@ class Book(LabelledResource):
         ResolvableField(
             'work_editions', 'work_edition_objs', 'many-to-many', 'book_objs'
         ),
-        ResolvableField('owners', 'owner_objs', 'many-to-many', 'book_objs'),
     ]
 
     @property
@@ -1087,7 +1177,22 @@ class Book(LabelledResource):
     @property
     def availability(self) -> ResourceAvailability:
         """Get the availability for this book."""
-        return _aggregate_availability(self.owner_objs)
+        loan_recipients = (
+            loan.loaned_to_obj
+            for ownership in self.owners
+            for loan in ownership.active_loans
+            if loan.loaned_to_obj is not None
+        )
+        return _aggregate_availability([*self.owner_objs, *loan_recipients])
+
+    @property
+    def owner_objs(self) -> list[Owner]:
+        """Get the resolved owners for this book."""
+        return [
+            owner.owner_obj
+            for owner in self.owners
+            if owner.owner_obj is not None
+        ]
 
     def _get_unique_works(self) -> list[Work]:
         works_by_id: dict[str, Work] = {}

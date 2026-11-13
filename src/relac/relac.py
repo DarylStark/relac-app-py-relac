@@ -198,6 +198,17 @@ class Relac:
                     out_path = output / f'{resource.id}.html'
                     out_path.write_text(html)
 
+        if 'book_owner' in metadata.resource_pages:
+            template = env.get_template(metadata.resource_pages['book_owner'])
+            for book in self.database.get_all_values(Book):
+                if book.id is None:
+                    continue
+
+                for index, book_owner in enumerate(book.owners):
+                    html = template.render(book_owner=book_owner, book=book)
+                    out_path = output / (f'book_owner.{book.id}.{index}.html')
+                    out_path.write_text(html)
+
         # Works
         if 'work' in metadata.resource_pages:
             reading_lists = self.database.get_all_values(ReadingList)

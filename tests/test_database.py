@@ -1,5 +1,6 @@
 """Tests for the database."""
 
+from datetime import date
 from typing import ClassVar
 
 import pytest
@@ -13,11 +14,18 @@ from relac.exceptions import (
     UnknownObjectTypeRequestedError,
 )
 from relac.model import (
+    Availability,
+    Book,
+    BookOwner,
+    BookOwnerLoan,
     Character,
     Contributor,
     Label,
+    Owner,
+    OwnerType,
     RelacConfig,
     ResolvableField,
+    ResourceAvailability,
     ResourceBase,
     Work,
     WorkCharacter,
@@ -147,6 +155,55 @@ def test_resolving_nested_work_character_relationships() -> None:
     assert work_character.work_obj is work
     assert character.work_objs == [work]
     assert character.work_character_objs == [work_character]
+
+
+def test_book_availability_uses_active_loan_recipient() -> None:
+    """Include the current borrower when aggregating book availability."""
+    db = Database()
+    library = Owner(
+        name='Library',
+        owner_type=OwnerType.LIBRARY,
+        availability=Availability.DIRECTLY_AVAILABLE,
+    )
+    borrower = Owner(
+        name='Borrower',
+        owner_type=OwnerType.PERSON,
+        availability=Availability.DIRECTLY_AVAILABLE,
+    )
+    book = Book(
+        id='book.test',
+        title='Test Book',
+        owners=[
+            BookOwner(
+                owner='owner.library',
+                loans=[BookOwnerLoan(loaned_to='owner.borrower')],
+            )
+        ],
+    )
+    db.add_object('owner.library', library)
+    db.add_object('owner.borrower', borrower)
+    db.add_object('book.test', book)
+    returned_book = Book(
+        id='book.returned',
+        title='Returned Book',
+        owners=[
+            BookOwner(
+                owner='owner.library',
+                loans=[
+                    BookOwnerLoan(
+                        loaned_to='owner.borrower',
+                        returned_on=date(2026, 1, 15),
+                    )
+                ],
+            )
+        ],
+    )
+    db.add_object('book.returned', returned_book)
+
+    db.resolve_all()
+
+    assert book.availability == ResourceAvailability.AVAILABLE_DIRECT
+    assert returned_book.availability == ResourceAvailability.AVAILABLE_TO_LOAN
 
 
 def test_retrieving_invalid_relac_config() -> None:

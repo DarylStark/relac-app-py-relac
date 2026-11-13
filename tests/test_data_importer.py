@@ -5,7 +5,7 @@ import pytest
 from relac.data_importer import DataImporter
 from relac.database import Database
 from relac.exceptions import DuplicateIdError, UnknownObjectTypeError
-from relac.model import Book, Contributor
+from relac.model import Book, BookOwner, Contributor, Owner
 
 
 def test_importing_contributors() -> None:
@@ -32,6 +32,60 @@ def test_importing_books() -> None:
 
     assert len(in_db) == 1
     assert in_db['book.stoner'].title == 'Stoner'
+
+
+def test_importing_book_owners_with_legacy_and_detailed_data() -> None:
+    """Import and resolve both simple and detailed book-owner relationships."""
+    db = Database()
+    importer = DataImporter(db)
+    importer.import_data(
+        {
+            'owner.daryl': {'name': 'Daryl'},
+            'owner.library': {'name': 'Library'},
+            'book.stoner': {
+                'title': 'Stoner',
+                'owners': [
+                    'owner.daryl',
+                    {
+                        'owner': 'owner.library',
+                        'since': '2024-05-01',
+                        'loaned_to': 'owner.daryl',
+                        'loaned_on': '2024-10-01',
+                        'due_date': '2024-10-15',
+                        'link': {
+                            'title': 'Loan record',
+                            'url': 'https://example.com/loan',
+                        },
+                    },
+                ],
+            },
+        }
+    )
+
+    db.resolve_all()
+
+    book = db.get_all(Book)['book.stoner']
+    owner = db.get_all(Owner)['owner.library']
+    borrower = db.get_all(Owner)['owner.daryl']
+    detailed_ownership = book.owners[1]
+    legacy_loan = detailed_ownership.loans[0]
+
+    assert isinstance(book.owners[0], BookOwner)
+    assert book.owners[0].owner_obj is db.get_all(Owner)['owner.daryl']
+    assert detailed_ownership.since is not None
+    assert detailed_ownership.since.isoformat() == '2024-05-01'
+    assert legacy_loan.loaned_to == 'owner.daryl'
+    assert legacy_loan.loaned_to_obj is borrower
+    assert legacy_loan.loaned_on is not None
+    assert legacy_loan.loaned_on.isoformat() == '2024-10-01'
+    assert legacy_loan.due_date is not None
+    assert legacy_loan.due_date.isoformat() == '2024-10-15'
+    assert detailed_ownership.link is not None
+    assert detailed_ownership.link.title == 'Loan record'
+    assert detailed_ownership.link.url == 'https://example.com/loan'
+    assert detailed_ownership.owner_obj is owner
+    assert book.owner_objs == [book.owners[0].owner_obj, owner]
+    assert owner.book_objs == [book]
 
 
 def test_importing_multiple_contributors() -> None:

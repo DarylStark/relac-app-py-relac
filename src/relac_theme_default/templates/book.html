@@ -3,7 +3,6 @@
 
 {% from "_work_edition_table.html" import work_edition_table %}
 {% from "_reading_session_table.html" import reading_session_table %}
-{% from "_owner_table.html" import owner_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_rating_value.html" import format_rating %}
@@ -97,8 +96,64 @@
     {{ reading_session_table(book.reading_session_objs) }}
   {% endif %}
 
-  {% if book.owner_objs %}
-    {{ owner_table(book.owner_objs) }}
+  {% if book.owners %}
+    <div class="card table-card">
+      <header class="table-card-header">
+        <h3 class="table-card-title">Ownership</h3>
+      </header>
+      <div class="table-scroll">
+        <table class="resources">
+          <thead>
+            <tr>
+              <th scope="col">Owner</th>
+              <th scope="col">Since</th>
+              <th scope="col">Loaned to</th>
+              <th scope="col">Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for book_owner in book.owners %}
+              <tr data-href="book_owner.{{ book.id }}.{{ loop.index0 }}.html">
+                <td>
+                  {% if book_owner.owner_obj %}
+                    {{ entity_link(book_owner.owner_obj, book_owner.owner_obj.name) }}
+                  {% else %}
+                    {{ book_owner.owner }}
+                  {% endif %}
+                </td>
+                <td>{{ book_owner.since if book_owner.since else "Unspecified" }}</td>
+                <td>
+                  {% if book_owner.active_loans %}
+                    {% for loan in book_owner.active_loans %}
+                      <div>
+                        {% if loan.loaned_to_obj %}
+                          {{ entity_link(loan.loaned_to_obj, loan.loaned_to_obj.name) }}
+                        {% else %}
+                          {{ loan.loaned_to }}
+                        {% endif %}
+                        <span class="table-secondary-text">
+                          Loaned on {{ loan.loaned_on if loan.loaned_on else "Unspecified" }}
+                          · Due back {{ loan.due_date if loan.due_date else "Unspecified" }}
+                        </span>
+                      </div>
+                    {% endfor %}
+                  {% elif book_owner.loans %}
+                    No active loan
+                  {% else %}
+                    Not loaned
+                  {% endif %}
+                </td>
+                <td>
+                  {% if book_owner.link %}
+                    <a href="{{ book_owner.link.url | e }}" target="_blank" rel="noopener noreferrer">{{ book_owner.link.title | e }}</a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
   {% endif %}
 
   {{ work_edition_table(book.work_edition_objs, "Works in this book") }}
