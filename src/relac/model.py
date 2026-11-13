@@ -740,7 +740,9 @@ class Work(LabelledResource):
     def availability(self) -> ResourceAvailability:
         """Get the availability for this edition."""
         return _aggregate_availability(
-            owner for book in self.book_objs for owner in book.owner_objs
+            owner
+            for book in self.book_objs
+            for owner in book.availability_owner_objs
         )
 
     @property
@@ -879,7 +881,9 @@ class WorkEdition(LabelledResource):
     def availability(self) -> ResourceAvailability:
         """Get the availability for this edition."""
         return _aggregate_availability(
-            owner for book in self.book_objs for owner in book.owner_objs
+            owner
+            for book in self.book_objs
+            for owner in book.availability_owner_objs
         )
 
     @property
@@ -1190,13 +1194,18 @@ class Book(LabelledResource):
     @property
     def availability(self) -> ResourceAvailability:
         """Get the availability for this book."""
+        return _aggregate_availability(self.availability_owner_objs)
+
+    @property
+    def availability_owner_objs(self) -> list[Owner]:
+        """Get owners whose availability contributes to this book."""
         loan_recipients = (
             loan.loaned_to_obj
             for ownership in self.owners
             for loan in ownership.active_loans
             if loan.loaned_to_obj is not None
         )
-        return _aggregate_availability([*self.owner_objs, *loan_recipients])
+        return [*self.owner_objs, *loan_recipients]
 
     @property
     def owner_objs(self) -> list[Owner]:

@@ -219,6 +219,7 @@ def test_book_availability_uses_active_loan_recipient() -> None:
     book = Book(
         id='book.test',
         title='Test Book',
+        work_editions=['work_edition.test'],
         owners=[
             BookOwner(
                 owner='owner.library',
@@ -226,9 +227,21 @@ def test_book_availability_uses_active_loan_recipient() -> None:
             )
         ],
     )
+    work = Work(
+        id='work.test',
+        title='Test Work',
+        authors=[],
+    )
+    edition = WorkEdition(
+        id='work_edition.test',
+        title='Test Edition',
+        work='work.test',
+    )
     db.add_object('owner.library', library)
     db.add_object('owner.borrower', borrower)
     db.add_object('book.test', book)
+    db.add_object('work.test', work)
+    db.add_object('work_edition.test', edition)
     returned_book = Book(
         id='book.returned',
         title='Returned Book',
@@ -249,6 +262,8 @@ def test_book_availability_uses_active_loan_recipient() -> None:
     db.resolve_all()
 
     assert book.availability == ResourceAvailability.AVAILABLE_DIRECT
+    assert edition.availability == ResourceAvailability.AVAILABLE_DIRECT
+    assert work.availability == ResourceAvailability.AVAILABLE_DIRECT
     assert returned_book.availability == ResourceAvailability.AVAILABLE_TO_LOAN
 
 
