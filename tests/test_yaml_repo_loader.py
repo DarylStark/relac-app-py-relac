@@ -30,26 +30,6 @@ def test_includes_on_correct_directory(
     loader.retrieve_objects()
 
 
-def test_includes_on_incorrect_directory_underscore(
-    include_tests_folder_incorrect_underscore: Path,
-) -> None:
-    """Test if the YamlRepoLoader include functionality gives an error."""
-    loader = YamlRepoLoader(repo_path=include_tests_folder_incorrect_underscore)
-    with pytest.raises(YamlLoadingError):
-        loader.retrieve_objects()
-
-
-def test_includes_on_incorrect_directory_nonexisting(
-    include_tests_folder_incorrect_nonexisting: Path,
-) -> None:
-    """Test if the YamlRepoLoader include functionality gives an error."""
-    loader = YamlRepoLoader(
-        repo_path=include_tests_folder_incorrect_nonexisting
-    )
-    with pytest.raises(YamlLoadingError):
-        loader.retrieve_objects()
-
-
 def test_duplicate_key_error(
     yaml_parse_test_folder_duplicate_key: Path,
 ) -> None:

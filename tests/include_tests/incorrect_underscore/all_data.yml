@@ -1,4 +1,0 @@
-include: "example_file.yml"
-
-contributor.test_contributor_2:
-  name: Test contributor_2

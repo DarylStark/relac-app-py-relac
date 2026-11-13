@@ -54,8 +54,10 @@ def _format_enum_label(value: str) -> str:
     return labels.get(value, value.replace('-', ' ').capitalize())
 
 
-def _code_to_language(language_code: str) -> str:
+def _code_to_language(language_code: str | None) -> str:
     """Get the name for a language code."""
+    if language_code is None:
+        return ''
     lang = languages.get(alpha_2=language_code)
     return lang.name if lang else language_code
 

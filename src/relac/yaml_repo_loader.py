@@ -28,38 +28,9 @@ class YamlRepoLoader(RepoLoader):
             if path.is_file() and not path.name.startswith('_')
         ]
 
-    def _get_include_contents(self, filename: str) -> str:
-        """Get the contents for a file that is included."""
-        if not filename.startswith('_'):
-            raise ValueError('Includes should always start with a underscore.')
-
-        file = Path(self._path / filename)
-
-        if not file.is_file():
-            raise ValueError(f'File "{str(file)}" not found.')
-
-        return file.read_text()
-
-    def _preprocess_includes(self, contents: str) -> str:
-        """Preprocess include statements.
-
-        User can "include" other YAML files into one by using the directive
-
-           include: "_other_yaml_file.yml"
-
-        The included file has to start with a underscore!.
-        """
-        return re.sub(
-            r'^include: "(?P<filename>.+)"$',
-            lambda match: self._get_include_contents(match.group('filename')),
-            contents,
-            flags=re.MULTILINE,
-        )
-
     def _preprocess_file(self, file: Path) -> str:
         """Preprocess a file."""
         contents = file.read_text()
-        contents = self._preprocess_includes(contents)
         return contents
 
     def _inject_files(self, data: object) -> None:

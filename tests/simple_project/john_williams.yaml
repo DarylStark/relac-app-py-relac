@@ -1,5 +1,14 @@
 ---
-include: "_templates.yaml"
+_template_work: &template_work
+  authors:
+    - contributor.stephen_king
+  work_type: genre-fiction
+  work_structure: short-story
+
+_template_work_edition: &template_work_edition
+  title: Mr. Harrigan's Phone
+  edition_type: original
+  language: en
 #-------------------------------------------------------------------------------
 # Contributor
 #-------------------------------------------------------------------------------
@@ -60,7 +69,6 @@ quote.william_stoner:
 
 work.john_williams__stoner:
   title: Stoner
-  <<: *template_work
   authors:
     - contributor.john_williams
   work_structure: novel
