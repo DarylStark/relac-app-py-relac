@@ -201,15 +201,30 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     database = Database()
     contributor = Contributor(id='jane_doe', name='Jane Doe')
     label = Label(id='science_fiction', name='Science Fiction')
+    work = Work(
+        id='glass_hotel_work',
+        title='The Glass Hotel',
+        authors=['jane_doe'],
+        author_objs=[contributor],
+    )
+    edition = WorkEdition(
+        id='glass_hotel_edition',
+        title='The Glass Hotel Edition',
+        work='glass_hotel_work',
+        work_obj=work,
+    )
     book = Book(
         id='glass_hotel',
         isbn13=9781982137984,
         title='The Glass Hotel',
-        contributor_objs=[contributor],
+        work_editions=['glass_hotel_edition'],
+        work_edition_objs=[edition],
         label_objs=[label],
     )
     database.add_object('jane_doe', contributor)
     database.add_object('science_fiction', label)
+    database.add_object('glass_hotel_work', work)
+    database.add_object('glass_hotel_edition', edition)
     database.add_object('glass_hotel', book)
 
     book_entry = next(
@@ -222,6 +237,7 @@ def test_build_search_index_includes_book_metadata_and_url() -> None:
     assert 'glass_hotel' in book_entry['searchText']
     assert 'glass_hotel' not in book_entry['details']
     assert 'Jane Doe' in book_entry['searchText']
+    assert 'Contributors: Jane Doe' in book_entry['details']
     assert str(book.isbn13) in book_entry['searchText']
     assert 'Science Fiction' in book_entry['searchText']
     assert 'Labels: Science Fiction' in book_entry['details']
@@ -1245,7 +1261,6 @@ def test_work_detail_renders_credits_and_markdown_premise() -> None:  # noqa: PL
         id='test_book',
         isbn13=9781234567897,
         title='Test Book',
-        contributor_objs=[contributor, illustrator, translator],
         work_edition_objs=[edition],
         reading_session_objs=[session],
     )

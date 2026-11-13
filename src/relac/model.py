@@ -1048,9 +1048,6 @@ class Book(LabelledResource):
     work_edition_objs: list[WorkEdition] = Field(
         default_factory=list, exclude=True
     )
-    contributor_objs: list[Contributor] = Field(
-        default_factory=list, exclude=True
-    )
     publisher_obj: BookPublisher = Field(default_factory=list, exclude=True)
     collection_objs: list[BookCollection] = Field(
         default_factory=list, exclude=True
@@ -1070,6 +1067,22 @@ class Book(LabelledResource):
         ),
         ResolvableField('owners', 'owner_objs', 'many-to-many', 'book_objs'),
     ]
+
+    @property
+    def contributor_objs(self) -> list[Contributor]:
+        """Get a list of all contributors in this model."""
+        all_contribs: list[Contributor] = []
+        for work_edition in self.work_edition_objs:
+            if work_edition.work_obj:
+                all_contribs.extend(work_edition.work_obj.author_objs)
+            all_contribs.extend(work_edition.illustrator_objs)
+            all_contribs.extend(work_edition.translator_objs)
+
+        rv: list[Contributor] = []
+        for contributor in all_contribs:
+            if contributor not in rv:
+                rv.append(contributor)
+        return rv
 
     # Properties
     @property
