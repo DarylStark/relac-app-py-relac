@@ -16,9 +16,8 @@
       </thead>
       <tbody>
         {% for work_character in work_characters %}
-        {% set work = work_character.work_obj %}
-        <tr data-href="{{ work.id }}.html">
-          <td><a href="{{ work.id }}.html">{{ work.title | e }}</a></td>
+        <tr data-href="{{ work_character.work_obj.id }}.html">
+          <td><a href="{{ work_character.work_obj.id }}.html">{{ work_character.work_obj.title | e }}</a></td>
           <td>
             {% for role in work_character.roles %}
               {% if not loop.first %}, {% endif %}{{ role.value | enum_label }}

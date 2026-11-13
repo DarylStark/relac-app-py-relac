@@ -10,10 +10,40 @@
 {% if chapter.part is not none and chapter.part != current_chapter.part %}Part {{ chapter.part }}: {% endif %}{{ chapter_label(chapter) }}
 {%- endmacro %}
 
-{% macro literary_analysis_menu(work, active_page, current_chapter=none) %}
+{% macro literary_analysis_menu(work, active_page=none, current_chapter=none) %}
+{% if active_page == "work" %}
+{% set current_page_label = "Work" %}
+{% elif active_page == "literary-analysis" %}
+{% set current_page_label = "Work Analysis" %}
+{% elif active_page == "literary-analysis-chapter" %}
+{% set current_page_label = chapter_page_label(current_chapter) if current_chapter else "Chapters" %}
+{% elif active_page == "literary-analysis-locations" %}
+{% set current_page_label = "Locations" %}
+{% elif active_page == "literary-analysis-characters" %}
+{% set current_page_label = "Characters" %}
+{% elif active_page == "literary-analysis-motifs" %}
+{% set current_page_label = "Motifs" %}
+{% elif active_page == "literary-analysis-quotes" %}
+{% set current_page_label = "Quotes" %}
+{% else %}
+{% set current_page_label = "Work pages" %}
+{% endif %}
 <div class="card literary-analysis-menu-card">
-  <nav class="literary-analysis-menu" aria-label="Work analysis pages">
+  <span class="literary-analysis-menu-current" role="button" tabindex="0" aria-controls="literary-analysis-menu-content" aria-label="Expand work pages menu">{{ current_page_label }}</span>
+  <button class="literary-analysis-menu-toggle" type="button" aria-controls="literary-analysis-menu-content" aria-expanded="true" aria-label="Collapse work pages menu" title="Collapse work pages menu">
+    <span class="visually-hidden literary-analysis-menu-toggle-label">Collapse work pages menu</span>
+    <span class="literary-analysis-menu-toggle-icon" aria-hidden="true">-</span>
+  </button>
+  <nav class="literary-analysis-menu" id="literary-analysis-menu-content" aria-label="Work pages">
     <ul>
+      <li>
+        {% if active_page == "work" %}
+        <span class="is-active" aria-current="page">Work</span>
+        {% else %}
+        <a href="{{ work.id }}.html">Work</a>
+        {% endif %}
+      </li>
+      {% if work.work_summary or work.work_analysis or work.structure or (work.setting and work.setting.time_period) %}
       <li>
         {% if active_page == "literary-analysis" %}
         <span class="is-active" aria-current="page">Work Analysis</span>
@@ -21,60 +51,26 @@
         <a href="literary_analysis.{{ work.id }}.html">Work Analysis</a>
         {% endif %}
       </li>
-      {% if work.literary_analysis.chapters %}
+      {% endif %}
+      {% if work.chapters %}
       <li class="literary-analysis-menu-group">
-        <details {% if active_page in ["literary-analysis", "literary-analysis-chapter"] %}open{% endif %}>
-          <summary>Chapter analysis</summary>
+        <details {% if active_page == "literary-analysis-chapter" %}open{% endif %}>
+          <summary>Chapters</summary>
           <ul class="literary-analysis-submenu">
-            {% set part_state = namespace(value=none, in_part=false) %}
-            {% for chapter in work.literary_analysis.chapters %}
-            {% if chapter.part is none %}
-            {% if part_state.in_part %}
-          </ul>
-        </details>
-      </li>
-            {% set part_state.in_part = false %}
-            {% endif %}
+            {% for chapter in work.chapters %}
             <li>
               {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.page_id == chapter.page_id %}
-              <span class="is-active" aria-current="page">{{ chapter_label(chapter) }}</span>
+              <span class="is-active" aria-current="page">{{ chapter_page_label(chapter) }}</span>
               {% else %}
-              <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.page_id }}.html">{{ chapter_label(chapter) }}</a>
+              <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.page_id }}.html">{{ chapter_page_label(chapter) }}</a>
               {% endif %}
             </li>
-            {% else %}
-            {% if not part_state.in_part or part_state.value != chapter.part %}
-            {% if part_state.in_part %}
-          </ul>
-        </details>
-      </li>
-            {% endif %}
-      <li class="literary-analysis-part">
-        <details{% if current_chapter and current_chapter.part is not none and current_chapter.part == chapter.part %} open{% endif %}>
-          <summary>Part {{ chapter.part }}</summary>
-          <ul class="literary-analysis-submenu">
-            {% set part_state.value = chapter.part %}
-            {% set part_state.in_part = true %}
-            {% endif %}
-            <li>
-              {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.page_id == chapter.page_id %}
-              <span class="is-active" aria-current="page">{{ chapter_label(chapter) }}</span>
-              {% else %}
-              <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.page_id }}.html">{{ chapter_label(chapter) }}</a>
-              {% endif %}
-            </li>
-            {% endif %}
             {% endfor %}
-            {% if part_state.in_part %}
-          </ul>
-        </details>
-      </li>
-            {% endif %}
           </ul>
         </details>
       </li>
       {% endif %}
-      {% if work.literary_analysis.setting and work.literary_analysis.setting.location_objs %}
+      {% if work.setting and work.setting.location_objs %}
       <li>
         {% if active_page == "literary-analysis-locations" %}
         <span class="is-active" aria-current="page">Locations</span>
@@ -83,7 +79,7 @@
         {% endif %}
       </li>
       {% endif %}
-      {% if work.literary_analysis.characters %}
+      {% if work.characters or work.narrator %}
       <li>
         {% if active_page == "literary-analysis-characters" %}
         <span class="is-active" aria-current="page">Characters</span>
@@ -92,7 +88,7 @@
         {% endif %}
       </li>
       {% endif %}
-      {% if work.literary_analysis.motifs %}
+      {% if work.motifs %}
       <li>
         {% if active_page == "literary-analysis-motifs" %}
         <span class="is-active" aria-current="page">Motifs</span>
@@ -101,7 +97,7 @@
         {% endif %}
       </li>
       {% endif %}
-      {% if work.literary_analysis.quote_objs %}
+      {% if work.quote_objs %}
       <li>
         {% if active_page == "literary-analysis-quotes" %}
         <span class="is-active" aria-current="page">Quotes</span>

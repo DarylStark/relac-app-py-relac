@@ -9,11 +9,17 @@
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_rating_value.html" import format_rating %}
 {% from "_detail_labels.html" import detail_labels %}
+{% from "_literary_analysis_menu.html" import literary_analysis_menu %}
 
 {% block content %}
 <div class="content">
   {{ breadcrumbs([("Works", "works.html"), (work.title, none)]) }}
-  <div class="card">
+  {% set has_analysis_menu = work.work_summary or work.work_analysis or work.structure or (work.setting and (work.setting.time_period or work.setting.location_objs)) or work.characters or work.chapters or work.motifs or work.narrator or work.quote_objs %}
+  <div class="literary-analysis-layout work-page-layout{% if not has_analysis_menu %} work-detail-only{% endif %}">
+    {% if has_analysis_menu %}
+    {{ literary_analysis_menu(work, "work") }}
+    {% endif %}
+  <div class="card" id="work">
       <section class="detail-summary" aria-labelledby="detail-title">
         <div class="detail-summary-header">
           <div>
@@ -77,12 +83,8 @@
         {{ work.premise | markdown }}
       </section>
       {% endif %}
-      {% if work.literary_analysis %}
-      <div class="detail-actions">
-        <a class="detail-action" href="literary_analysis.{{ work.id }}.html">Read literary analysis</a>
-      </div>
-      {% endif %}
       {{ detail_labels(work.label_objs) }}
+  </div>
   </div>
 
   {% if work.reading_session_objs %}

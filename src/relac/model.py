@@ -1,11 +1,36 @@
 """Module with the models for the application."""
 
 import statistics
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass
 from datetime import date, timedelta
 from enum import Enum
+from typing import ClassVar, Literal, override
 
 from pydantic import BaseModel, Field
+
+from relac.data_helpers import (
+    _code_to_language,
+    _format_enum_label,
+    _format_isbn,
+)
+from relac.exceptions import DoubleModelNameError
+
+relac_models: dict[str, type[ResourceBase]] = {}
+
+
+def register_model[TResource: ResourceBase](
+    model_name: str,
+) -> Callable[[type[TResource]], type[TResource]]:
+    """Decorator to register a model for data."""
+
+    def model_decorator(class_: type[TResource]) -> type[TResource]:
+        if model_name in relac_models:
+            raise DoubleModelNameError(model_name)
+        relac_models[model_name] = class_
+        return class_
+
+    return model_decorator
 
 
 class ResourceAvailability(Enum):
@@ -52,27 +77,180 @@ def _aggregate_availability(
     return ResourceAvailability.UNAVAILABLE
 
 
+@dataclass
+class ResolvableField:
+    """Field that can be resolved."""
+
+    source_field: str
+    destination_field: str
+    type: Literal['many-to-many', 'one-to-many', 'one-to-none']
+    populates_back: str | None = None
+
+
+def search_detail(name: str, value: str | None) -> str:
+    """Generate a search detail."""
+    if value is None:
+        return ''
+    return f'{name}: {value}'
+
+
+def search_detail_for_obj[T: BaseModel](
+    name: str, field: str, obj: T | None
+) -> str:
+    """Create a search detail for a enum value."""
+    if obj is None:
+        return ''
+
+    return search_detail(name, getattr(obj, field, ''))
+
+
+def search_detail_for_obj_list[T: BaseModel](
+    name: str, field: str, lst: list[T] | None
+) -> str:
+    """Create a search detail for a enum value."""
+    if not lst:
+        return ''
+
+    values = [getattr(value, field) for value in lst]
+    return search_detail(name, ', '.join(values))
+
+
+def search_detail_for_str_list(name: str, lst: list[str] | None) -> str:
+    """Create a search detail for a enum value."""
+    if not lst:
+        return ''
+    return search_detail(name, ', '.join(lst))
+
+
+def transformed_search_detail[T](
+    name: str, value: T | None, transform: Callable[[T], str]
+) -> str:
+    """Transform a search detail."""
+    if value is None:
+        return ''
+    return search_detail(name, transform(value))
+
+
+def search_detail_for_enum[T: Enum](name: str, obj: T | None) -> str:
+    """Create a search detail for a enum value."""
+    if obj is None:
+        return ''
+    return transformed_search_detail(name, obj.value, _format_enum_label)
+
+
+@dataclass
+class SearchIndexData:
+    """Class that contains search index data."""
+
+    resource_type: str
+    resource_id: str | None
+    title: str
+    details: list[str]
+    search_terms: list[str] | None = None
+    labels: list[str] | None = None
+
+    extra_data: list[SearchIndexData] | None = None
+
+
+@dataclass
+class LintingFinding:
+    """Class for a Linting Error."""
+
+    id: str
+    resource_id: str | None
+    error: str
+
+
 class ResourceBase(BaseModel):
     """Base model for resources."""
 
-    id: str | None = Field(default=None)
+    id: str | None = Field(default=None, exclude=False)
+
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        return []
+
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return type(self).__name__
+
+    def _get_title(self) -> str:
+        """Get the title for this object."""
+        fields = ('title', 'name')
+        for field in fields:
+            value = getattr(self, field, None)
+            if value:
+                return value
+        return ''
+
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return []
+
+    def _get_search_terms(self) -> list[str] | None:
+        """Get the search terms for this object."""
+        return None
+
+    def _get_label_names(self) -> list[str] | None:
+        """Get the label names for this object."""
+        return None
+
+    def _get_extra_data(self) -> list[SearchIndexData] | None:
+        """Get additional search entries for this object."""
+        return None
+
+    def get_search_index_data(self) -> SearchIndexData:
+        """Build the data for the search index."""
+        return SearchIndexData(
+            resource_type=self._get_resource_type(),
+            resource_id=self.id,
+            title=self._get_title(),
+            details=[detail for detail in self._get_details() if detail],
+            search_terms=self._get_search_terms(),
+            labels=self._get_label_names(),
+            extra_data=self._get_extra_data(),
+        )
+
+    def __repr__(self) -> str:
+        """The repr for this model."""
+        # TODO: Implement something sensible
+        return ''
+
+    def __str__(self) -> str:
+        """The str representation for this model."""
+        # TODO: Implement something sensible
+        return ''
 
 
 class LabelledResource(ResourceBase):
     """Base model for labelled resources."""
 
-    labels: list[str] | None = None
-    label_objs: list[Label] = Field(default_factory=list)
+    labels: list[str] = Field(default_factory=list)
+
+    # Relation (real objects)
+    label_objs: list[Label] = Field(default_factory=list, exclude=True)
+
+    @override
+    def _get_label_names(self) -> list[str]:
+        """Get the label names for this object."""
+        return [label.name for label in self.label_objs]
 
 
-class RelacConfig(BaseModel):
+@register_model('relac')
+class RelacConfig(ResourceBase):
     """Model for Relac configuration."""
 
     title: str
     owner: str | None = None
 
     # Relation (real objects)
-    owner_obj: Owner | None = None
+    owner_obj: Owner | None = Field(default=None, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('owner', 'owner_obj', 'one-to-none'),
+    ]
 
 
 class ContributorState(Enum):
@@ -83,6 +261,7 @@ class ContributorState(Enum):
     DECEASED = 'deceased'
 
 
+@register_model('contributor')
 class Contributor(LabelledResource):
     """Model for a contributor."""
 
@@ -91,18 +270,32 @@ class Contributor(LabelledResource):
     birthdate: date | None = None
     deceased_date: date | None = None
     countries: list[str] = Field(default_factory=list)
-    # labels: list[str] | None = None
 
     # Relation (real objects)
-    work_objs: list[Work] = Field(default_factory=list)
-    book_objs: list[Book] = Field(default_factory=list)
-    quote_objs: list[Quote] = Field(default_factory=list)
+    work_objs: list[Work] = Field(default_factory=list, exclude=True)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+    quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
     illustrator_work_edition_objs: list[WorkEdition] = Field(
-        default_factory=list
+        default_factory=list, exclude=True
     )
     translator_work_edition_objs: list[WorkEdition] = Field(
-        default_factory=list
+        default_factory=list, exclude=True
     )
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'labels', 'label_objs', 'many-to-many', 'contributor_objs'
+        ),
+    ]
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj_list('Works', 'title', self.work_objs),
+            search_detail_for_obj_list('Books', 'title', self.book_objs),
+        ]
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -218,6 +411,7 @@ class StoryStructure(BaseModel):
     pacing: WorkPacing
 
 
+@register_model('location')
 class Location(ResourceBase):
     """Model for a location."""
 
@@ -226,7 +420,16 @@ class Location(ResourceBase):
     description: str | None = None
 
     # Relation (real objects)
-    work_objs: list[Work] = Field(default_factory=list)
+    work_objs: list[Work] = Field(default_factory=list, exclude=True)
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail('Country', self.country),
+            search_detail('Description', self.description),
+            search_detail_for_obj_list('Works', 'title', self.work_objs),
+        ]
 
 
 class StorySetting(BaseModel):
@@ -236,9 +439,16 @@ class StorySetting(BaseModel):
     locations: list[str] | None = None
 
     # Relation (real objects)
-    location_objs: list[Location] = Field(default_factory=list)
+    location_objs: list[Location] = Field(default_factory=list, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'locations', 'location_objs', 'many-to-many', 'work_objs'
+        )
+    ]
 
 
+@register_model('character')
 class Character(ResourceBase):
     """A character in a story."""
 
@@ -250,8 +460,34 @@ class Character(ResourceBase):
     description: str | None = None
 
     # Relation (real objects)
-    work_character_objs: list[WorkCharacter] = Field(default_factory=list)
-    quote_objs: list[Quote] = Field(default_factory=list)
+    work_objs: list[Work] = Field(default_factory=list, exclude=True)
+    quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail('Birthplace', self.birthplace),
+            search_detail('Birth country', self.birthcountry),
+            search_detail_for_obj_list('Works', 'title', self.work_objs),
+        ]
+
+    def _get_works_with_specific_reading_state(
+        self, reading_state: ReadingState
+    ) -> list[Work]:
+        return [
+            work
+            for work in self.work_objs
+            if work.reading_state == reading_state
+        ]
+
+    @property
+    def work_character_objs(self) -> list[WorkCharacter]:
+        """Get all Work Character objects for this character."""
+        rv: list[WorkCharacter] = list()
+        for work_obj in self.work_objs:
+            rv.extend(work_obj.characters)
+        return rv
 
 
 class CharacterRole(Enum):
@@ -276,7 +512,7 @@ class StoryArc(Enum):
 
 
 class WorkCharacter(BaseModel):
-    """A link between a character and a LiteraryAnalysis."""
+    """A character appearing in a work."""
 
     character: str
     roles: list[CharacterRole] = Field(default_factory=list)
@@ -284,8 +520,16 @@ class WorkCharacter(BaseModel):
     story_arc: StoryArc | None = None
 
     # Relation (real objects)
-    character_obj: Character | None = None
-    work_obj: Work | None = None
+    character_obj: Character | None = Field(default=None, exclude=True)
+    work_obj: Work | None = Field(default=None, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'character', 'character_obj', 'one-to-many', 'work_objs'
+        )
+    ]
+    resolvable_parent_fields: ClassVar[tuple[str, ...]] = ('work_obj',)
 
 
 class ChapterAnalysis(BaseModel):
@@ -305,6 +549,7 @@ class ChapterAnalysis(BaseModel):
         return f'part-{self.part}.chapter-{self.number}'
 
 
+@register_model('quote')
 class Quote(ResourceBase):
     """A quote from a contributor."""
 
@@ -315,9 +560,25 @@ class Quote(ResourceBase):
     work: str | None = None
 
     # Relation (real objects)
-    contributor_obj: Contributor | None = None
-    character_obj: Character | None = None
-    work_obj: Work | None = None
+    contributor_obj: Contributor | None = Field(default=None, exclude=True)
+    character_obj: Character | None = Field(default=None, exclude=True)
+    work_obj: Work | None = Field(default=None, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'contributor', 'contributor_obj', 'one-to-many', 'quote_objs'
+        ),
+        ResolvableField(
+            'character', 'character_obj', 'one-to-many', 'quote_objs'
+        ),
+        ResolvableField(
+            'work',
+            'work_obj',
+            'one-to-many',
+            'quote_objs',
+        ),
+    ]
 
 
 class MotifType(Enum):
@@ -355,24 +616,11 @@ class Narrator(BaseModel):
     notes: str | None = None
 
     # Relation (real objects)
-    character_obj: Character | None = None
+    character_obj: Character | None = Field(default=None, exclude=True)
 
-
-class LiteraryAnalysis(BaseModel):
-    """Model for a works literary analysis."""
-
-    work_summary: str | None = None
-    work_analysis: str | None = None
-    structure: StoryStructure | None = None
-    setting: StorySetting | None = None
-    characters: list[WorkCharacter] = Field(default_factory=list)
-    chapters: list[ChapterAnalysis] = Field(default_factory=list)
-    quotes: list[str] = Field(default_factory=list)
-    motifs: list[Motif] = Field(default_factory=list)
-    narrator: Narrator | None = None
-
-    # Relation (real objects)
-    quote_objs: list[Quote] = Field(default_factory=list)
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('character', 'character_obj', 'one-to-none')
+    ]
 
 
 class PrimaryGenre(Enum):
@@ -393,6 +641,7 @@ class GenreClassification(BaseModel):
     subgenres: list[str] = Field(default_factory=list)
 
 
+@register_model('work')
 class Work(LabelledResource):
     """Model for a work."""
 
@@ -402,14 +651,76 @@ class Work(LabelledResource):
     work_structure: WorkStructure | None = None
     premise: str | None = None
     genre: GenreClassification | None = None
-
-    literary_analysis: LiteraryAnalysis | None = None
+    work_summary: str | None = None
+    work_analysis: str | None = None
+    structure: StoryStructure | None = None
+    setting: StorySetting | None = None
+    characters: list[WorkCharacter] = Field(default_factory=list)
+    chapters: list[ChapterAnalysis] = Field(default_factory=list)
+    quotes: list[str] = Field(default_factory=list)
+    motifs: list[Motif] = Field(default_factory=list)
+    narrator: Narrator | None = None
 
     # Relation (real objects)
-    author_objs: list[Contributor] = Field(default_factory=list)
-    edition_objs: list[WorkEdition] = Field(default_factory=list)
-    book_objs: list[Book] = Field(default_factory=list)
-    series_objs: list[Series] = Field(default_factory=list)
+    author_objs: list[Contributor] = Field(default_factory=list, exclude=True)
+    edition_objs: list[WorkEdition] = Field(default_factory=list, exclude=True)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+    series_objs: list[Series] = Field(default_factory=list, exclude=True)
+    quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('labels', 'label_objs', 'many-to-many', 'work_objs'),
+        ResolvableField('authors', 'author_objs', 'many-to-many', 'work_objs'),
+        ResolvableField('quotes', 'quote_objs', 'many-to-many'),
+    ]
+    resolvable_children: ClassVar[tuple[str, ...]] = (
+        'characters',
+        'narrator',
+        'setting',
+    )
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        rv = [
+            search_detail_for_obj_list('Authors', 'name', self.author_objs),
+            search_detail_for_enum('Structure', self.work_structure),
+            search_detail_for_enum('Category', self.work_type),
+            search_detail_for_obj_list('Editions', 'title', self.edition_objs),
+        ]
+
+        if self.genre:
+            genres = [
+                _format_enum_label(self.genre.primary.value.replace('_', '-')),
+                *self.genre.subgenres,
+            ]
+            rv.append(search_detail('Genres', ', '.join(genres)))
+
+        return rv
+
+    @override
+    def _get_extra_data(self) -> list[SearchIndexData] | None:
+        """Get titled chapter entries associated with this work."""
+        if self.id is None:
+            return None
+
+        return [
+            SearchIndexData(
+                resource_type='Chapter',
+                resource_id=(
+                    f'literary_analysis_chapter.{self.id}.{chapter.page_id}'
+                ),
+                title=(
+                    f'Part {chapter.part}: ' if chapter.part is not None else ''
+                )
+                + f'{chapter.number}. {chapter.title}',
+                details=[search_detail('Work', self.title)],
+                search_terms=[self.title],
+            )
+            for chapter in self.chapters
+            if chapter.title
+        ]
 
     # Properties
     @property
@@ -484,6 +795,7 @@ class WorkEditionType(Enum):
     ANNOTATED = 'annotated'  # With study notes
 
 
+@register_model('work_edition')
 class WorkEdition(LabelledResource):
     """A edition for a work."""
 
@@ -496,11 +808,58 @@ class WorkEdition(LabelledResource):
     translators: list[str] | None = None
 
     # Relations (real objects)
-    work_obj: Work | None = None
-    book_objs: list[Book] = Field(default_factory=list)
-    reading_session_objs: list[ReadingSession] = Field(default_factory=list)
-    illustrator_objs: list[Contributor] = Field(default_factory=list)
-    translator_objs: list[Contributor] = Field(default_factory=list)
+    work_obj: Work | None = Field(default=None, exclude=True)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+    reading_session_objs: list[ReadingSession] = Field(
+        default_factory=list, exclude=True
+    )
+    illustrator_objs: list[Contributor] = Field(
+        default_factory=list, exclude=True
+    )
+    translator_objs: list[Contributor] = Field(
+        default_factory=list, exclude=True
+    )
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'labels', 'label_objs', 'many-to-many', 'work_edition_objs'
+        ),
+        ResolvableField('work', 'work_obj', 'one-to-many', 'edition_objs'),
+        ResolvableField(
+            'illustrators',
+            'illustrator_objs',
+            'many-to-many',
+            'illustrator_work_edition_objs',
+        ),
+        ResolvableField(
+            'translators',
+            'translator_objs',
+            'many-to-many',
+            'translator_work_edition_objs',
+        ),
+    ]
+
+    @override
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return 'Edition'
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj('Work', 'title', self.work_obj),
+            search_detail(
+                'Release date',
+                str(self.release_date) if self.release_date else None,
+            ),
+            transformed_search_detail(
+                'Language', self.language, _code_to_language
+            ),
+            search_detail_for_enum('Type', self.edition_type),
+            search_detail_for_obj_list('Books', 'title', self.book_objs),
+        ]
 
     # Properties
     @property
@@ -559,6 +918,7 @@ class WorkEdition(LabelledResource):
         return statistics.mean(ratings)
 
 
+@register_model('collection')
 class BookCollection(LabelledResource):
     """A collection of books."""
 
@@ -566,7 +926,28 @@ class BookCollection(LabelledResource):
     books: list[str] = Field(default_factory=list)
 
     # Relations (real objects)
-    book_objs: list[Book] = Field(default_factory=list)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'labels', 'label_objs', 'many-to-many', 'book_collection_objs'
+        ),
+        ResolvableField(
+            'books', 'book_objs', 'many-to-many', 'collection_objs'
+        ),
+    ]
+
+    @override
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return 'Collection'
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj_list('Books', 'title', self.book_objs),
+        ]
 
     def owned_percentage(self, owner: Owner | None) -> float:
         """Get the percentage of books owned by the specified owner."""
@@ -588,6 +969,7 @@ class BookCollection(LabelledResource):
         return statistics.mean(rated_ratings)
 
 
+@register_model('publisher')
 class BookPublisher(ResourceBase):
     """Model for a publisher."""
 
@@ -595,7 +977,7 @@ class BookPublisher(ResourceBase):
     imprint: str | None = None
 
     # Relations (real objects)
-    book_objs: list[Book] = Field(default_factory=list)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
 
 
 class BookMedium(Enum):
@@ -624,6 +1006,7 @@ class BookBinding(Enum):
     PDF_DRM = 'pdf-drm'
 
 
+@register_model('book')
 class Book(LabelledResource):
     """A book."""
 
@@ -635,13 +1018,70 @@ class Book(LabelledResource):
     binding: BookBinding = BookBinding.UNSPECIFIED
     owners: list[str] | None = None
 
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj_list(
+                'Contributors', 'name', self.contributor_objs
+            ),
+            search_detail_for_obj('Publisher', 'name', self.publisher_obj),
+            search_detail_for_obj('Imprint', 'imprint', self.publisher_obj),
+            transformed_search_detail('ISBN', self.isbn13, _format_isbn),
+            search_detail_for_enum('Medium', self.medium),
+            search_detail_for_enum('Binding', self.binding),
+            search_detail_for_obj_list(
+                'Works', 'title', self.work_edition_objs
+            ),
+            search_detail_for_obj_list(
+                'Collections', 'name', self.collection_objs
+            ),
+        ]
+
+    @override
+    def _get_search_terms(self) -> list[str]:
+        """Get the search terms for this object."""
+        return [str(self.isbn13)] if self.isbn13 is not None else []
+
     # Relationships (real objects)
-    work_edition_objs: list[WorkEdition] = Field(default_factory=list)
-    contributor_objs: list[Contributor] = Field(default_factory=list)
-    publisher_obj: BookPublisher = Field(default_factory=list)
-    collection_objs: list[BookCollection] = Field(default_factory=list)
-    owner_objs: list[Owner] = Field(default_factory=list)
-    reading_session_objs: list[ReadingSession] = Field(default_factory=list)
+    work_edition_objs: list[WorkEdition] = Field(
+        default_factory=list, exclude=True
+    )
+    publisher_obj: BookPublisher = Field(default_factory=list, exclude=True)
+    collection_objs: list[BookCollection] = Field(
+        default_factory=list, exclude=True
+    )
+    owner_objs: list[Owner] = Field(default_factory=list, exclude=True)
+    reading_session_objs: list[ReadingSession] = Field(
+        default_factory=list, exclude=True
+    )
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('labels', 'label_objs', 'many-to-many', 'book_objs'),
+        ResolvableField(
+            'publisher', 'publisher_obj', 'one-to-many', 'book_objs'
+        ),
+        ResolvableField(
+            'work_editions', 'work_edition_objs', 'many-to-many', 'book_objs'
+        ),
+        ResolvableField('owners', 'owner_objs', 'many-to-many', 'book_objs'),
+    ]
+
+    @property
+    def contributor_objs(self) -> list[Contributor]:
+        """Get a list of all contributors in this model."""
+        all_contribs: list[Contributor] = []
+        for work_edition in self.work_edition_objs:
+            if work_edition.work_obj:
+                all_contribs.extend(work_edition.work_obj.author_objs)
+            all_contribs.extend(work_edition.illustrator_objs)
+            all_contribs.extend(work_edition.translator_objs)
+
+        rv: list[Contributor] = []
+        for contributor in all_contribs:
+            if contributor not in rv:
+                rv.append(contributor)
+        return rv
 
     # Properties
     @property
@@ -747,6 +1187,7 @@ class Rating(BaseModel):
     note: str | None = None
 
 
+@register_model('reading_session')
 class ReadingSession(LabelledResource):
     """A reading session."""
 
@@ -760,8 +1201,104 @@ class ReadingSession(LabelledResource):
     book_rating: Rating | None = None
 
     # Relationships (real objects)
-    work_edition_obj: WorkEdition | None = None
-    book_obj: Book | None = None
+    work_edition_obj: WorkEdition | None = Field(default=None, exclude=True)
+    book_obj: Book | None = Field(default=None, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'labels', 'label_objs', 'many-to-many', 'reading_sessions_objs'
+        ),
+        ResolvableField(
+            'work_edition',
+            'work_edition_obj',
+            'one-to-many',
+            'reading_session_objs',
+        ),
+        ResolvableField(
+            'book', 'book_obj', 'one-to-many', 'reading_session_objs'
+        ),
+    ]
+
+    @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        if all(
+            [
+                self.state != ReadingState.FINISHED,
+                self.state != ReadingState.DID_NOT_FINISH,
+                self.enddate is not None,
+            ]
+        ):
+            rv.append(
+                LintingFinding(
+                    id='reading-session-enddate-set',
+                    resource_id=self.id,
+                    error='Enddate set but work not '
+                    '"Finished" or "Did not finish".',
+                )
+            )
+
+        if self.startdate and self.enddate and self.startdate > self.enddate:
+            rv.append(
+                LintingFinding(
+                    id='reading-session-enddate-smaller-then-startdate',
+                    resource_id=self.id,
+                    error='Enddate is bigger then startdate',
+                )
+            )
+
+        return rv
+
+    @override
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return 'Reading session'
+
+    @override
+    def _get_title(self) -> str:
+        """Get a display title for this reading session."""
+        if self.work_edition_obj:
+            return self.work_edition_obj.title
+        if self.book_obj:
+            return self.book_obj.title
+        return self.id or 'Reading session'
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj(
+                'Work edition', 'title', self.work_edition_obj
+            ),
+            search_detail_for_obj('Book', 'title', self.book_obj),
+            search_detail_for_enum('State', self.state),
+            search_detail(
+                'Start date',
+                str(self.startdate) if self.startdate else None,
+            ),
+            search_detail(
+                'End date', str(self.enddate) if self.enddate else None
+            ),
+            search_detail(
+                'Work rating',
+                str(self.work_rating.rating) if self.work_rating else None,
+            ),
+            search_detail(
+                'Work rating note',
+                self.work_rating.note if self.work_rating else None,
+            ),
+            search_detail(
+                'Book rating',
+                str(self.book_rating.rating) if self.book_rating else None,
+            ),
+            search_detail(
+                'Book rating note',
+                self.book_rating.note if self.book_rating else None,
+            ),
+        ]
 
     @property
     def effective_enddate(self) -> date | None:
@@ -791,38 +1328,114 @@ class ReadingSession(LabelledResource):
         return None if len(ratings) == 0 else statistics.mean(ratings)
 
 
+@register_model('label')
 class Label(ResourceBase):
     """A label."""
 
     name: str
 
     # Relationships (real objects)
-    contributor_objs: list[Contributor] = Field(default_factory=list)
-    work_objs: list[Work] = Field(default_factory=list)
-    work_edition_objs: list[WorkEdition] = Field(default_factory=list)
-    series_objs: list[Series] = Field(default_factory=list)
-    reading_list_objs: list[ReadingList] = Field(default_factory=list)
-    reading_session_objs: list[ReadingSession] = Field(default_factory=list)
-    book_objs: list[Book] = Field(default_factory=list)
-    owner_objs: list[Owner] = Field(default_factory=list)
-    book_collection_objs: list[BookCollection] = Field(default_factory=list)
+    contributor_objs: list[Contributor] = Field(
+        default_factory=list, exclude=True
+    )
+    work_objs: list[Work] = Field(default_factory=list, exclude=True)
+    work_edition_objs: list[WorkEdition] = Field(
+        default_factory=list, exclude=True
+    )
+    series_objs: list[Series] = Field(default_factory=list, exclude=True)
+    reading_list_objs: list[ReadingList] = Field(
+        default_factory=list, exclude=True
+    )
+    reading_session_objs: list[ReadingSession] = Field(
+        default_factory=list, exclude=True
+    )
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+    owner_objs: list[Owner] = Field(default_factory=list, exclude=True)
+    book_collection_objs: list[BookCollection] = Field(
+        default_factory=list, exclude=True
+    )
 
 
-class ReadingListItem(ResourceBase):
+class ReadingListItem(BaseModel):
     """A item in a reading list."""
 
     order: int
     work: str
 
     # Relationships (real objects)
-    work_obj: Work | None = None
+    work_obj: Work | None = Field(default=None, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('work', 'work_obj', 'one-to-none'),
+    ]
 
 
+@register_model('reading_list')
 class ReadingList(LabelledResource):
     """A list of resources."""
 
     name: str
     works: list[ReadingListItem] = Field(default_factory=list)
+
+    resolvable_children: ClassVar[tuple[str, ...]] = ('works',)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField(
+            'labels', 'label_objs', 'many-to-many', 'reading_list_objs'
+        )
+    ]
+
+    @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        orders = [work.order for work in self.works]
+        double = set([order for order in orders if orders.count(order) > 1])
+
+        for double_order in double:
+            rv.append(
+                LintingFinding(
+                    id='reading-list-double-order',
+                    resource_id=self.id,
+                    error=f'Order {double_order} is double in the list.',
+                )
+            )
+
+        all_works = [
+            work.work_obj.id or ''
+            for work in self.works
+            if work.work_obj is not None
+        ]
+        double_works: set[str] = set(
+            [work for work in all_works if all_works.count(work) > 1]
+        )
+
+        for double_work in double_works:
+            rv.append(
+                LintingFinding(
+                    id='reading-list-double-work',
+                    resource_id=self.id,
+                    error=f'Work "{double_work}" is double in the list.',
+                )
+            )
+
+        return rv
+
+    @override
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return 'Reading list'
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        works = [
+            item.work_obj for item in self.works if item.work_obj is not None
+        ]
+        return [search_detail_for_obj_list('Works', 'title', works)]
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -909,6 +1522,7 @@ class Availability(Enum):
     INDIRECTLY_AVAILABLE = 'indirectly'
 
 
+@register_model('owner')
 class Owner(LabelledResource):
     """Model for a owner."""
 
@@ -917,24 +1531,115 @@ class Owner(LabelledResource):
     availability: Availability = Availability.NOT_AVAILABLE
 
     # Relationships (real objects)
-    book_objs: list[Book] = Field(default_factory=list)
+    book_objs: list[Book] = Field(default_factory=list, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('labels', 'label_objs', 'many-to-many', 'owner_objs')
+    ]
+
+    @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+        if (
+            self.owner_type in (OwnerType.STORE, OwnerType.LIBRARY)
+            and self.availability == Availability.INDIRECTLY_AVAILABLE
+        ):
+            rv.append(
+                LintingFinding(
+                    id='owner-store-library-indirect',
+                    resource_id=self.id,
+                    error='A "store" or "library" should never '
+                    'be "indirectly" available.',
+                )
+            )
+        return rv
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_enum('Type', self.owner_type),
+            search_detail_for_enum('Availability', self.availability),
+            search_detail_for_obj_list('Books', 'title', self.book_objs),
+        ]
 
 
-class SeriesItem(ResourceBase):
+class SeriesItem(BaseModel):
     """A item in a serie."""
 
     number: int
     work: str
 
     # Relationships (real objects)
-    work_obj: Work | None = None
+    work_obj: Work | None = Field(default=None, exclude=True)
+    series_obj: Series | None = Field(default=None, exclude=True)
+
+    # Resolve definitions
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('work', 'work_obj', 'one-to-many', 'series_objs'),
+    ]
 
 
+@register_model('series')
 class Series(LabelledResource):
     """A serie of works."""
 
     name: str
     works: list[SeriesItem] = Field(default_factory=list)
+
+    resolvable_children: ClassVar[tuple[str, ...]] = ('works',)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('labels', 'label_objs', 'many-to-many', 'series_objs')
+    ]
+
+    @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        orders = [work.number for work in self.works]
+        double = set([order for order in orders if orders.count(order) > 1])
+
+        for double_order in double:
+            rv.append(
+                LintingFinding(
+                    id='series-double-number',
+                    resource_id=self.id,
+                    error=f'Number {double_order} is double in the series.',
+                )
+            )
+
+        all_works = [
+            work.work_obj.id or ''
+            for work in self.works
+            if work.work_obj is not None
+        ]
+        double_works: set[str] = set(
+            [work for work in all_works if all_works.count(work) > 1]
+        )
+
+        for double_work in double_works:
+            rv.append(
+                LintingFinding(
+                    id='series-double-work',
+                    resource_id=self.id,
+                    error=f'Work "{double_work}" is double in the series.',
+                )
+            )
+
+        return rv
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        works = [
+            item.work_obj for item in self.works if item.work_obj is not None
+        ]
+        return [search_detail_for_obj_list('Works', 'title', works)]
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -1001,3 +1706,6 @@ class Series(LabelledResource):
         if not rated_ratings:
             return None
         return statistics.mean(rated_ratings)
+
+
+# relac_models: dict[str, type[ResourceBase]] = {'contributor': Contributor}

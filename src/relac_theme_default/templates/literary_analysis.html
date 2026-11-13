@@ -8,9 +8,8 @@
 {% block content %}
 <div class="content">
   {{ breadcrumbs([
-      ("Work", "works.html"),
+      ("Works", "works.html"),
       (work.title, work.id ~ ".html"),
-      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
       ("Work Analysis", none)
   ]) }}
   <div class="literary-analysis-layout">
@@ -18,39 +17,36 @@
     <div class="card literary-analysis-card" role="article" aria-labelledby="analysis-title">
       <header class="literary-analysis-header">
         <div>
-          <p class="detail-kind">Literary analysis</p>
+          <p class="detail-kind">Work analysis</p>
           <h2 class="detail-title" id="analysis-title">{{ work.title }}</h2>
         </div>
         <button class="literary-analysis-width-toggle" type="button" aria-label="Full-width text" aria-pressed="false" title="Switch to full-width text">Full width</button>
       </header>
-      {% if work.literary_analysis.structure or (work.literary_analysis.setting and work.literary_analysis.setting.time_period) %}
+      {% if work.structure or (work.setting and work.setting.time_period) %}
       <dl class="detail-metadata literary-analysis-metadata">
-        {% if work.literary_analysis.setting and work.literary_analysis.setting.time_period %}
+        {% if work.setting and work.setting.time_period %}
         <div class="detail-fact">
           <dt>Time period</dt>
-          <dd>{{ work.literary_analysis.setting.time_period | e }}</dd>
+          <dd>{{ work.setting.time_period | e }}</dd>
         </div>
         {% endif %}
-        {% if work.literary_analysis.structure %}
+        {% if work.structure %}
         <div class="detail-fact">
           <dt>Chronology</dt>
-          <dd>{{ work.literary_analysis.structure.chronology.value | enum_label }}</dd>
+          <dd>{{ work.structure.chronology.value | enum_label }}</dd>
         </div>
         <div class="detail-fact">
           <dt>Pacing</dt>
-          <dd>{{ work.literary_analysis.structure.pacing.value | enum_label }}</dd>
+          <dd>{{ work.structure.pacing.value | enum_label }}</dd>
         </div>
         {% endif %}
       </dl>
       {% endif %}
-      {% if work.literary_analysis.work_summary %}
-      {{ literary_analysis_section("work-summary", "Summary", work.literary_analysis.work_summary) }}
+      {% if work.work_summary %}
+      {{ literary_analysis_section("work-summary", "Summary", work.work_summary) }}
       {% endif %}
-      {% if work.literary_analysis.work_analysis %}
-      {{ literary_analysis_section("work-analysis", "Analysis", work.literary_analysis.work_analysis) }}
-      {% endif %}
-      {% if not work.literary_analysis.work_summary and not work.literary_analysis.work_analysis %}
-      <p class="literary-analysis-empty">No literary analysis has been written for this work yet.</p>
+      {% if work.work_analysis %}
+      {{ literary_analysis_section("work-analysis-text", "Analysis", work.work_analysis) }}
       {% endif %}
     </div>
   </div>

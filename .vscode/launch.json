@@ -10,9 +10,7 @@
             "request": "launch",
             "module": "relac",
             "args": [
-                "static_html",
-                "create",
-                "--output",
+                "create-static-webpage",
                 "${workspaceFolder}/out"
             ],
             "cwd": "${workspaceFolder}/tests/simple_project",

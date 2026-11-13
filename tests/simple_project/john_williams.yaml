@@ -1,4 +1,14 @@
 ---
+_template_work: &template_work
+  authors:
+    - contributor.stephen_king
+  work_type: genre-fiction
+  work_structure: short-story
+
+_template_work_edition: &template_work_edition
+  title: Mr. Harrigan's Phone
+  edition_type: original
+  language: en
 #-------------------------------------------------------------------------------
 # Contributor
 #-------------------------------------------------------------------------------
@@ -59,7 +69,6 @@ quote.william_stoner:
 
 work.john_williams__stoner:
   title: Stoner
-  <<: *template_work
   authors:
     - contributor.john_williams
   work_structure: novel
@@ -73,73 +82,71 @@ work.john_williams__stoner:
       - Drama
       - Domestic fiction
   premise: "The premise of _Stoner_ by _John Williams_ follows the quiet, unremarkable life of William Stoner, a poor Missouri farm boy who goes to the University of Missouri to study agriculture and instead falls in love with English literature.\n\nExtremly <b>good</b> book"
-  literary_analysis:
-    work_summary: "This is a *good* book about Stoner."
-    work_analysis: "Depression _and_ loneliness."
-    structure:
-      chronology: linear
-      pacing: contemplative
-    setting:
-      time_period: "1900 - 1950"
-      locations:
-        - location.university_missouri
-        - location.missouri
-    characters:
-      - character: character.william_stoner
-        roles:
-          - protagonist
-      - character: character.edith_elaine_bostwick
-        roles:
-          - love-interest
-          - antagonist
-      - character: character.grace_stoner
-        roles:
-          - deuteragonist
-    narrator:
-      perspective: third-person-limited
-      character: character.william_stoner
-      reliable: false
-      notes: "The narration stays close to William."
-
-    chapters:
-      - number: 1
-        part: 1
-        title: "First chapter"
-        summary: "First __chapter__ tells a lot"
-        analysis: "[file:john_williams__stoner__chapter_1__analyse.md]"
-      - number: 2
-        part: 1
-        title: "Second chapter"
-        summary: "Movement to uni"
-        analysis: "Falls in love with literature"
-      - number: 1
-        part: 2
-        summary: "Titleless chapter"
-        analysis: "Just to see if it works"
-      - number: 2
-        part: 2
-        title: "Part 2"
-        summary: "Chapter 2 in part 2"
-        analysis: "Just to see if it works"
-    motifs:
-      - name: "Value of a unremarkable life"
-        description: "On the outside a failure, on the inside a lot of devotion, integrity and passion"
-        motif_type: thematic
-      - name: "Passion as isolating power"
-        description: "Love for literature lifts him, but also enstrages him from family"
-        motif_type: thematic
-      - name: "Emotional enstrangement and silence"
-        motif_type: situation
-        symbolizes: "The distance between people"
-        description: "Edith keeps constantly dissapearing and he loses contact with his daughter."
-      - name: "Published book"
-        motif_type: leitmotiv
-        symbolizes: "Silence devotion and legacy"
-        description: "A monografy that nobody reads but as the physical proof of his existense and integrity"
-      - name: "Own build study room"
-        motif_type: leitmotiv
-        symbolizes: "Intellectual property"
-        description: "His refugee at home; get's taken away by Edith"
+  work_summary: "This is a *good* book about Stoner."
+  work_analysis: "Depression _and_ loneliness."
+  structure:
+    chronology: linear
+    pacing: contemplative
+  setting:
+    time_period: "1900 - 1950"
+    locations:
+      - location.university_missouri
+      - location.missouri
+  characters:
+    - character: character.william_stoner
+      roles:
+        - protagonist
+    - character: character.edith_elaine_bostwick
+      roles:
+        - love-interest
+        - antagonist
+    - character: character.grace_stoner
+      roles:
+        - deuteragonist
+  chapters:
+    - number: 1
+      part: 1
+      title: "First chapter"
+      summary: "First __chapter__ tells a lot"
+      analysis: "[file:stoner_ch1_analyse.md]"
+    - number: 2
+      part: 1
+      title: "Second chapter"
+      summary: "Movement to uni"
+      analysis: "Falls in love with literature"
+    - number: 1
+      part: 2
+      summary: "Titleless chapter"
+      analysis: "Just to see if it works"
+    - number: 2
+      part: 2
+      title: "Part 2"
+      summary: "Chapter 2 in part 2"
+      analysis: "Just to see if it works"
+  motifs:
+    - name: "Value of a unremarkable life"
+      description: "On the outside a failure, on the inside a lot of devotion, integrity and passion"
+      motif_type: thematic
+    - name: "Passion as isolating power"
+      description: "Love for literature lifts him, but also enstrages him from family"
+      motif_type: thematic
+    - name: "Emotional enstrangement and silence"
+      motif_type: situation
+      symbolizes: "The distance between people"
+      description: "Edith keeps constantly dissapearing and he loses contact with his daughter."
+    - name: "Published book"
+      motif_type: leitmotiv
+      symbolizes: "Silence devotion and legacy"
+      description: "A monografy that nobody reads but as the physical proof of his existense and integrity"
+    - name: "Own build study room"
+      motif_type: leitmotiv
+      symbolizes: "Intellectual property"
+      description: "His refugee at home; get's taken away by Edith"
+  narrator:
+    perspective: third-person-limited
+    character: character.william_stoner
+    reliable: false
+    notes: "The narration stays close to William."
 
 work_edition.john_williams__stoner__original:
   title: Stoner

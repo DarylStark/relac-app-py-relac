@@ -3,14 +3,13 @@
 
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_literary_analysis.html" import literary_analysis_section %}
-{% from "_literary_analysis_menu.html" import chapter_label, chapter_page_label, chapter_navigation_label, literary_analysis_menu %}
+{% from "_literary_analysis_menu.html" import chapter_page_label, chapter_navigation_label, literary_analysis_menu %}
 
 {% block content %}
 <div class="content">
   {{ breadcrumbs([
-      ("Work", "works.html"),
+      ("Works", "works.html"),
       (work.title, work.id ~ ".html"),
-      ("Literary Analysis", "literary_analysis." ~ work.id ~ ".html"),
       (chapter_page_label(chapter), none)
   ]) }}
   <div class="literary-analysis-layout">
@@ -33,7 +32,7 @@
       <p class="literary-analysis-empty">No analysis has been written for this chapter yet.</p>
       {% endif %}
       {% set neighbors = namespace(previous=none, next=none) %}
-      {% for item in work.literary_analysis.chapters %}
+      {% for item in work.chapters %}
       {% if item.page_id == chapter.page_id %}
       {% if not loop.first %}
       {% set neighbors.previous = loop.previtem %}

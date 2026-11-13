@@ -1480,9 +1480,20 @@ div.card .detail-premise p:last-child
 {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: minmax(180px, 0.32fr) minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+    align-items: stretch;
     gap: 14px;
+}
+
+.literary-analysis-layout.work-detail-only
+{
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.literary-analysis-layout.menu-collapsed
+{
+    grid-template-columns: 44px minmax(0, 1fr);
+    align-items: stretch;
 }
 
 @media (max-width: 760px)
@@ -1491,6 +1502,94 @@ div.card .detail-premise p:last-child
     {
         grid-template-columns: minmax(0, 1fr);
     }
+
+    .literary-analysis-layout:not(.menu-collapsed) .literary-analysis-menu-card
+    {
+        display: flex;
+        flex-direction: row;
+        align-items: flex-start;
+        gap: 8px;
+        padding: 6px;
+    }
+
+    .literary-analysis-layout:not(.menu-collapsed) .literary-analysis-menu-toggle
+    {
+        order: 2;
+        flex: none;
+        align-self: flex-start;
+        width: 28px;
+        height: 28px;
+        min-height: 28px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        justify-content: center;
+    }
+
+    .literary-analysis-layout:not(.menu-collapsed) .literary-analysis-menu
+    {
+        order: 1;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .literary-analysis-layout.menu-collapsed
+    {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .literary-analysis-layout.menu-collapsed .literary-analysis-menu-card
+    {
+        display: flex;
+        align-items: center;
+        min-height: 48px;
+        padding: 6px;
+    }
+
+    .literary-analysis-layout.menu-collapsed .literary-analysis-menu-toggle
+    {
+        width: 28px;
+        height: 28px;
+        min-height: 28px;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        justify-content: center;
+        order: 2;
+        flex: none;
+    }
+
+    .literary-analysis-layout.menu-collapsed .literary-analysis-menu-current
+    {
+        display: block;
+        order: 1;
+        flex: 1;
+        min-width: 0;
+        padding-left: 12px;
+        padding-top: 4px;
+        overflow: hidden;
+        border: 0;
+        color: inherit;
+        background: transparent;
+        font: inherit;
+        text-align: left;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+
+    .literary-analysis-layout.menu-collapsed .literary-analysis-menu-toggle
+    {
+        display: none;
+    }
+
+    .literary-analysis-layout .literary-analysis-menu-toggle:hover
+    {
+        background: var(--hover-surface);
+    }
+
 }
 
 div.content .literary-analysis-layout > .card:not(.small)
@@ -1501,6 +1600,110 @@ div.content .literary-analysis-layout > .card:not(.small)
 .literary-analysis-menu-card
 {
     min-width: 0;
+    padding: 10px;
+}
+
+.literary-analysis-menu-toggle
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 28px;
+    height: 28px;
+    min-height: 28px;
+    margin: 0 0 8px auto;
+    padding: 0;
+    border: 0;
+    border-radius: 5px;
+    color: var(--text);
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+.literary-analysis-menu-toggle:hover
+{
+    background: var(--hover-surface);
+}
+
+.literary-analysis-menu-toggle:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.literary-analysis-menu-toggle-icon
+{
+    font-size: 20px;
+    line-height: 1;
+}
+
+.literary-analysis-menu-current
+{
+    display: none;
+}
+
+.literary-analysis-layout.menu-collapsed .literary-analysis-menu-card
+{
+    padding: 6px;
+}
+
+.literary-analysis-layout.menu-collapsed .literary-analysis-menu-toggle
+{
+    min-height: 28px;
+    margin-bottom: 0;
+    justify-content: center;
+}
+
+@media (min-width: 761px)
+{
+    .literary-analysis-layout:not(.menu-collapsed) .literary-analysis-menu-card
+    {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .literary-analysis-layout:not(.menu-collapsed) .literary-analysis-menu-toggle
+    {
+        order: 2;
+        margin: 0;
+    }
+
+    .literary-analysis-layout:not(.menu-collapsed) .literary-analysis-menu
+    {
+        order: 1;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .literary-analysis-layout.menu-collapsed .literary-analysis-menu-card
+    {
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+    }
+
+    .literary-analysis-layout.menu-collapsed .literary-analysis-menu-toggle
+    {
+        margin: 0;
+    }
+}
+
+@media (max-width: 760px)
+{
+    .literary-analysis-layout.menu-collapsed .literary-analysis-menu-card
+    {
+        min-height: 46px;
+        padding: 0 6px;
+        cursor: pointer;
+    }
+}
+
+.literary-analysis-layout.menu-collapsed .literary-analysis-menu
+{
+    display: none;
 }
 
 .literary-analysis-content

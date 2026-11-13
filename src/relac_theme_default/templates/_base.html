@@ -19,21 +19,21 @@
         {% set page_title = ("Collection: " ~ collection.name) if collection is defined else "Collections" %}
     {% elif active_page == "owners" %}
         {% set page_title = ("Owner: " ~ owner.name) if owner is defined else "Owners" %}
-    {% elif active_page == "work-editions" %}
-        {% set page_title = "Work Editions" %}
     {% elif active_page == "literary-analysis" %}
-        {% set page_title = ("Literary analysis: " ~ work.title) if work is defined else "Literary analysis" %}
+        {% set page_title = ("Work analysis: " ~ work.title) if work is defined else "Work analysis" %}
     {% elif active_page == "literary-analysis-locations" %}
-        {% set page_title = ("Locations: " ~ work.title) if work is defined else "Literary analysis locations" %}
+        {% set page_title = ("Locations: " ~ work.title) if work is defined else "Work locations" %}
     {% elif active_page == "literary-analysis-characters" %}
-        {% set page_title = ("Characters: " ~ work.title) if work is defined else "Literary analysis characters" %}
+        {% set page_title = ("Characters: " ~ work.title) if work is defined else "Work characters" %}
     {% elif active_page == "literary-analysis-quotes" %}
-        {% set page_title = ("Quotes: " ~ work.title) if work is defined else "Literary analysis quotes" %}
+        {% set page_title = ("Quotes: " ~ work.title) if work is defined else "Work quotes" %}
     {% elif active_page == "literary-analysis-motifs" %}
-        {% set page_title = ("Motifs: " ~ work.title) if work is defined else "Literary analysis motifs" %}
+        {% set page_title = ("Motifs: " ~ work.title) if work is defined else "Work motifs" %}
     {% elif active_page == "literary-analysis-chapter" %}
         {% set chapter_part = ("Part " ~ chapter.part ~ ": ") if chapter is defined and chapter.part is not none else "" %}
         {% set page_title = (chapter_part ~ ((chapter.number ~ ". " ~ chapter.title) if chapter.title else ("Chapter " ~ chapter.number)) ~ ": " ~ work.title) if chapter is defined and work is defined else "Chapter analysis" %}
+    {% elif active_page == "work-editions" %}
+        {% set page_title = "Work Editions" %}
     {% elif active_page == "works" %}
         {% set page_title = ("Edition: " ~ work_edition.title) if work_edition is defined else ("Work: " ~ work.title) if work is defined else "Works" %}
     {% elif active_page == "lists" %}
@@ -125,8 +125,9 @@
     <script src="static/sortable-tables.js" defer></script>
     <script src="static/search.js" defer></script>
     <script src="static/theme.js" defer></script>
-    {% if active_page in ["literary-analysis", "literary-analysis-chapter"] %}
+    {% if work is defined %}
     <script src="static/literary-analysis-width.js" defer></script>
+    <script src="static/literary-analysis-menu.js" defer></script>
     {% endif %}
 </body>
 </html>

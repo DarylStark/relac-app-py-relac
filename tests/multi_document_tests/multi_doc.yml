@@ -1,0 +1,16 @@
+---
+contributor.test_contributor_1:
+  name: Test contributor 1
+
+contributor.test_contributor_2:
+  name: Test contributor 2
+---
+contributor.test_contributor_3:
+  name: Test contributor 3
+
+contributor.test_contributor_4:
+  name: Test contributor 4
+---
+contributor.test_contributor_5:
+  name: Test contributor 5
+---
