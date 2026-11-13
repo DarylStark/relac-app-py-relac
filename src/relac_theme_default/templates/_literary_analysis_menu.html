@@ -11,8 +11,30 @@
 {%- endmacro %}
 
 {% macro literary_analysis_menu(work, active_page=none, current_chapter=none) %}
+{% if active_page == "work" %}
+{% set current_page_label = "Work" %}
+{% elif active_page == "literary-analysis" %}
+{% set current_page_label = "Work Analysis" %}
+{% elif active_page == "literary-analysis-chapter" %}
+{% set current_page_label = chapter_page_label(current_chapter) if current_chapter else "Chapters" %}
+{% elif active_page == "literary-analysis-locations" %}
+{% set current_page_label = "Locations" %}
+{% elif active_page == "literary-analysis-characters" %}
+{% set current_page_label = "Characters" %}
+{% elif active_page == "literary-analysis-motifs" %}
+{% set current_page_label = "Motifs" %}
+{% elif active_page == "literary-analysis-quotes" %}
+{% set current_page_label = "Quotes" %}
+{% else %}
+{% set current_page_label = "Work pages" %}
+{% endif %}
 <div class="card literary-analysis-menu-card">
-  <nav class="literary-analysis-menu" aria-label="Work pages">
+  <span class="literary-analysis-menu-current" role="button" tabindex="0" aria-controls="literary-analysis-menu-content" aria-label="Expand work pages menu">{{ current_page_label }}</span>
+  <button class="literary-analysis-menu-toggle" type="button" aria-controls="literary-analysis-menu-content" aria-expanded="true" aria-label="Collapse work pages menu" title="Collapse work pages menu">
+    <span class="visually-hidden literary-analysis-menu-toggle-label">Collapse work pages menu</span>
+    <span class="literary-analysis-menu-toggle-icon" aria-hidden="true">-</span>
+  </button>
+  <nav class="literary-analysis-menu" id="literary-analysis-menu-content" aria-label="Work pages">
     <ul>
       <li>
         {% if active_page == "work" %}
