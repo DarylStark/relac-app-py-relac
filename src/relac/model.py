@@ -9,7 +9,11 @@ from typing import ClassVar, Literal, override
 
 from pydantic import BaseModel, Field
 
-from relac.data_helpers import _format_enum_label, _format_isbn
+from relac.data_helpers import (
+    _code_to_language,
+    _format_enum_label,
+    _format_isbn,
+)
 from relac.exceptions import DoubleModelNameError
 
 relac_models: dict[str, type[ResourceBase]] = {}
@@ -97,14 +101,14 @@ def search_detail_for_obj[T: BaseModel](
     if obj is None:
         return ''
 
-    return getattr(obj, field, '')
+    return search_detail(name, getattr(obj, field, ''))
 
 
 def search_detail_for_obj_list[T: BaseModel](
     name: str, field: str, lst: list[T] | None
 ) -> str:
     """Create a search detail for a enum value."""
-    if lst is None:
+    if not lst:
         return ''
 
     values = [getattr(value, field) for value in lst]
@@ -113,7 +117,7 @@ def search_detail_for_obj_list[T: BaseModel](
 
 def search_detail_for_str_list(name: str, lst: list[str] | None) -> str:
     """Create a search detail for a enum value."""
-    if lst is None:
+    if not lst:
         return ''
     return search_detail(name, ', '.join(lst))
 
@@ -178,15 +182,20 @@ class ResourceBase(BaseModel):
         """Get the label names for this object."""
         return None
 
+    def _get_extra_data(self) -> list[SearchIndexData] | None:
+        """Get additional search entries for this object."""
+        return None
+
     def get_search_index_data(self) -> SearchIndexData:
         """Build the data for the search index."""
         return SearchIndexData(
             resource_type=self._get_resource_type(),
             resource_id=self.id,
             title=self._get_title(),
-            details=self._get_details(),
+            details=[detail for detail in self._get_details() if detail],
             search_terms=self._get_search_terms(),
             labels=self._get_label_names(),
+            extra_data=self._get_extra_data(),
         )
 
     def __repr__(self) -> str:
@@ -398,6 +407,15 @@ class Location(ResourceBase):
 
     # Relation (real objects)
     work_objs: list[Work] = Field(default_factory=list, exclude=True)
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail('Country', self.country),
+            search_detail('Description', self.description),
+            search_detail_for_obj_list('Works', 'title', self.work_objs),
+        ]
 
 
 class StorySetting(BaseModel):
@@ -674,14 +692,36 @@ class Work(LabelledResource):
         ]
 
         if self.genre:
-            rv.append(search_detail_for_enum('Genre', self.genre.primary))
-            rv.append(
-                search_detail_for_str_list('Subgenres', self.genre.subgenres)
-            )
-
-        # TODO: CHAPTERS!
+            genres = [
+                _format_enum_label(self.genre.primary.value.replace('_', '-')),
+                *self.genre.subgenres,
+            ]
+            rv.append(search_detail('Genres', ', '.join(genres)))
 
         return rv
+
+    @override
+    def _get_extra_data(self) -> list[SearchIndexData] | None:
+        """Get titled chapter entries associated with this work."""
+        if self.id is None or self.literary_analysis is None:
+            return None
+
+        return [
+            SearchIndexData(
+                resource_type='Chapter',
+                resource_id=(
+                    f'literary_analysis_chapter.{self.id}.{chapter.page_id}'
+                ),
+                title=(
+                    f'Part {chapter.part}: ' if chapter.part is not None else ''
+                )
+                + f'{chapter.number}. {chapter.title}',
+                details=[search_detail('Work', self.title)],
+                search_terms=[self.title],
+            )
+            for chapter in self.literary_analysis.chapters
+            if chapter.title
+        ]
 
     # Properties
     @property
@@ -801,6 +841,27 @@ class WorkEdition(LabelledResource):
         ),
     ]
 
+    @override
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return 'Edition'
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj('Work', 'title', self.work_obj),
+            search_detail(
+                'Release date',
+                str(self.release_date) if self.release_date else None,
+            ),
+            transformed_search_detail(
+                'Language', self.language, _code_to_language
+            ),
+            search_detail_for_enum('Type', self.edition_type),
+            search_detail_for_obj_list('Books', 'title', self.book_objs),
+        ]
+
     # Properties
     @property
     def availability(self) -> ResourceAvailability:
@@ -876,6 +937,18 @@ class BookCollection(LabelledResource):
             'books', 'book_objs', 'many-to-many', 'collection_objs'
         ),
     ]
+
+    @override
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return 'Collection'
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj_list('Books', 'title', self.book_objs),
+        ]
 
     def owned_percentage(self, owner: Owner | None) -> float:
         """Get the percentage of books owned by the specified owner."""
@@ -1134,6 +1207,54 @@ class ReadingSession(LabelledResource):
         ),
     ]
 
+    @override
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return 'Reading session'
+
+    @override
+    def _get_title(self) -> str:
+        """Get a display title for this reading session."""
+        if self.work_edition_obj:
+            return self.work_edition_obj.title
+        if self.book_obj:
+            return self.book_obj.title
+        return self.id or 'Reading session'
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj(
+                'Work edition', 'title', self.work_edition_obj
+            ),
+            search_detail_for_obj('Book', 'title', self.book_obj),
+            search_detail_for_enum('State', self.state),
+            search_detail(
+                'Start date',
+                str(self.startdate) if self.startdate else None,
+            ),
+            search_detail(
+                'End date', str(self.enddate) if self.enddate else None
+            ),
+            search_detail(
+                'Work rating',
+                str(self.work_rating.rating) if self.work_rating else None,
+            ),
+            search_detail(
+                'Work rating note',
+                self.work_rating.note if self.work_rating else None,
+            ),
+            search_detail(
+                'Book rating',
+                str(self.book_rating.rating) if self.book_rating else None,
+            ),
+            search_detail(
+                'Book rating note',
+                self.book_rating.note if self.book_rating else None,
+            ),
+        ]
+
     @property
     def effective_enddate(self) -> date | None:
         """Get the end date, using today for an active reading session."""
@@ -1219,6 +1340,19 @@ class ReadingList(LabelledResource):
             'labels', 'label_objs', 'many-to-many', 'reading_list_objs'
         )
     ]
+
+    @override
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return 'Reading list'
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        works = [
+            item.work_obj for item in self.works if item.work_obj is not None
+        ]
+        return [search_detail_for_obj_list('Works', 'title', works)]
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -1320,6 +1454,15 @@ class Owner(LabelledResource):
         ResolvableField('labels', 'label_objs', 'many-to-many', 'owner_objs')
     ]
 
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_enum('Type', self.owner_type),
+            search_detail_for_enum('Availability', self.availability),
+            search_detail_for_obj_list('Books', 'title', self.book_objs),
+        ]
+
 
 class SeriesItem(BaseModel):
     """A item in a serie."""
@@ -1349,6 +1492,14 @@ class Series(LabelledResource):
     resolvable_fields: ClassVar[list[ResolvableField]] = [
         ResolvableField('labels', 'label_objs', 'many-to-many', 'series_objs')
     ]
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        works = [
+            item.work_obj for item in self.works if item.work_obj is not None
+        ]
+        return [search_detail_for_obj_list('Works', 'title', works)]
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState

@@ -1492,3 +1492,63 @@ def test_build_search_index_includes_series_and_url() -> None:
     assert series_entry['href'] == 'the_housemaid.html'
     assert series_entry['title'] == 'The Housemaid'
     assert 'The Housemaid' in series_entry['searchText']
+
+
+def test_build_search_index_includes_edition_collection_and_list_details() -> (
+    None
+):
+    """Include linked model metadata for editions, collections, and lists."""
+    database = Database()
+    work = Work(id='sample_work', title='Sample Work', authors=[])
+    book = Book(id='sample_book', title='Sample Book')
+    edition = WorkEdition(
+        id='sample_edition',
+        title='Sample Edition',
+        work='sample_work',
+        release_date=date(2020, 5, 1),
+        language='en',
+        work_obj=work,
+        book_objs=[book],
+    )
+    collection = BookCollection(
+        id='sample_collection',
+        name='Sample Collection',
+        book_objs=[book],
+    )
+    reading_list = ReadingList(
+        id='sample_list',
+        name='Sample List',
+        works=[
+            ReadingListItem(order=1, work='sample_work', work_obj=work),
+        ],
+    )
+    series = Series(
+        id='sample_series',
+        name='Sample Series',
+        works=[
+            SeriesItem(number=1, work='sample_work', work_obj=work),
+        ],
+    )
+
+    database.add_object('sample_edition', edition)
+    database.add_object('sample_collection', collection)
+    database.add_object('sample_list', reading_list)
+    database.add_object('sample_series', series)
+
+    entries = _build_search_index(database)['items']
+    edition_entry = next(item for item in entries if item['type'] == 'Edition')
+    collection_entry = next(
+        item for item in entries if item['type'] == 'Collection'
+    )
+    reading_list_entry = next(
+        item for item in entries if item['type'] == 'Reading list'
+    )
+    series_entry = next(item for item in entries if item['type'] == 'Series')
+
+    assert 'Work: Sample Work' in edition_entry['details']
+    assert 'Release date: 2020-05-01' in edition_entry['details']
+    assert 'Language: English' in edition_entry['details']
+    assert 'Books: Sample Book' in edition_entry['details']
+    assert 'Books: Sample Book' in collection_entry['details']
+    assert 'Works: Sample Work' in reading_list_entry['details']
+    assert 'Works: Sample Work' in series_entry['details']
