@@ -15,6 +15,7 @@ from relac.model import (
     Character,
     Contributor,
     Label,
+    LintingFinding,
     Location,
     Owner,
     ReadingList,
@@ -57,6 +58,13 @@ class Relac:
     def database(self) -> Database:
         """Property for the database."""
         return self._database
+
+    def lint_repo(self) -> list[LintingFinding]:
+        """Get all linting findings for all objects."""
+        findings: list[LintingFinding] = []
+        for resource in self.database.get_all_values_for_all_types():
+            findings.extend(resource.linting_findings)
+        return findings
 
     def _build_search_index(
         self,

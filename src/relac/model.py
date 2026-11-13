@@ -152,10 +152,24 @@ class SearchIndexData:
     extra_data: list[SearchIndexData] | None = None
 
 
+@dataclass
+class LintingFinding:
+    """Class for a Linting Error."""
+
+    id: str
+    resource_id: str | None
+    error: str
+
+
 class ResourceBase(BaseModel):
     """Base model for resources."""
 
     id: str | None = Field(default=None, exclude=False)
+
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        return []
 
     def _get_resource_type(self) -> str:
         """Get the resource type for this object."""
@@ -1221,6 +1235,39 @@ class ReadingSession(LabelledResource):
     ]
 
     @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        if all(
+            [
+                self.state != ReadingState.FINISHED,
+                self.state != ReadingState.DID_NOT_FINISH,
+                self.enddate is not None,
+            ]
+        ):
+            rv.append(
+                LintingFinding(
+                    id='reading-session-enddate-set',
+                    resource_id=self.id,
+                    error='Enddate set but work not '
+                    '"Finished" or "Did not finish".',
+                )
+            )
+
+        if self.startdate and self.enddate and self.startdate > self.enddate:
+            rv.append(
+                LintingFinding(
+                    id='reading-session-enddate-smaller-then-startdate',
+                    resource_id=self.id,
+                    error='Enddate is bigger then startdate',
+                )
+            )
+
+        return rv
+
+    @override
     def _get_resource_type(self) -> str:
         """Get the resource type for this object."""
         return 'Reading session'
@@ -1355,6 +1402,44 @@ class ReadingList(LabelledResource):
     ]
 
     @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        orders = [work.order for work in self.works]
+        double = set([order for order in orders if orders.count(order) > 1])
+
+        for double_order in double:
+            rv.append(
+                LintingFinding(
+                    id='reading-list-double-order',
+                    resource_id=self.id,
+                    error=f'Order {double_order} is double in the list.',
+                )
+            )
+
+        all_works = [
+            work.work_obj.id or ''
+            for work in self.works
+            if work.work_obj is not None
+        ]
+        double_works: set[str] = set(
+            [work for work in all_works if all_works.count(work) > 1]
+        )
+
+        for double_work in double_works:
+            rv.append(
+                LintingFinding(
+                    id='reading-list-double-work',
+                    resource_id=self.id,
+                    error=f'Work "{double_work}" is double in the list.',
+                )
+            )
+
+        return rv
+
+    @override
     def _get_resource_type(self) -> str:
         """Get the resource type for this object."""
         return 'Reading list'
@@ -1468,6 +1553,25 @@ class Owner(LabelledResource):
     ]
 
     @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+        if (
+            self.owner_type in (OwnerType.STORE, OwnerType.LIBRARY)
+            and self.availability == Availability.INDIRECTLY_AVAILABLE
+        ):
+            rv.append(
+                LintingFinding(
+                    id='owner-store-library-indirect',
+                    resource_id=self.id,
+                    error='A "store" or "library" should never '
+                    'be "indirectly" available.',
+                )
+            )
+        return rv
+
+    @override
     def _get_details(self) -> list[str]:
         """Get the details for this object."""
         return [
@@ -1505,6 +1609,44 @@ class Series(LabelledResource):
     resolvable_fields: ClassVar[list[ResolvableField]] = [
         ResolvableField('labels', 'label_objs', 'many-to-many', 'series_objs')
     ]
+
+    @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        orders = [work.number for work in self.works]
+        double = set([order for order in orders if orders.count(order) > 1])
+
+        for double_order in double:
+            rv.append(
+                LintingFinding(
+                    id='series-double-number',
+                    resource_id=self.id,
+                    error=f'Number {double_order} is double in the series.',
+                )
+            )
+
+        all_works = [
+            work.work_obj.id or ''
+            for work in self.works
+            if work.work_obj is not None
+        ]
+        double_works: set[str] = set(
+            [work for work in all_works if all_works.count(work) > 1]
+        )
+
+        for double_work in double_works:
+            rv.append(
+                LintingFinding(
+                    id='series-double-work',
+                    resource_id=self.id,
+                    error=f'Work "{double_work}" is double in the series.',
+                )
+            )
+
+        return rv
 
     @override
     def _get_details(self) -> list[str]:

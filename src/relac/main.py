@@ -51,6 +51,24 @@ def validate(ctx: Context) -> None:
     console.print('[green][b]Relac repository is correct[/b][/green]')
 
 
+@app.command(name='lint', help='Lint the Relac repository')
+def lint(ctx: Context) -> None:
+    """Create the static webpage."""
+    console: Console = ctx.obj['console']
+    relac: Relac = ctx.obj['relac']
+    findings = relac.lint_repo()
+
+    if not findings:
+        console.print('[green][b]All checks passed![/b][/green]')
+        return
+
+    for finding in findings:
+        console.print(
+            f'{finding.resource_id} - [yellow][b]{finding.id}[/b]: '
+            '{finding.error}[/yellow]'
+        )
+
+
 def main() -> None:
     """Main entry point for the CLI app."""
     app()
