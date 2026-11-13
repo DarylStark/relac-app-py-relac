@@ -71,7 +71,7 @@
         const type = document.createElement("span");
         type.className = "library-search-result-type";
         type.textContent = item.type;
-        link.append(main, type);
+        link.append(type, main);
         listItem.append(link);
         return listItem;
     };

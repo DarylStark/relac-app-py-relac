@@ -33,6 +33,7 @@ class RelacTheme:
     resource_pages: dict[
         Literal[
             'book',
+            'book_owner',
             'work',
             'contributor',
             'label',

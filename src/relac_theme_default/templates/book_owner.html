@@ -1,0 +1,82 @@
+{% extends "_base.html" %}
+{% set active_page = "books" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_entity_link.html" import entity_link %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([("Books", "books.html"), (book.title, book.id ~ ".html"), ("Ownership", none)]) }}
+  <div class="card">
+    <section class="detail-summary" aria-labelledby="detail-title">
+      <div class="detail-summary-header">
+        <div>
+          <p class="detail-kind">Book ownership</p>
+          <h3 id="detail-title">{{ book.title }} — {{ book_owner.owner_obj.name }}</h3>
+        </div>
+      </div>
+      <dl class="detail-metadata">
+        <div class="detail-fact">
+          <dt>Book</dt>
+          <dd><a href="{{ book.id }}.html">{{ book.title }}</a></dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Owner</dt>
+          <dd>{{ entity_link(book_owner.owner_obj, book_owner.owner_obj.name) }}</dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Owned since</dt>
+          <dd>{{ book_owner.since if book_owner.since else "Unspecified" }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <div class="card">
+    <h3>Loan history</h3>
+    {% if book_owner.loans %}
+      <div class="table-scroll">
+        <table class="resources">
+          <thead>
+            <tr>
+              <th scope="col">Loaned to</th>
+              <th scope="col">Loaned on</th>
+              <th scope="col">Due back</th>
+              <th scope="col">Returned on</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for loan in book_owner.loans %}
+              <tr>
+                <td>
+                  {% if loan.loaned_to_obj %}
+                    {{ entity_link(loan.loaned_to_obj, loan.loaned_to_obj.name) }}
+                  {% else %}
+                    {{ loan.loaned_to }}
+                  {% endif %}
+                </td>
+                <td>{{ loan.loaned_on if loan.loaned_on else "Unspecified" }}</td>
+                <td>{{ loan.due_date if loan.due_date else "Unspecified" }}</td>
+                <td>{{ loan.returned_on if loan.returned_on else "Not returned" }}</td>
+                <td>{{ "Returned" if loan.returned_on else "Active" }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p>No loan history recorded.</p>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h3>Link</h3>
+    {% if book_owner.link %}
+      <a href="{{ book_owner.link.url | e }}" target="_blank" rel="noopener noreferrer">{{ book_owner.link.title | e }}</a>
+    {% else %}
+      <p>No link.</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
