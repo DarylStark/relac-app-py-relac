@@ -10,13 +10,23 @@
 {% if chapter.part is not none and chapter.part != current_chapter.part %}Part {{ chapter.part }}: {% endif %}{{ chapter_label(chapter) }}
 {%- endmacro %}
 
+{% macro chapter_menu_item(work, chapter, active_page, current_chapter) %}
+<li>
+  {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.page_id == chapter.page_id %}
+  <span class="is-active" aria-current="page">{{ chapter_label(chapter) }}</span>
+  {% else %}
+  <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.page_id }}.html">{{ chapter_label(chapter) }}</a>
+  {% endif %}
+</li>
+{% endmacro %}
+
 {% macro literary_analysis_menu(work, active_page=none, current_chapter=none) %}
 {% if active_page == "work" %}
 {% set current_page_label = "Work" %}
 {% elif active_page == "literary-analysis" %}
 {% set current_page_label = "Work Analysis" %}
 {% elif active_page == "literary-analysis-chapter" %}
-{% set current_page_label = chapter_page_label(current_chapter) if current_chapter else "Chapters" %}
+{% set current_page_label = chapter_label(current_chapter) if current_chapter else "Chapters" %}
 {% elif active_page == "literary-analysis-locations" %}
 {% set current_page_label = "Locations" %}
 {% elif active_page == "literary-analysis-characters" %}
@@ -57,13 +67,25 @@
         <details {% if active_page == "literary-analysis-chapter" %}open{% endif %}>
           <summary>Chapters</summary>
           <ul class="literary-analysis-submenu">
+            {% set part_numbers = [] %}
             {% for chapter in work.chapters %}
-            <li>
-              {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.page_id == chapter.page_id %}
-              <span class="is-active" aria-current="page">{{ chapter_page_label(chapter) }}</span>
-              {% else %}
-              <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.page_id }}.html">{{ chapter_page_label(chapter) }}</a>
-              {% endif %}
+            {% if chapter.part is not none and chapter.part not in part_numbers %}
+            {% set _ = part_numbers.append(chapter.part) %}
+            {% endif %}
+            {% endfor %}
+            {% for chapter in work.chapters if chapter.part is none %}
+            {{ chapter_menu_item(work, chapter, active_page, current_chapter) }}
+            {% endfor %}
+            {% for part in part_numbers %}
+            <li class="literary-analysis-menu-group">
+              <details {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.part == part %}open{% endif %}>
+                <summary>Part {{ part }}</summary>
+                <ul class="literary-analysis-submenu">
+                  {% for chapter in work.chapters if chapter.part == part %}
+                  {{ chapter_menu_item(work, chapter, active_page, current_chapter) }}
+                  {% endfor %}
+                </ul>
+              </details>
             </li>
             {% endfor %}
           </ul>
