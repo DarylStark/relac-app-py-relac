@@ -2,16 +2,11 @@
 
 import json
 import shutil
-from datetime import date
 from importlib import import_module
 from pathlib import Path
 from typing import cast
 
-from isbnlib import mask
 from jinja2 import Environment, FileSystemLoader
-from markdown_it import MarkdownIt
-from markupsafe import Markup
-from pycountry import countries, languages
 from typer import Context, Option, Typer
 
 from relac.database import Database
@@ -25,71 +20,21 @@ from relac.model import (
     Owner,
     ReadingList,
     ReadingSession,
+    SearchIndexData,
     Series,
     Work,
     WorkEdition,
 )
 from relac.theme import RelacTheme
 
-_MARKDOWN = MarkdownIt('commonmark', {'html': False})
-
-
-def _render_markdown(text: str) -> Markup:
-    """Render Markdown while treating source HTML as plain text."""
-    return Markup(_MARKDOWN.render(text))
-
-
-def _calculate_age(
-    birthdate: date | None, reference_date: date | None = None
-) -> int | None:
-    """Calculate an age in whole years at the reference date."""
-    if birthdate is None:
-        return None
-
-    reference_date = reference_date or date.today()
-    age = reference_date.year - birthdate.year
-    if (reference_date.month, reference_date.day) < (
-        birthdate.month,
-        birthdate.day,
-    ):
-        age -= 1
-    return age
-
-
-def _format_enum_label(value: str) -> str:
-    """Format enum values for display without changing their stored values."""
-    labels = {
-        'unavailable': 'Unavailable',
-        'available-direct': 'Available',
-        'available-indirect': 'Available (indirect)',
-        'available-to-loan': 'Available to loan',
-        'available-to-buy': 'Available to buy',
-        'ebook': 'eBook',
-        'epub': 'ePub',
-        'epub-drm': 'ePub (DRM)',
-        'epub-watermark': 'ePub (watermarked)',
-        'graphical-novel-adaption': 'Graphic novel adaptation',
-    }
-    return labels.get(value, value.replace('-', ' ').capitalize())
-
-
-def _format_isbn(value: int | None) -> str:
-    """Format an ISBN for display, leaving missing values blank."""
-    return mask(str(value)) if value is not None else ''
-
-
-def _code_to_language(language_code: str) -> str:
-    """Get the name for a language code."""
-    lang = languages.get(alpha_2=language_code)
-    return lang.name if lang else language_code
-
-
-def _code_to_country(country_code: str | None) -> str:
-    """Get the name for a country code."""
-    if not country_code:
-        return ''
-    country = countries.get(alpha_2=country_code)
-    return country.name if country else country_code
+from .data_helpers import (
+    _calculate_age,
+    _code_to_country,
+    _code_to_language,
+    _format_enum_label,
+    _format_isbn,
+    _render_markdown,
+)
 
 
 def _build_search_index(  # noqa: PLR0912
@@ -98,140 +43,36 @@ def _build_search_index(  # noqa: PLR0912
     """Build the client-side search data for every linked resource."""
     entries: list[dict[str, str | list[str]]] = []
 
-    def add_entry(
-        resource_type: str,
-        resource_id: str | None,
-        title: str,
-        details: list[str],
-        search_terms: list[str] | None = None,
-        labels: list[str] | None = None,
-    ) -> None:
-        if resource_id is None:
+    def add_entry(data: SearchIndexData) -> None:
+        if data.resource_id is None:
             return
 
-        if labels:
-            details = [*details, f'Labels: {", ".join(labels)}']
+        if data.labels:
+            details = [*data.details, f'Labels: {", ".join(data.labels)}']
+        else:
+            details = data.details
 
         terms = [
-            resource_type,
-            resource_id,
-            title,
+            data.resource_type,
+            data.resource_id,
+            data.title,
             *details,
-            *(search_terms or []),
+            *(data.search_terms or []),
         ]
         entries.append(
             {
-                'type': resource_type,
-                'title': title,
-                'href': f'{resource_id}.html',
+                'type': data.resource_type,
+                'title': data.title,
+                'href': f'{data.resource_id}.html',
                 'details': details,
                 'searchText': ' '.join(terms),
             }
         )
 
-    for book in db.get_all_values(Book):
-        contributors = ', '.join(
-            contributor.name for contributor in book.contributor_objs
-        )
-        publisher = getattr(book.publisher_obj, 'name', '')
-        imprint = getattr(book.publisher_obj, 'imprint', '')
-        details = [
-            f'Contributors: {contributors}' if contributors else '',
-            f'Publisher: {publisher}' if publisher else '',
-            f'Imprint: {imprint}' if imprint else '',
-            (
-                f'ISBN: {_format_isbn(book.isbn13)}'
-                if book.isbn13 is not None
-                else ''
-            ),
-            f'Medium: {_format_enum_label(book.medium.value)}',
-            f'Binding: {_format_enum_label(book.binding.value)}',
-            f'Works: {", ".join(e.title for e in book.work_edition_objs)}',
-            f'Collections: {", ".join(c.name for c in book.collection_objs)}',
-        ]
-        details = [detail for detail in details if not detail.endswith(': ')]
-        add_entry(
-            'Book',
-            book.id,
-            book.title,
-            details,
-            [str(book.isbn13)] if book.isbn13 is not None else [],
-            [label.name for label in book.label_objs],
-        )
+    for book in db.get_all_values_for_all_types():
+        add_entry(book.get_search_index_data())
 
-    for work in db.get_all_values(Work):
-        authors = ', '.join(author.name for author in work.author_objs)
-        details = [
-            f'Authors: {authors}' if authors else '',
-            f'Structure: {_format_enum_label(work.work_structure.value)}'
-            if work.work_structure
-            else '',
-            f'Category: {_format_enum_label(work.work_type.value)}'
-            if work.work_type
-            else '',
-            (
-                'Genres: '
-                + ', '.join(
-                    [
-                        _format_enum_label(
-                            work.genre.primary.value.replace('_', '-')
-                        ),
-                        *work.genre.subgenres,
-                    ]
-                )
-                if work.genre
-                else ''
-            ),
-            f'Editions: {", ''".join(e.title for e in work.edition_objs)}',
-        ]
-        add_entry(
-            'Work',
-            work.id,
-            work.title,
-            [detail for detail in details if detail],
-            labels=[label.name for label in work.label_objs],
-        )
-        if work.id and work.literary_analysis:
-            for chapter in work.literary_analysis.chapters:
-                if chapter.title:
-                    add_entry(
-                        'Chapter',
-                        f'literary_analysis_chapter.{work.id}.{chapter.page_id}',
-                        (
-                            f'Part {chapter.part}: '
-                            if chapter.part is not None
-                            else ''
-                        )
-                        + f'{chapter.number}. {chapter.title}',
-                        [f'Work: {work.title}'],
-                    )
-
-    for contributor in db.get_all_values(Contributor):
-        details = [
-            f'Works: {", ".join(work.title for work in contributor.work_objs)}',
-            f'Books: {", ".join(book.title for book in contributor.book_objs)}',
-        ]
-        add_entry(
-            'Contributor',
-            contributor.id,
-            contributor.name,
-            [detail for detail in details if detail],
-            labels=[label.name for label in contributor.label_objs],
-        )
-
-    for character in db.get_all_values(Character):
-        work_titles = [link.title for link in character.work_objs if link]
-        details = [
-            f'Birthplace: {character.birthplace}',
-            f'Birth country: {character.birthcountry}',
-            f'Works: {", ".join(work_titles)}' if work_titles else '',
-        ]
-        add_entry(
-            'Character',
-            character.id,
-            character.name,
-            [detail for detail in details if detail],
-        )
+    return {'items': entries}
 
     for location in db.get_all_values(Location):
         work_titles = [work.title for work in location.work_objs]

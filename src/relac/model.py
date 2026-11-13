@@ -5,10 +5,11 @@ from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
 from enum import Enum
-from typing import ClassVar, Literal
+from typing import ClassVar, Literal, override
 
 from pydantic import BaseModel, Field
 
+from relac.data_helpers import _format_enum_label, _format_isbn
 from relac.exceptions import DoubleModelNameError
 
 relac_models: dict[str, type[ResourceBase]] = {}
@@ -82,10 +83,121 @@ class ResolvableField:
     populates_back: str | None = None
 
 
+def search_detail(name: str, value: str | None) -> str:
+    """Generate a search detail."""
+    if value is None:
+        return ''
+    return f'{name}: {value}'
+
+
+def search_detail_for_obj[T: BaseModel](
+    name: str, field: str, obj: T | None
+) -> str:
+    """Create a search detail for a enum value."""
+    if obj is None:
+        return ''
+
+    return getattr(obj, field, '')
+
+
+def search_detail_for_obj_list[T: BaseModel](
+    name: str, field: str, lst: list[T] | None
+) -> str:
+    """Create a search detail for a enum value."""
+    if lst is None:
+        return ''
+
+    values = [getattr(value, field) for value in lst]
+    return search_detail(name, ', '.join(values))
+
+
+def search_detail_for_str_list(name: str, lst: list[str] | None) -> str:
+    """Create a search detail for a enum value."""
+    if lst is None:
+        return ''
+    return search_detail(name, ', '.join(lst))
+
+
+def transformed_search_detail[T](
+    name: str, value: T | None, transform: Callable[[T], str]
+) -> str:
+    """Transform a search detail."""
+    if value is None:
+        return ''
+    return search_detail(name, transform(value))
+
+
+def search_detail_for_enum[T: Enum](name: str, obj: T | None) -> str:
+    """Create a search detail for a enum value."""
+    if obj is None:
+        return ''
+    return transformed_search_detail(name, obj.value, _format_enum_label)
+
+
+@dataclass
+class SearchIndexData:
+    """Class that contains search index data."""
+
+    resource_type: str
+    resource_id: str | None
+    title: str
+    details: list[str]
+    search_terms: list[str] | None = None
+    labels: list[str] | None = None
+
+    extra_data: list[SearchIndexData] | None = None
+
+
 class ResourceBase(BaseModel):
     """Base model for resources."""
 
     id: str | None = Field(default=None, exclude=False)
+
+    def _get_resource_type(self) -> str:
+        """Get the resource type for this object."""
+        return type(self).__name__
+
+    def _get_title(self) -> str:
+        """Get the title for this object."""
+        fields = ('title', 'name')
+        for field in fields:
+            value = getattr(self, field, None)
+            if value:
+                return value
+        return ''
+
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return []
+
+    def _get_search_terms(self) -> list[str] | None:
+        """Get the search terms for this object."""
+        return None
+
+    def _get_label_names(self) -> list[str] | None:
+        """Get the label names for this object."""
+        return None
+
+    def get_search_index_data(self) -> SearchIndexData:
+        """Build the data for the search index."""
+        return SearchIndexData(
+            resource_type=self._get_resource_type(),
+            resource_id=self.id,
+            title=self._get_title(),
+            details=self._get_details(),
+            search_terms=self._get_search_terms(),
+            labels=self._get_label_names(),
+        )
+
+    def __repr__(self) -> str:
+        """The repr for this model."""
+        # TODO: Implement something sensible
+        return ''
+
+    def __str__(self) -> str:
+        """The str representation for this model."""
+        # TODO: Implement something sensible
+        return ''
 
 
 class LabelledResource(ResourceBase):
@@ -95,6 +207,11 @@ class LabelledResource(ResourceBase):
 
     # Relation (real objects)
     label_objs: list[Label] = Field(default_factory=list, exclude=True)
+
+    @override
+    def _get_label_names(self) -> list[str]:
+        """Get the label names for this object."""
+        return [label.name for label in self.label_objs]
 
 
 @register_model('relac')
@@ -148,6 +265,14 @@ class Contributor(LabelledResource):
             'labels', 'label_objs', 'many-to-many', 'contributor_objs'
         ),
     ]
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj_list('Works', 'title', self.work_objs),
+            search_detail_for_obj_list('Books', 'title', self.book_objs),
+        ]
 
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
@@ -305,6 +430,24 @@ class Character(ResourceBase):
     # Relation (real objects)
     work_objs: list[Work] = Field(default_factory=list, exclude=True)
     quote_objs: list[Quote] = Field(default_factory=list, exclude=True)
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail('Birthplace', self.birthplace),
+            search_detail('Birth country', self.birthcountry),
+            search_detail_for_obj_list('Works', 'title', self.work_objs),
+        ]
+
+    def _get_works_with_specific_reading_state(
+        self, reading_state: ReadingState
+    ) -> list[Work]:
+        return [
+            work
+            for work in self.work_objs
+            if work.reading_state == reading_state
+        ]
 
     @property
     def work_character_objs(self) -> list[WorkCharacter]:
@@ -519,6 +662,26 @@ class Work(LabelledResource):
         ResolvableField('authors', 'author_objs', 'many-to-many', 'work_objs'),
     ]
     resolvable_children: ClassVar[tuple[str, ...]] = ('literary_analysis',)
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        rv = [
+            search_detail_for_obj_list('Authors', 'name', self.author_objs),
+            search_detail_for_enum('Structure', self.work_structure),
+            search_detail_for_enum('Category', self.work_type),
+            search_detail_for_obj_list('Editions', 'title', self.edition_objs),
+        ]
+
+        if self.genre:
+            rv.append(search_detail_for_enum('Genre', self.genre.primary))
+            rv.append(
+                search_detail_for_str_list('Subgenres', self.genre.subgenres)
+            )
+
+        # TODO: CHAPTERS!
+
+        return rv
 
     # Properties
     @property
@@ -782,6 +945,31 @@ class Book(LabelledResource):
     medium: BookMedium = BookMedium.UNSPECIFIED
     binding: BookBinding = BookBinding.UNSPECIFIED
     owners: list[str] | None = None
+
+    @override
+    def _get_details(self) -> list[str]:
+        """Get the details for this object."""
+        return [
+            search_detail_for_obj_list(
+                'Contributors', 'name', self.contributor_objs
+            ),
+            search_detail_for_obj('Publisher', 'name', self.publisher_obj),
+            search_detail_for_obj('Imprint', 'imprint', self.publisher_obj),
+            transformed_search_detail('ISBN', self.isbn13, _format_isbn),
+            search_detail_for_enum('Medium', self.medium),
+            search_detail_for_enum('Binding', self.binding),
+            search_detail_for_obj_list(
+                'Works', 'title', self.work_edition_objs
+            ),
+            search_detail_for_obj_list(
+                'Collections', 'name', self.collection_objs
+            ),
+        ]
+
+    @override
+    def _get_search_terms(self) -> list[str]:
+        """Get the search terms for this object."""
+        return [str(self.isbn13)] if self.isbn13 is not None else []
 
     # Relationships (real objects)
     work_edition_objs: list[WorkEdition] = Field(

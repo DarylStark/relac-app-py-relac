@@ -177,6 +177,13 @@ class Database:
         store = cast(DataStore[T], self._data[obj_type])
         return list(store.get_all().values())
 
+    def get_all_values_for_all_types(self) -> list[ResourceBase]:
+        """Retrieve all values from all stores."""
+        all_values: list[ResourceBase] = []
+        for store in self._data:
+            all_values.extend(self.get_all_values(store))
+        return all_values
+
     def get_one(self, obj_id: str) -> ResourceBase:
         """Get one object on ID."""
         obj_type = relac_models.get(obj_id.split('.', maxsplit=1)[0])
