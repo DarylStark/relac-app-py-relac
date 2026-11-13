@@ -341,10 +341,9 @@ h1
 .library-search-result
 {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
     align-items: flex-start;
-    justify-content: space-between;
-    gap: 16px;
+    gap: 4px;
     padding: 12px 4px;
 }
 
@@ -361,6 +360,7 @@ h1
 .library-search-result-title
 {
     display: block;
+    padding-bottom: 4px;
     color: var(--text-strong);
     font-size: 15px;
     font-weight: 500;
@@ -380,6 +380,7 @@ h1
 .library-search-result-type
 {
     flex: none;
+    padding-bottom: 4px;
     color: var(--muted);
     font-family: "Google Sans Code", monospace;
     font-size: 10px;
