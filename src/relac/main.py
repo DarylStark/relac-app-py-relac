@@ -3,6 +3,7 @@
 import sys
 from pathlib import Path
 
+from pydantic import ValidationError
 from rich.console import Console
 from typer import Context, Option, Typer
 
@@ -28,7 +29,7 @@ def context(
 
     try:
         ctx.obj['relac'].import_data()
-    except RelacError as exc:
+    except (RelacError, ValidationError) as exc:
         console.print(f'[red][b]ERROR: [/b][/red] {exc}')
         sys.exit(1)
 
