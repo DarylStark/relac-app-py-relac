@@ -1480,7 +1480,7 @@ div.card .detail-premise p:last-child
 {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: minmax(180px, 240px) minmax(0, 1fr);
+    grid-template-columns: minmax(180px, 340px) minmax(0, 1fr);
     align-items: stretch;
     gap: 14px;
 }
