@@ -20,7 +20,14 @@
           <p class="detail-kind">Work analysis</p>
           <h2 class="detail-title" id="analysis-title">{{ work.title }}</h2>
         </div>
-        <button class="literary-analysis-width-toggle" type="button" aria-label="Full-width text" aria-pressed="false" title="Switch to full-width text">Full width</button>
+        <div class="literary-analysis-header-actions">
+          <button class="literary-analysis-read-toggle" type="button" data-read-page-key="work:{{ work.id }}:analysis" aria-pressed="false">
+            <span class="literary-analysis-read-toggle-icon" aria-hidden="true"></span>
+            <span class="literary-analysis-read-toggle-label">Mark as read</span>
+          </button>
+          <span class="literary-analysis-read-feedback" role="status" aria-live="polite"></span>
+          <button class="literary-analysis-width-toggle" type="button" aria-label="Full-width text" aria-pressed="false" title="Switch to full-width text">Full width</button>
+        </div>
       </header>
       {% if work.structure or (work.setting and work.setting.time_period) %}
       <dl class="detail-metadata literary-analysis-metadata">

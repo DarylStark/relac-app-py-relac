@@ -10,12 +10,39 @@
 {% if chapter.part is not none and chapter.part != current_chapter.part %}Part {{ chapter.part }}: {% endif %}{{ chapter_label(chapter) }}
 {%- endmacro %}
 
+{% macro content_indicators(summary, analysis) %}
+<span class="literary-analysis-menu-meta">
+  {% if summary %}
+  <span class="literary-analysis-content-icon" role="img" aria-label="Summary available" title="Summary available">
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path d="M4 1.75h5l3 3v9.5H4z"></path>
+      <path d="M9 1.75v3h3M6 7.5h4M6 10h4"></path>
+    </svg>
+  </span>
+  {% endif %}
+  {% if analysis %}
+  <span class="literary-analysis-content-icon" role="img" aria-label="Analysis available" title="Analysis available">
+    <svg viewBox="0 0 16 16" aria-hidden="true">
+      <path d="m3 11.5-.75 3 3-.75L13 6.99 9.99 4 3 11.5Z"></path>
+      <path d="m8.99 5 3 3"></path>
+    </svg>
+  </span>
+  {% endif %}
+</span>
+{% endmacro %}
+
 {% macro chapter_menu_item(work, chapter, active_page, current_chapter) %}
 <li>
   {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.page_id == chapter.page_id %}
-  <span class="is-active" aria-current="page">{{ chapter_label(chapter) }}</span>
+  <span class="is-active" aria-current="page" data-read-page-key="work:{{ work.id }}:chapter:{{ chapter.page_id }}">
+    <span class="literary-analysis-menu-label">{{ chapter_label(chapter) }}</span>
+    {{ content_indicators(chapter.summary, chapter.analysis) }}
+  </span>
   {% else %}
-  <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.page_id }}.html">{{ chapter_label(chapter) }}</a>
+  <a href="literary_analysis_chapter.{{ work.id }}.{{ chapter.page_id }}.html" data-read-page-key="work:{{ work.id }}:chapter:{{ chapter.page_id }}">
+    <span class="literary-analysis-menu-label">{{ chapter_label(chapter) }}</span>
+    {{ content_indicators(chapter.summary, chapter.analysis) }}
+  </a>
   {% endif %}
 </li>
 {% endmacro %}
@@ -56,16 +83,26 @@
       {% if work.work_summary or work.work_analysis or work.structure or (work.setting and work.setting.time_period) %}
       <li>
         {% if active_page == "literary-analysis" %}
-        <span class="is-active" aria-current="page">Work Analysis</span>
+        <span class="is-active" aria-current="page" data-read-page-key="work:{{ work.id }}:analysis">
+          <span class="literary-analysis-menu-label">Work Analysis</span>
+          {{ content_indicators(work.work_summary, work.work_analysis) }}
+        </span>
         {% else %}
-        <a href="literary_analysis.{{ work.id }}.html">Work Analysis</a>
+        <a href="literary_analysis.{{ work.id }}.html" data-read-page-key="work:{{ work.id }}:analysis">
+          <span class="literary-analysis-menu-label">Work Analysis</span>
+          {{ content_indicators(work.work_summary, work.work_analysis) }}
+        </a>
         {% endif %}
       </li>
       {% endif %}
       {% if work.chapters %}
       <li class="literary-analysis-menu-group">
         <details {% if active_page == "literary-analysis-chapter" %}open{% endif %}>
-          <summary>Chapters</summary>
+          <summary
+            data-read-group-label="Chapters"
+            data-read-group-complete-label="All chapters read"
+            data-read-group-incomplete-label="Not all chapters read"
+          >Chapters</summary>
           <ul class="literary-analysis-submenu">
             {% set part_numbers = [] %}
             {% for chapter in work.chapters %}
@@ -79,7 +116,11 @@
             {% for part in part_numbers %}
             <li class="literary-analysis-menu-group">
               <details {% if active_page == "literary-analysis-chapter" and current_chapter and current_chapter.part == part %}open{% endif %}>
-                <summary>Part {{ part }}</summary>
+                <summary
+                  data-read-group-label="Part {{ part }}"
+                  data-read-group-complete-label="All chapters in Part {{ part }} read"
+                  data-read-group-incomplete-label="Not all chapters in Part {{ part }} read"
+                >Part {{ part }}</summary>
                 <ul class="literary-analysis-submenu">
                   {% for chapter in work.chapters if chapter.part == part %}
                   {{ chapter_menu_item(work, chapter, active_page, current_chapter) }}
