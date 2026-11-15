@@ -1,0 +1,24 @@
+{% macro detail_links(links) %}
+{% if links %}
+<div class="card detail-links-card">
+  <header class="table-card-header">
+    <h3 class="table-card-title">Links</h3>
+  </header>
+  <ul class="detail-link-list">
+    {% for link in links %}
+    <li class="detail-link-item">
+      <a class="detail-link" href="{{ link.url | e }}" target="_blank" rel="noopener noreferrer">
+        <span class="detail-link-header">
+          <span class="detail-link-title">{{ link.title | e }}</span>
+          {% if link.link_type %}
+          <span class="detail-link-type">{{ link.link_type | capitalize | e }}</span>
+          {% endif %}
+        </span>
+        <span class="detail-link-url">{{ link.url | e }}</span>
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
+{% endmacro %}

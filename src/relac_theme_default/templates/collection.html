@@ -5,6 +5,7 @@
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_rating_value.html" import rating_value %}
 {% from "_detail_labels.html" import detail_labels %}
+{% from "_detail_links.html" import detail_links %}
 
 {% block content %}
 <div class="content">
@@ -32,5 +33,6 @@
   </div>
 
   {{ book_table(collection.book_objs, "Books in this collection") }}
+  {{ detail_links(collection.links) }}
 </div>
 {% endblock %}

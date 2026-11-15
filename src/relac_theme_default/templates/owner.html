@@ -4,6 +4,7 @@
 {% from "_book_table.html" import book_table %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_detail_labels.html" import detail_labels %}
+{% from "_detail_links.html" import detail_links %}
 
 {% block content %}
 <div class="content">
@@ -31,5 +32,6 @@
   </div>
 
   {{ book_table(owner.book_objs, "Books owned by " ~ owner.name) }}
+  {{ detail_links(owner.links) }}
 </div>
 {% endblock %}

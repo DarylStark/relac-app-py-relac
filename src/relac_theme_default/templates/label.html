@@ -11,6 +11,7 @@
 {% from "_book_table.html" import book_table %}
 {% from "_owner_table.html" import owner_table %}
 {% from "_collection_table.html" import collection_table %}
+{% from "_detail_links.html" import detail_links %}
 
 {% block content %}
 <div class="content">
@@ -42,5 +43,6 @@
     {% if label.book_collection_objs %}
         {{ collection_table(label.book_collection_objs, title="Collections with this label") }}
     {% endif %}
+    {{ detail_links(label.links) }}
 </div>
 {% endblock %}

@@ -166,6 +166,7 @@ class Link(BaseModel):
 
     title: str
     url: str
+    link_type: str | None = None
 
 
 class ResourceBase(BaseModel):

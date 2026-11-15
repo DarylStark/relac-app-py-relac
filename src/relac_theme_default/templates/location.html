@@ -3,6 +3,7 @@
 
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_work_table.html" import work_table %}
+{% from "_detail_links.html" import detail_links %}
 
 {% block content %}
 <div class="content">
@@ -41,5 +42,6 @@
     <p class="detail-unspecified">No works are linked to this location.</p>
   </div>
   {% endif %}
+  {{ detail_links(location.links) }}
 </div>
 {% endblock %}

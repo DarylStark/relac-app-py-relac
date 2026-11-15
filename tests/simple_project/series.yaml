@@ -12,3 +12,7 @@ series.the_housemaid:
   links:
     - title: Testlink
       url: https://google.com/search?q=the%20housmaid
+      link_type: info
+    - title: Second link
+      url: https://bing.com/search?q=the%20housmaid
+      link_type: buy

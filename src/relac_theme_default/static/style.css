@@ -2002,6 +2002,77 @@ div.card p.literary-analysis-empty
     overflow-wrap: anywhere;
 }
 
+.detail-link-list
+{
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.detail-link-item
+{
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--transparent);
+}
+
+.detail-link
+{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 12px;
+    color: inherit;
+    text-decoration: none;
+}
+
+.detail-link:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.detail-link-header
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.detail-link-title
+{
+    color: var(--text);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.detail-link-type
+{
+    flex: none;
+    padding: 4px 9px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--hover-surface);
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.detail-link:hover .detail-link-title
+{
+    text-decoration: underline;
+}
+
+.detail-link-url
+{
+    color: var(--muted);
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
 .detail-contents-header
 {
     align-items: center;
