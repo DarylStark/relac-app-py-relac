@@ -1481,7 +1481,7 @@ div.card .detail-premise p:last-child
 {
     grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: minmax(180px, 340px) minmax(0, 1fr);
+    grid-template-columns: minmax(230px, 390px) minmax(0, 1fr);
     align-items: stretch;
     gap: 14px;
 }
@@ -1754,6 +1754,50 @@ div.content .literary-analysis-layout > .card:not(.small)
     text-decoration: none;
 }
 
+.literary-analysis-menu a,
+.literary-analysis-menu .is-active
+{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.literary-analysis-menu-label
+{
+    min-width: 0;
+}
+
+.literary-analysis-menu-meta
+{
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+}
+
+.literary-analysis-content-icon
+{
+    display: inline-flex;
+    width: 14px;
+    height: 14px;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+}
+
+.literary-analysis-content-icon svg
+{
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.4;
+}
+
 .literary-analysis-menu summary
 {
     display: list-item;
@@ -1789,6 +1833,116 @@ div.content .literary-analysis-layout > .card:not(.small)
     justify-content: space-between;
     gap: 16px;
     margin-bottom: 24px;
+}
+
+.literary-analysis-header-actions
+{
+    display: flex;
+    flex: none;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.literary-analysis-read-toggle
+{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 11px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    color: var(--text);
+    background: var(--surface);
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.literary-analysis-read-toggle:hover
+{
+    background: var(--hover-surface);
+}
+
+.literary-analysis-read-toggle[aria-pressed="true"]
+{
+    border-color: var(--accent-text);
+    color: var(--accent-text);
+}
+
+.literary-analysis-read-toggle:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+.literary-analysis-read-feedback
+{
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.literary-analysis-read-status
+{
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+    align-items: center;
+    justify-content: center;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.literary-analysis-read-status[data-read="true"],
+.literary-analysis-read-toggle[data-read="true"] .literary-analysis-read-toggle-icon
+{
+    color: var(--accent-text);
+}
+
+.literary-analysis-read-status[data-read="false"],
+.literary-analysis-read-group-status[data-read="false"],
+.literary-analysis-read-toggle[data-read="false"] .literary-analysis-read-toggle-icon
+{
+    color: var(--muted);
+}
+
+.literary-analysis-read-group-status
+{
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+    float: right;
+    align-items: center;
+    justify-content: center;
+    margin-left: 8px;
+}
+
+.literary-analysis-read-group-status[data-read="true"]
+{
+    color: var(--accent-text);
+}
+
+.literary-analysis-read-toggle-icon
+{
+    display: inline-flex;
+    width: 15px;
+    height: 15px;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.literary-analysis-read-icon
+{
+    width: 100%;
+    height: 100%;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.6;
 }
 
 .literary-analysis-header .detail-title

@@ -99,3 +99,42 @@ def test_generates_book_owner_detail_page(tmp_path: Path) -> None:
     cells = re.findall(r'<td>(.*?)</td>', no_link_row.group(1), re.DOTALL)
     assert len(cells) == 4
     assert not cells[-1].strip()
+
+
+def test_generated_analysis_pages_have_read_status_controls(
+    tmp_path: Path,
+) -> None:
+    """Render stable read-status keys on work and chapter analysis pages."""
+    repo_path = Path(__file__).parent / 'simple_project'
+    relac = Relac(YamlRepoLoader(repo_path))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    analysis_page = (
+        output / 'literary_analysis.work.john_williams__stoner.html'
+    ).read_text(encoding='utf-8')
+    analysis_key = 'work:work.john_williams__stoner:analysis'
+    assert f'data-read-page-key="{analysis_key}"' in analysis_page
+    assert 'Mark as read' in analysis_page
+    assert 'literary-analysis-read-toggle-icon' in analysis_page
+    assert 'static/literary-analysis-read-status.js' in analysis_page
+    assert 'aria-label="Summary available"' in analysis_page
+    assert 'aria-label="Analysis available"' in analysis_page
+
+    chapter_page_path = (
+        output / 'literary_analysis_chapter.work.john_williams__stoner.'
+        'part-1.chapter-1.html'
+    )
+    chapter_page = chapter_page_path.read_text(encoding='utf-8')
+    chapter_page_id = chapter_page_path.stem.removeprefix(
+        'literary_analysis_chapter.work.john_williams__stoner.'
+    )
+    chapter_key = f'work:work.john_williams__stoner:chapter:{chapter_page_id}'
+    assert f'data-read-page-key="{chapter_key}"' in chapter_page
+    assert 'Mark as read' in chapter_page
+    assert 'literary-analysis-read-toggle-icon' in chapter_page
+    assert 'aria-label="Summary available"' in chapter_page
+    assert 'aria-label="Analysis available"' in chapter_page
+    assert 'data-read-group-label="Chapters"' in chapter_page
+    assert 'data-read-group-label="Part 1"' in chapter_page
