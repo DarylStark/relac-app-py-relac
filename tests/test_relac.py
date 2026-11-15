@@ -22,6 +22,10 @@ def test_generates_book_owner_detail_page(tmp_path: Path) -> None:
     (repo_path / 'books.yml').write_text(
         'book.stoner:\n'
         '  title: Stoner\n'
+        '  links:\n'
+        '    - title: Book reference\n'
+        '      url: https://example.com/book\n'
+        '      link_type: buy\n'
         '  owners:\n'
         '    - owner: owner.library\n'
         '      loans:\n'
@@ -64,6 +68,19 @@ def test_generates_book_owner_detail_page(tmp_path: Path) -> None:
     assert 'https://example.com/loan' in page_content
     assert 'Loan record' in page_content
     book_page = (output / 'book.stoner.html').read_text(encoding='utf-8')
+    assert '<h3 class="table-card-title">Links</h3>' in book_page
+    assert (
+        '<a class="detail-link" href="https://example.com/book"'
+        ' target="_blank" rel="noopener noreferrer">'
+    ) in book_page
+    assert '<span class="detail-link-title">Book reference</span>' in book_page
+    assert '<span class="detail-link-type">Buy</span>' in book_page
+    assert (
+        'class="detail-link-url">https://example.com/book</span>' in book_page
+    )
+    assert book_page.rfind('<div class="card detail-links-card">') == (
+        book_page.rfind('<div class="card')
+    )
     assert '<th scope="col">Loaned to</th>' in book_page
     assert 'Daryl' in book_page
     assert 'Loaned on 2026-02-01' in book_page

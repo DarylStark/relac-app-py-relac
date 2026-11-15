@@ -8,6 +8,7 @@
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_rating_value.html" import rating_value %}
 {% from "_quote_cards.html" import quote_cards %}
+{% from "_detail_links.html" import detail_links %}
 
 {% block content %}
 <div class="content">
@@ -99,6 +100,7 @@
         heading_id="contributor-quotes-title"
     ) }}
   {% endif %}
+  {{ detail_links(contributor.links) }}
 
 </div>
 {% endblock %}

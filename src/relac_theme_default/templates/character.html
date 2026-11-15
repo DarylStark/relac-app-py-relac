@@ -4,6 +4,7 @@
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_character_works_table.html" import character_works_table %}
 {% from "_quote_cards.html" import quote_cards %}
+{% from "_detail_links.html" import detail_links %}
 
 {% block content %}
 <div class="content">
@@ -60,5 +61,6 @@
         heading_id="character-quotes-title"
     ) }}
   {% endif %}
+  {{ detail_links(character.links) }}
 </div>
 {% endblock %}

@@ -10,6 +10,7 @@
 {% from "_rating_value.html" import format_rating %}
 {% from "_detail_labels.html" import detail_labels %}
 {% from "_literary_analysis_menu.html" import literary_analysis_menu %}
+{% from "_detail_links.html" import detail_links %}
 
 {% block content %}
 <div class="content">
@@ -96,5 +97,6 @@
   {% if reading_lists %}
   {{ list_table(reading_lists, "Reading lists including this work") }}
   {% endif %}
+  {{ detail_links(work.links) }}
 </div>
 {% endblock %}

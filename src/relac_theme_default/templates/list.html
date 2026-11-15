@@ -5,6 +5,7 @@
 {% from "_breadcrumbs.html" import breadcrumbs %}
 {% from "_rating_value.html" import rating_value %}
 {% from "_detail_labels.html" import detail_labels %}
+{% from "_detail_links.html" import detail_links %}
 
 {% block content %}
 <div class="content">
@@ -34,6 +35,7 @@
   </div>
 
   {{ work_table(list.works, show_order=true, title="Works in this reading list") }}
+  {{ detail_links(list.links) }}
 
 </div>
 {% endblock %}

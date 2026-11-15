@@ -9,3 +9,10 @@ series.the_housemaid:
       work: work.freida_mcfadden__the_housemaid_s_wedding
     - number: 4
       work: work.freida_mcfadden__the_housemaid_s_secret
+  links:
+    - title: Testlink
+      url: https://google.com/search?q=the%20housmaid
+      link_type: info
+    - title: Second link
+      url: https://bing.com/search?q=the%20housmaid
+      link_type: buy
