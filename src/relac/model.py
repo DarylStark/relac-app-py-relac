@@ -161,10 +161,18 @@ class LintingFinding:
     error: str
 
 
+class Link(BaseModel):
+    """A link with a title and URL."""
+
+    title: str
+    url: str
+
+
 class ResourceBase(BaseModel):
     """Base model for resources."""
 
     id: str | None = Field(default=None, exclude=False)
+    links: list[Link] | None = None
 
     @property
     def linting_findings(self) -> list[LintingFinding]:
@@ -1023,13 +1031,6 @@ class BookBinding(Enum):
     PDF_DRM = 'pdf-drm'
 
 
-class BookOwnerLink(BaseModel):
-    """A link associated with a book ownership."""
-
-    title: str
-    url: str
-
-
 class BookOwnerLoan(BaseModel):
     """A loan of a book by one owner to another owner."""
 
@@ -1051,7 +1052,7 @@ class BookOwner(BaseModel):
     owner: str
     since: date | None = None
     loans: list[BookOwnerLoan] = Field(default_factory=list)
-    link: BookOwnerLink | None = None
+    link: Link | None = None
 
     owner_obj: Owner | None = Field(default=None, exclude=True)
 
