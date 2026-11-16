@@ -1379,7 +1379,7 @@ class ReadingSession(LabelledResource):
                 LintingFinding(
                     id='reading-session-enddate-smaller-then-startdate',
                     resource_id=self.id,
-                    error='Enddate is bigger then startdate',
+                    error='Startdate is after enddate',
                 )
             )
 
