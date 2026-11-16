@@ -223,13 +223,11 @@ class ResourceBase(BaseModel):
 
     def __repr__(self) -> str:
         """The repr for this model."""
-        # TODO: Implement something sensible
-        return ''
+        return str(self)
 
     def __str__(self) -> str:
         """The str representation for this model."""
-        # TODO: Implement something sensible
-        return ''
+        return f'<{type(self).__name__}: "{self._get_title()}">'
 
 
 class LabelledResource(ResourceBase):
