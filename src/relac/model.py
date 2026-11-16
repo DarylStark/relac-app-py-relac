@@ -733,17 +733,14 @@ class Work(LabelledResource):
         """Get linting findings for the model."""
         rv = super().linting_findings
 
+        originals = [
+            edition
+            for edition in self.edition_objs
+            if edition.edition_type == WorkEditionType.ORIGINAL
+        ]
+
         # Find all WorkEditions with a `original` type
-        if (
-            len(
-                [
-                    edition
-                    for edition in self.edition_objs
-                    if edition.edition_type == WorkEditionType.ORIGINAL
-                ]
-            )
-            != 1
-        ):
+        if len(originals) != 1:
             rv.append(
                 LintingFinding(
                     id='work-no-original-edition',
@@ -751,6 +748,17 @@ class Work(LabelledResource):
                     error='No "original" work edition created',
                 )
             )
+        else:
+            original = originals[0]
+            if original.title != self.title:
+                rv.append(
+                    LintingFinding(
+                        id='work-original-different-title',
+                        resource_id=self.id,
+                        error='The "original" work edition has a '
+                        f'different title: "{original.title}"',
+                    )
+                )
         return rv
 
     @override
