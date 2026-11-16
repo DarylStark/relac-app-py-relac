@@ -1,6 +1,7 @@
 """Module with the `main` method."""
 
 import sys
+from collections import Counter
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -70,9 +71,15 @@ def lint(
 
     for finding in findings:
         console.print(
-            f'{finding.resource_id} - [yellow][b]{finding.id}[/b]: '
+            f'[u]{finding.resource_id}[/u] - [yellow][b]{finding.id}[/b]: '
             f'[/yellow]{finding.error}'
         )
+
+    finding_ids = Counter(finding.id for finding in findings)
+
+    console.print('\n[b]Finding totals:[/b]\n')
+    for finding_id, count in finding_ids.items():
+        console.print(f'{finding_id}: {count}')
 
     sys.exit(1)
 
