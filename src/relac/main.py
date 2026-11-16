@@ -69,17 +69,19 @@ def lint(
         console.print('[green][b]All checks passed![/b][/green]')
         return
 
+    console.print('')
     for finding in findings:
         console.print(
-            f'[u]{finding.resource_id}[/u] - [yellow][b]{finding.id}[/b]: '
+            f'[i]{finding.resource_id}[/i] - [yellow][b]{finding.id}[/b]: '
             f'[/yellow]{finding.error}'
         )
 
     finding_ids = Counter(finding.id for finding in findings)
 
-    console.print('\n[b]Finding totals:[/b]\n')
+    console.print('\n[b][u]Totals:[/u][/b]\n')
     for finding_id, count in finding_ids.items():
-        console.print(f'{finding_id}: {count}')
+        console.print(f'> [yellow][b]{finding_id}[/yellow][/b]: {count}')
+    console.print(f'\n> [red][b]Total findings: [/red][/b]: {len(findings)}\n')
 
     sys.exit(1)
 
