@@ -66,7 +66,7 @@ def lint(ctx: Context) -> None:
     for finding in findings:
         console.print(
             f'{finding.resource_id} - [yellow][b]{finding.id}[/b]: '
-            '{finding.error}[/yellow]'
+            f'[/yellow]{finding.error}'
         )
 
 

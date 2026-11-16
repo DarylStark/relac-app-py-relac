@@ -297,6 +297,27 @@ class Contributor(LabelledResource):
     ]
 
     @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        # Find all WorkEditions with a `original` type
+        if (
+            self.deceased_date is not None
+            and self.state != ContributorState.DECEASED
+        ):
+            rv.append(
+                LintingFinding(
+                    id='contributor-deceased-date-set-but-not-deceased',
+                    resource_id=self.id,
+                    error='Deceased date is set, but state is '
+                    'not set to "deceased"',
+                )
+            )
+        return rv
+
+    @override
     def _get_details(self) -> list[str]:
         """Get the details for this object."""
         return [
@@ -693,6 +714,32 @@ class Work(LabelledResource):
     )
 
     @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        # Find all WorkEditions with a `original` type
+        if (
+            len(
+                [
+                    edition
+                    for edition in self.edition_objs
+                    if edition.edition_type == WorkEditionType.ORIGINAL
+                ]
+            )
+            != 1
+        ):
+            rv.append(
+                LintingFinding(
+                    id='work-no-original-edition',
+                    resource_id=self.id,
+                    error='No "original" work edition created',
+                )
+            )
+        return rv
+
+    @override
     def _get_details(self) -> list[str]:
         """Get the details for this object."""
         rv = [
@@ -867,6 +914,26 @@ class WorkEdition(LabelledResource):
             'translator_work_edition_objs',
         ),
     ]
+
+    @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        if (
+            self.edition_type == WorkEditionType.TRANSLATION
+            and len(self.translator_objs) == 0
+        ):
+            rv.append(
+                LintingFinding(
+                    id='work-edition-translation-without-translators',
+                    resource_id=self.id,
+                    error='Work is a translation but no translators '
+                    'are configured',
+                )
+            )
+        return rv
 
     @override
     def _get_resource_type(self) -> str:
@@ -1116,6 +1183,22 @@ class Book(LabelledResource):
     medium: BookMedium = BookMedium.UNSPECIFIED
     binding: BookBinding = BookBinding.UNSPECIFIED
     owners: list[BookOwner] = Field(default_factory=list)
+
+    @override
+    @property
+    def linting_findings(self) -> list[LintingFinding]:
+        """Get linting findings for the model."""
+        rv = super().linting_findings
+
+        if len(self.work_edition_objs) == 0:
+            rv.append(
+                LintingFinding(
+                    id='book-no-works-set',
+                    resource_id=self.id,
+                    error='No works set for this book',
+                )
+            )
+        return rv
 
     @field_validator('owners', mode='before')
     @classmethod
