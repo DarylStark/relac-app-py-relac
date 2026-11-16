@@ -495,7 +495,13 @@ class Character(ResourceBase):
         """Get all Work Character objects for this character."""
         rv: list[WorkCharacter] = list()
         for work_obj in self.work_objs:
-            rv.extend(work_obj.characters)
+            rv.extend(
+                [
+                    character
+                    for character in work_obj.characters
+                    if character.character_obj == self
+                ]
+            )
         return rv
 
 
