@@ -7,7 +7,7 @@
 {% from "_reading_session_table.html" import reading_session_table %}
 {% from "_entity_link.html" import entity_link %}
 {% from "_breadcrumbs.html" import breadcrumbs %}
-{% from "_rating_value.html" import format_rating %}
+{% from "_rating_value.html" import rating_value %}
 {% from "_detail_labels.html" import detail_labels %}
 {% from "_literary_analysis_menu.html" import literary_analysis_menu %}
 {% from "_detail_links.html" import detail_links %}
@@ -75,7 +75,7 @@
           {% endif %}
           <div class="detail-fact">
             <dt>Rating</dt>
-            <dd>{{ format_rating(work.rating) }}</dd>
+            <dd>{{ rating_value(work.rating) }}</dd>
           </div>
         </dl>
       </section>

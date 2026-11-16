@@ -53,11 +53,16 @@ def validate(ctx: Context) -> None:
 
 
 @app.command(name='lint', help='Lint the Relac repository')
-def lint(ctx: Context) -> None:
+def lint(
+    ctx: Context,
+    use_ignores: bool = Option(
+        default=True, help='Use the ignore lists for linting.'
+    ),
+) -> None:
     """Create the static webpage."""
     console: Console = ctx.obj['console']
     relac: Relac = ctx.obj['relac']
-    findings = relac.lint_repo()
+    findings = relac.lint_repo(use_ignores=use_ignores)
 
     if not findings:
         console.print('[green][b]All checks passed![/b][/green]')
@@ -66,8 +71,10 @@ def lint(ctx: Context) -> None:
     for finding in findings:
         console.print(
             f'{finding.resource_id} - [yellow][b]{finding.id}[/b]: '
-            '{finding.error}[/yellow]'
+            f'[/yellow]{finding.error}'
         )
+
+    sys.exit(1)
 
 
 def main() -> None:
