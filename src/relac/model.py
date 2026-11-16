@@ -1222,6 +1222,15 @@ class Book(LabelledResource):
             )
         return rv
 
+    @property
+    def languages(self) -> list[str]:
+        """Get the languages for this book."""
+        rv: list[str] = []
+        for edition in self.work_edition_objs:
+            if edition.language:
+                rv.append(edition.language)
+        return list(set(rv))
+
     @field_validator('owners', mode='before')
     @classmethod
     def normalize_owners(cls, owners: object) -> object:

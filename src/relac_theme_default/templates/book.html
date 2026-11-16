@@ -74,6 +74,16 @@
               <span class="detail-small">{{ book_binding | enum_label }}</span>
             </dd>
           </div>
+          <div class="detail-fact">
+            <dt>Language</dt>
+            <dd>
+              {% if book.languages %}
+                {{ book.languages | map('language') | join(", ") }}
+              {% else %}
+                <span class="detail-unspecified">Unspecified</span>
+              {% endif %}
+            </dd>
+          </div>
           {% if book.isbn13 is not none %}
           <div class="detail-fact">
             <dt>ISBN</dt>

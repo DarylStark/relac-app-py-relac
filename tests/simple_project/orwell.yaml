@@ -23,6 +23,14 @@ work.george_orwell__nineteen_eighty_four:
 work_edition.george_orwell__nineteen_eighty_four__original:
   title: Nineteen Eighty-Four
   work: work.george_orwell__nineteen_eighty_four
+  edition_type: original
+  language: en
+
+work_edition.george_orwell__nineteen_eighty_four__translation_nl:
+  title: Nineteen Eighty-Four
+  work: work.george_orwell__nineteen_eighty_four
+  edition_type: translation
+  language: nl
 #-------------------------------------------------------------------------------
 # Books
 #-------------------------------------------------------------------------------
@@ -43,4 +51,5 @@ book.george_orwell__nineteen_eighty_four__epub:
   binding: epub-drm
   work_editions:
     - work_edition.george_orwell__nineteen_eighty_four__original
+    - work_edition.george_orwell__nineteen_eighty_four__translation_nl
 #-------------------------------------------------------------------------------

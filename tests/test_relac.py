@@ -1,5 +1,6 @@
 """Tests for static page generation."""
 
+import json
 import re
 from pathlib import Path
 
@@ -99,6 +100,71 @@ def test_generates_book_owner_detail_page(tmp_path: Path) -> None:
     cells = re.findall(r'<td>(.*?)</td>', no_link_row.group(1), re.DOTALL)
     assert len(cells) == 4
     assert not cells[-1].strip()
+
+
+def test_book_language_is_shown_in_tables_and_detail_metadata(
+    tmp_path: Path,
+) -> None:
+    """Render each book language as an independent filter value."""
+    repo_path = tmp_path / 'repo'
+    repo_path.mkdir()
+    (repo_path / 'library.yml').write_text(
+        'relac:\n'
+        '  title: Test Library\n'
+        '  owner: owner.test\n'
+        'owner.test:\n'
+        '  name: Test Owner\n'
+        'contributor.author:\n'
+        '  name: Example Author\n'
+        'work.example:\n'
+        '  title: Example Work\n'
+        '  authors:\n'
+        '    - contributor.author\n'
+        'work_edition.example.en:\n'
+        '  title: Example Work\n'
+        '  work: work.example\n'
+        '  language: en\n'
+        '  edition_type: original\n'
+        'work_edition.example.nl:\n'
+        '  title: Voorbeeld\n'
+        '  work: work.example\n'
+        '  language: nl\n'
+        '  edition_type: translation\n'
+        'book.multi_language:\n'
+        '  title: Multi-language book\n'
+        '  work_editions:\n'
+        '    - work_edition.example.en\n'
+        '    - work_edition.example.nl\n',
+        encoding='utf-8',
+    )
+    relac = Relac(YamlRepoLoader(repo_path))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    books_page = (output / 'books.html').read_text(encoding='utf-8')
+    assert (
+        '<th scope="col" class="right fit-content">Language</th>' in books_page
+    )
+    language_cell = re.search(
+        r"""<td class="right fit-content" """
+        r"""data-filter-values='([^']*)'>(.*?)</td>""",
+        books_page,
+    )
+    assert language_cell is not None
+    assert set(json.loads(language_cell.group(1))) == {'Dutch', 'English'}
+    assert set(language_cell.group(2).split(', ')) == {'Dutch', 'English'}
+
+    book_page = (output / 'book.multi_language.html').read_text(
+        encoding='utf-8'
+    )
+    language_fact = re.search(
+        r'<dt>Language</dt>\s*<dd>\s*(.*?)\s*</dd>',
+        book_page,
+        re.DOTALL,
+    )
+    assert language_fact is not None
+    assert set(language_fact.group(1).split(', ')) == {'Dutch', 'English'}
 
 
 def test_generated_analysis_pages_have_read_status_controls(
