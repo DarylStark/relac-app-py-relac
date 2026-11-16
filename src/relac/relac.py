@@ -62,9 +62,12 @@ class Relac:
     def lint_repo(self) -> list[LintingFinding]:
         """Get all linting findings for all objects."""
         findings: list[LintingFinding] = []
+        ignores = self.database.get_relac_config().linting_ignores
         for resource in self.database.get_all_values_for_all_types():
             findings.extend(resource.linting_findings)
-        return findings
+        return [
+            violation for violation in findings if violation.id not in ignores
+        ]
 
     def _build_search_index(
         self,

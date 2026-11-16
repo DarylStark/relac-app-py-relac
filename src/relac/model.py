@@ -250,6 +250,7 @@ class RelacConfig(ResourceBase):
 
     title: str
     owner: str | None = None
+    linting_ignores: list[str] = []
 
     # Relation (real objects)
     owner_obj: Owner | None = Field(default=None, exclude=True)

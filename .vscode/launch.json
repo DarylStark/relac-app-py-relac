@@ -16,6 +16,18 @@
             "cwd": "${workspaceFolder}/tests/simple_project",
             "python": "${workspaceFolder}/.venv/bin/python",
             "console": "integratedTerminal"
+        },
+        {
+            "name": "Run app - Lint",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "relac",
+            "args": [
+                "lint"
+            ],
+            "cwd": "${workspaceFolder}/tests/simple_project",
+            "python": "${workspaceFolder}/.venv/bin/python",
+            "console": "integratedTerminal"
         }
     ]
 }

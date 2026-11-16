@@ -69,6 +69,8 @@ def lint(ctx: Context) -> None:
             f'[/yellow]{finding.error}'
         )
 
+    sys.exit(1)
+
 
 def main() -> None:
     """Main entry point for the CLI app."""
