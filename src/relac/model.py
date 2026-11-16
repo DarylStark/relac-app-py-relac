@@ -1229,7 +1229,7 @@ class Book(LabelledResource):
         for edition in self.work_edition_objs:
             if edition.language:
                 rv.append(edition.language)
-        return rv
+        return list(set(rv))
 
     @field_validator('owners', mode='before')
     @classmethod

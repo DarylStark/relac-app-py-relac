@@ -1,6 +1,7 @@
 """Tests for static page generation."""
 
 import re
+import shutil
 from pathlib import Path
 
 from relac.relac import Relac
@@ -99,6 +100,46 @@ def test_generates_book_owner_detail_page(tmp_path: Path) -> None:
     cells = re.findall(r'<td>(.*?)</td>', no_link_row.group(1), re.DOTALL)
     assert len(cells) == 4
     assert not cells[-1].strip()
+
+
+def test_book_language_is_shown_in_tables_and_detail_metadata(
+    tmp_path: Path,
+) -> None:
+    """Render each book language as an independent filter value."""
+    repo_path = tmp_path / 'repo'
+    shutil.copytree(Path(__file__).parent / 'simple_project', repo_path)
+    (repo_path / 'books.yml').write_text(
+        'book.multi_language:\n'
+        '  title: Multi-language book\n'
+        '  work_editions:\n'
+        '    - work_edition.stephen_king__mr_harrigans_phone__original\n'
+        '    - work_edition.stephen_king__mr_harrigans_phone__nl\n',
+        encoding='utf-8',
+    )
+    relac = Relac(YamlRepoLoader(repo_path))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    books_page = (output / 'books.html').read_text(encoding='utf-8')
+    assert (
+        '<th scope="col" class="right fit-content">Language</th>' in books_page
+    )
+    assert (
+        '<td class="right fit-content" '
+        'data-filter-values=\'["Dutch"]\'>Dutch</td>' in books_page
+    )
+    assert (
+        '<td class="right fit-content" '
+        'data-filter-values=\'["English", "Dutch"]\'>English, Dutch</td>'
+        in books_page
+    )
+
+    book_page = (output / 'book.multi_language.html').read_text(
+        encoding='utf-8'
+    )
+    assert '<dt>Language</dt>' in book_page
+    assert 'English, Dutch' in book_page
 
 
 def test_generated_analysis_pages_have_read_status_controls(
