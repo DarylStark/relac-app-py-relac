@@ -174,6 +174,19 @@ class ResourceBase(BaseModel):
 
     id: str | None = Field(default=None, exclude=False)
     links: list[Link] | None = None
+    resource_linting_ignores: list[str] | None = None
+
+    def get_linting_findings(
+        self, use_ignores: bool = True
+    ) -> list[LintingFinding]:
+        """Get linting findings."""
+        findings = self.linting_findings
+        ignores = self.resource_linting_ignores or []
+        return [
+            finding
+            for finding in findings
+            if finding.id not in ignores or not use_ignores
+        ]
 
     @property
     def linting_findings(self) -> list[LintingFinding]:
