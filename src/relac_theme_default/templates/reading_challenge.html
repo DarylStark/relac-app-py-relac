@@ -12,6 +12,7 @@
       (reading_challenge.name, none)
   ]) }}
   {% set session_count = challenge_sessions | length %}
+  {% set session_percentage = (session_count / reading_challenge.goal * 100) | round | int if reading_challenge.goal > 0 else none %}
   {% set result = reading_challenge.get_result(reading_sessions) %}
   <div class="card">
     <section class="detail-summary" aria-labelledby="detail-title">
@@ -21,17 +22,21 @@
           <h3 id="detail-title">{{ reading_challenge.name }}</h3>
         </div>
         <p class="detail-badge">
-          <span class="availability-badge">{{ result.name | replace('_', '-') | enum_label }}</span>
+          <span class="availability-badge reading-challenge-result reading-challenge-result--{{ result.name | lower | replace('_', '-') }}">{{ result.name | replace('_', '-') | enum_label }}</span>
         </p>
       </div>
       <dl class="detail-metadata">
         <div class="detail-fact">
           <dt>Sessions</dt>
-          <dd>{{ session_count }} / {{ reading_challenge.goal }}</dd>
+          <dd>
+            <span class="reading-challenge-sessions"><pre>{{ session_count }}</pre> / <pre>{{ reading_challenge.goal }}</pre> ({% if session_percentage is not none %}<pre>{{ session_percentage }}%</pre>{% else %}N/A{% endif %})</span>
+          </dd>
         </div>
         <div class="detail-fact">
           <dt>Challenge state</dt>
-          <dd>{{ reading_challenge.state.value | replace('_', '-') | enum_label }}</dd>
+          <dd>
+            <span class="availability-badge reading-challenge-state reading-challenge-state--{{ reading_challenge.state.value | replace('_', '-') }}">{{ reading_challenge.state.value | replace('_', '-') | enum_label }}</span>
+          </dd>
         </div>
       </dl>
     </section>

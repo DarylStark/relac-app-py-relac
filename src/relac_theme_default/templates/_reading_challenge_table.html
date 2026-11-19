@@ -10,6 +10,7 @@
                 <tr>
                     <th scope="col">Challenge</th>
                     <th scope="col" class="right fit-content">Sessions</th>
+                    <th scope="col" class="right fit-content">State</th>
                     <th scope="col" class="right fit-content">Status</th>
                 </tr>
             </thead>
@@ -23,7 +24,10 @@
                             <pre>{{ session_count }}</pre> / <pre>{{ challenge.goal }}</pre>
                         </td>
                         <td class="right fit-content">
-                            <span class="availability-badge">{{ result.name | replace('_', '-') | enum_label }}</span>
+                            <span class="availability-badge reading-challenge-state reading-challenge-state--{{ challenge.state.value | replace('_', '-') }}">{{ challenge.state.value | replace('_', '-') | enum_label }}</span>
+                        </td>
+                        <td class="right fit-content">
+                            <span class="availability-badge reading-challenge-result reading-challenge-result--{{ result.name | lower | replace('_', '-') }}">{{ result.name | replace('_', '-') | enum_label }}</span>
                         </td>
                     </tr>
                 {% endfor %}
