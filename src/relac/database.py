@@ -122,7 +122,10 @@ class DataStore[T: ResourceBase]:
         for obj_id in obj_value:
             related_obj = database.get_one(obj_id)
             getattr(item, field.destination_field).append(related_obj)
-            self._populate_back_reference(item, related_obj, field, parent_item)
+            if field.type != 'many-to-none':
+                self._populate_back_reference(
+                    item, related_obj, field, parent_item
+                )
 
     def _resolve_field(
         self,

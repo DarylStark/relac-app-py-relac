@@ -1,41 +1,44 @@
 {% extends "_base.html" %}
 {% set active_page = "overview" %}
 
+{% from "_entity_link.html" import entity_link %}
+{% from "_work_table.html" import work_table %}
+
 {% block content %}
     <div class="statistics">
         <div class="card">
             <p>
-                142
+                {{ db.get_all_values(models['contributor']) | length }}
             </p>
             <p>
-                Works
-            </p>
-        </div>
-
-        <div class="card">
-            <p>
-                89
-            </p>
-            <p>
-                books owned
+                contributors
             </p>
         </div>
 
         <div class="card">
             <p>
-                2
+                {{ db.get_all_values(models['work_edition']) | length }} / {{ db.get_all_values(models['work']) | length }}
             </p>
             <p>
-                reading right now
+                editions and works
             </p>
         </div>
 
         <div class="card">
             <p>
-                72
+                {{ db.get_all_values(models['reading_list']) | length }}
             </p>
             <p>
-                on reading list
+                reading lists
+            </p>
+        </div>
+
+        <div class="card">
+            <p>
+                {{ db.get_all_values(models['book']) | length }}
+            </p>
+            <p>
+                books
             </p>
         </div>
     </div>
@@ -47,13 +50,40 @@
         </div>
 
         <div class="card small">
-            <h2>Recent reading sessions</h2>
-            <p>Here come all the recent reading sessions</p>
+            <h2>Currently reading</h2>
+            {% if currently_reading %}
+                <ul class="currently-reading-list" aria-label="Currently reading sessions">
+                    {% for session in currently_reading %}
+                        <li class="currently-reading-entry">
+                            <div class="currently-reading-entry-header">
+                                <h3 class="currently-reading-title">{{ entity_link(session.work_edition_obj, session.work_edition_obj.title) }}</h3>
+                                {% if session.state.value == "paused" %}
+                                    <span class="currently-reading-status currently-reading-status--paused">PAUSED</span>
+                                {% else %}
+                                    <span class="currently-reading-status">READING</span>
+                                {% endif %}
+                            </div>
+                            <p class="currently-reading-book">
+                                {{ entity_link(session.book_obj, session.book_obj.title) }}
+                            </p>
+                            {% if session.book_obj.contributor_objs %}
+                                <p class="currently-reading-contributors">
+                                    By
+                                    {% for contributor in session.book_obj.contributor_objs %}
+                                        {% if not loop.first %}, {% endif %}{{ entity_link(contributor, contributor.name) }}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="currently-reading-empty">No active reading sessions.</p>
+            {% endif %}
         </div>
 
-        <div class="card">
-            <h2>Works to read</h2>
-            <p>Here comes your reading list.</p>
-        </div>
+        {% for reading_list in relac.dashboard_lists_objs %}
+            {{ work_table(reading_list.works, show_order=true, title=reading_list.name, table_id="dashboard-reading-list-" ~ loop.index) }}
+        {% endfor %}
     </div>
 {% endblock %}

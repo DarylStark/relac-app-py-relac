@@ -926,6 +926,97 @@ div.card p:last-child
     line-height: 1.4;
 }
 
+.currently-reading-list
+{
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.currently-reading-entry
+{
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent-text);
+    border-radius: 0 6px 6px 0;
+    background: var(--hover-surface);
+}
+
+.currently-reading-entry-header
+{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+h3.currently-reading-title
+{
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.currently-reading-status
+{
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border: 1px solid rgb(39 145 83 / 0.45);
+    border-radius: 999px;
+    color: rgb(24, 112, 62);
+    background: rgb(39 174 96 / 0.14);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+}
+
+.currently-reading-status--paused
+{
+    border-color: rgb(202 124 22 / 0.5);
+    color: rgb(150, 87, 10);
+    background: rgb(243 156 18 / 0.16);
+}
+
+.dark .currently-reading-status
+{
+    color: rgb(127, 224, 161);
+}
+
+.dark .currently-reading-status--paused
+{
+    color: rgb(255, 190, 100);
+}
+
+.currently-reading-entry > .currently-reading-book
+{
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.currently-reading-contributors
+{
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+}
+
+.currently-reading-empty
+{
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
+}
+
 div.content
 {
     display: grid;

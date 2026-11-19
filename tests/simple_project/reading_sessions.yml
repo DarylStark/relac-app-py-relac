@@ -13,7 +13,7 @@ reading_session.nineteen_eighty_four:
 reading_session.nineteen_eighty_four_second_time:
   work_edition: work_edition.george_orwell__nineteen_eighty_four__original
   book: book.george_orwell__nineteen_eighty_four__clothbound_classic
-  state: reading
+  state: paused
   startdate: 2026-10-26
   book_rating:
     rating: 6
