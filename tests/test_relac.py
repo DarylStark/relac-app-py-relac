@@ -102,6 +102,38 @@ def test_generates_book_owner_detail_page(tmp_path: Path) -> None:
     assert not cells[-1].strip()
 
 
+def test_character_and_location_detail_breadcrumbs(tmp_path: Path) -> None:
+    """Include the character or location index in detail breadcrumbs."""
+    relac = Relac(YamlRepoLoader(Path(__file__).parent / 'simple_project'))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    character_page = (output / 'character.william_stoner.html').read_text(
+        encoding='utf-8'
+    )
+    assert re.search(
+        r'<nav class="breadcrumbs".*?'
+        r'<a href="works.html">Works</a>.*?'
+        r'<a href="characters.html">Characters</a>.*?'
+        r'<span aria-current="page">William Stoner</span>.*?</nav>',
+        character_page,
+        re.DOTALL,
+    )
+
+    location_page = (output / 'location.university_missouri.html').read_text(
+        encoding='utf-8'
+    )
+    assert re.search(
+        r'<nav class="breadcrumbs".*?'
+        r'<a href="works.html">Works</a>.*?'
+        r'<a href="locations.html">Locations</a>.*?'
+        r'<span aria-current="page">University of Missouri</span>.*?</nav>',
+        location_page,
+        re.DOTALL,
+    )
+
+
 def test_book_language_is_shown_in_tables_and_detail_metadata(
     tmp_path: Path,
 ) -> None:

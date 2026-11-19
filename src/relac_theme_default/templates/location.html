@@ -7,7 +7,11 @@
 
 {% block content %}
 <div class="content">
-  {{ breadcrumbs([("Works", "works.html"), (location.name, none)]) }}
+  {{ breadcrumbs([
+      ("Works", "works.html"),
+      ("Locations", "locations.html"),
+      (location.name, none)
+  ]) }}
   <div class="card">
     <section class="detail-summary" aria-labelledby="detail-title">
       <div class="detail-summary-header">
