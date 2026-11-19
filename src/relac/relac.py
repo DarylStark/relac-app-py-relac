@@ -20,10 +20,12 @@ from relac.model import (
     Owner,
     ReadingList,
     ReadingSession,
+    ReadingState,
     SearchIndexData,
     Series,
     Work,
     WorkEdition,
+    relac_models,
 )
 from relac.theme import RelacTheme
 
@@ -146,7 +148,15 @@ class Relac:
 
         # Index page
         template = env.get_template(metadata.index_template)
-        html = template.render(db=self.database)
+        html = template.render(
+            db=self.database,
+            models=relac_models,
+            currently_reading=[
+                session
+                for session in self.database.get_all_values(ReadingSession)
+                if session.state == ReadingState.READING
+            ],
+        )
         out_path = output / 'index.html'
         out_path.write_text(html)
 

@@ -5,37 +5,37 @@
     <div class="statistics">
         <div class="card">
             <p>
-                142
+                {{ db.get_all_values(models['contributor']) | length }}
             </p>
             <p>
-                Works
-            </p>
-        </div>
-
-        <div class="card">
-            <p>
-                89
-            </p>
-            <p>
-                books owned
+                contributors
             </p>
         </div>
 
         <div class="card">
             <p>
-                2
+                {{ db.get_all_values(models['work_edition']) | length }} / {{ db.get_all_values(models['work']) | length }}
             </p>
             <p>
-                reading right now
+                editions and works
             </p>
         </div>
 
         <div class="card">
             <p>
-                72
+                {{ db.get_all_values(models['reading_list']) | length }}
             </p>
             <p>
-                on reading list
+                reading lists
+            </p>
+        </div>
+
+        <div class="card">
+            <p>
+                {{ db.get_all_values(models['book']) | length }}
+            </p>
+            <p>
+                books
             </p>
         </div>
     </div>
@@ -47,8 +47,11 @@
         </div>
 
         <div class="card small">
-            <h2>Recent reading sessions</h2>
-            <p>Here come all the recent reading sessions</p>
+            <h2>Currently reading</h2>
+            {% for session in currently_reading %}
+                <p>{{ session.work_edition_obj.title }}</p>
+                <p>{{ session.book_obj.title }}</p>
+            {% endfor %}
         </div>
 
         <div class="card">
