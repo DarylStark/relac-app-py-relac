@@ -83,7 +83,7 @@ class ResolvableField:
 
     source_field: str
     destination_field: str
-    type: Literal['many-to-many', 'one-to-many', 'one-to-none']
+    type: Literal['many-to-many', 'one-to-many', 'one-to-none', 'many-to-none']
     populates_back: str | None = None
 
 
@@ -263,14 +263,21 @@ class RelacConfig(ResourceBase):
 
     title: str
     owner: str | None = None
+    dashboard_lists: list[str] | None = None
     linting_ignores: list[str] = []
 
     # Relation (real objects)
     owner_obj: Owner | None = Field(default=None, exclude=True)
+    dashboard_lists_objs: list[ReadingList] = Field(
+        default_factory=list, exclude=True
+    )
 
     # Resolve definitions
     resolvable_fields: ClassVar[list[ResolvableField]] = [
         ResolvableField('owner', 'owner_obj', 'one-to-none'),
+        ResolvableField(
+            'dashboard_lists', 'dashboard_lists_objs', 'many-to-none'
+        ),
     ]
 
 

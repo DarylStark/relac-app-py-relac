@@ -2,6 +2,7 @@
 {% set active_page = "overview" %}
 
 {% from "_entity_link.html" import entity_link %}
+{% from "_work_table.html" import work_table %}
 
 {% block content %}
     <div class="statistics">
@@ -81,9 +82,8 @@
             {% endif %}
         </div>
 
-        <div class="card">
-            <h2>Works to read</h2>
-            <p>Here comes your reading list.</p>
-        </div>
+        {% for reading_list in relac.dashboard_lists_objs %}
+            {{ work_table(reading_list.works, show_order=true, title=reading_list.name, table_id="dashboard-reading-list-" ~ loop.index) }}
+        {% endfor %}
     </div>
 {% endblock %}

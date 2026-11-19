@@ -1,3 +1,5 @@
 relac:
   title: Test library
   owner: owner.daryl
+  dashboard_lists:
+    - reading_list.my_reading_list

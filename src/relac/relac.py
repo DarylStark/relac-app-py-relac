@@ -156,6 +156,7 @@ class Relac:
                 for session in self.database.get_all_values(ReadingSession)
                 if session.state in (ReadingState.READING, ReadingState.PAUSED)
             ],
+            relac=self.database.get_relac_config(),
         )
         out_path = output / 'index.html'
         out_path.write_text(html)

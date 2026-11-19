@@ -1,14 +1,14 @@
 {% from "_entity_link.html" import entity_link %}
 {% from "_rating_value.html" import rating_value %}
 
-{% macro work_table(works, show_order=false, title="Works", order_attribute="order") %}
+{% macro work_table(works, show_order=false, title="Works", order_attribute="order", table_id="works-table") %}
 <div class="card table-card">
     <header class="table-card-header">
         <h3 class="table-card-title">{{ title }}</h3>
         <div class="table-card-actions"></div>
     </header>
 <div class="table-scroll">
-    <table id="works-table" class="resources" data-sortable>
+    <table id="{{ table_id }}" class="resources" data-sortable>
         <thead>
             <tr>
                 {% if show_order %}<th scope="col" class="center fit-content">#</th>{% endif %}
