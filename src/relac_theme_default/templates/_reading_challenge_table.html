@@ -1,0 +1,34 @@
+{% macro reading_challenge_table(reading_challenges, reading_sessions, title="Reading challenges") %}
+<div class="card table-card">
+    <header class="table-card-header">
+        <h3 class="table-card-title">{{ title }}</h3>
+        <div class="table-card-actions"></div>
+    </header>
+    <div class="table-scroll">
+        <table class="resources" data-sortable>
+            <thead>
+                <tr>
+                    <th scope="col">Challenge</th>
+                    <th scope="col" class="right fit-content">Sessions</th>
+                    <th scope="col" class="right fit-content">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for challenge in reading_challenges %}
+                    {% set session_count = challenge.get_count(reading_sessions) %}
+                    {% set result = challenge.get_result(reading_sessions) %}
+                    <tr data-href="{{ challenge.id }}.html">
+                        <td>{{ challenge.name }}</td>
+                        <td class="right fit-content" data-sort-value="{{ session_count }}" data-filter-values='{{ [session_count] | tojson }}'>
+                            <pre>{{ session_count }}</pre> / <pre>{{ challenge.goal }}</pre>
+                        </td>
+                        <td class="right fit-content">
+                            <span class="availability-badge">{{ result.name | replace('_', '-') | enum_label }}</span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endmacro %}

@@ -926,7 +926,8 @@ div.card p:last-child
     line-height: 1.4;
 }
 
-.currently-reading-list
+.currently-reading-list,
+.reading-challenge-list
 {
     display: grid;
     gap: 10px;
@@ -935,8 +936,10 @@ div.card p:last-child
     list-style: none;
 }
 
-.currently-reading-entry
+.currently-reading-entry,
+.reading-challenge-entry
 {
+    display: block;
     padding: 12px;
     border: 1px solid var(--line);
     border-left: 3px solid var(--accent-text);
@@ -944,7 +947,8 @@ div.card p:last-child
     background: var(--hover-surface);
 }
 
-.currently-reading-entry-header
+.currently-reading-entry-header,
+.reading-challenge-entry-header
 {
     display: flex;
     align-items: flex-start;
@@ -958,6 +962,15 @@ h3.currently-reading-title
     font-size: 16px;
     font-weight: 600;
     line-height: 1.3;
+}
+
+h3.reading-challenge-title
+{
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
 }
 
 .currently-reading-status
@@ -989,6 +1002,52 @@ h3.currently-reading-title
 .dark .currently-reading-status--paused
 {
     color: rgb(255, 190, 100);
+}
+
+.reading-challenge-status
+{
+    flex: 0 0 auto;
+    padding: 3px 7px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--surface);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    line-height: 1.2;
+}
+
+.reading-challenge-status--reached
+{
+    border-color: rgb(39 145 83 / 0.45);
+    color: rgb(24, 112, 62);
+    background: rgb(39 174 96 / 0.14);
+}
+
+.reading-challenge-status--not-reached
+{
+    border-color: rgb(202 124 22 / 0.5);
+    color: rgb(150, 87, 10);
+    background: rgb(243 156 18 / 0.16);
+}
+
+.dark .reading-challenge-status--reached
+{
+    color: rgb(127, 224, 161);
+}
+
+.dark .reading-challenge-status--not-reached
+{
+    color: rgb(255, 190, 100);
+}
+
+.reading-challenge-progress
+{
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.4;
 }
 
 .currently-reading-entry > .currently-reading-book
@@ -1109,6 +1168,11 @@ nav.breadcrumbs [aria-current="page"]
     div.statistics
     {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    div.content.dashboard-content
+    {
+        grid-template-columns: minmax(0, 1fr);
     }
 }
 
