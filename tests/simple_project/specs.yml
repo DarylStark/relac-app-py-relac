@@ -1,0 +1,19 @@
+reading_session_is_finished.is_finished: {}
+
+reading_session_finished_after.finished_after_2026_01_01:
+  date: 2026-01-01
+
+reading_session_finished_before.finished_before_2026_12_31:
+  date: 2026-01-01
+
+reading_session_all_spec.challenge_2026:
+  specs:
+    - reading_session_is_finished.is_finished
+    - reading_session_finished_after.finished_after_2026_01_01
+    - reading_session_finished_before.finished_before_2026_12_31
+
+reading_challenge.challenge_2026:
+  name: "Reading 20 works in 2026"
+  goal: 10
+  state: in_progress
+  spec: reading_session_all_spec.challenge_2026

@@ -1,6 +1,7 @@
 """Module with the models for the application."""
 
 import statistics
+from abc import ABC, abstractmethod
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from datetime import date, timedelta
@@ -1962,4 +1963,177 @@ class Series(LabelledResource):
         return statistics.mean(rated_ratings)
 
 
-# relac_models: dict[str, type[ResourceBase]] = {'contributor': Contributor}
+class ResourceSpec[T: ResourceBase](ResourceBase, ABC):
+    """Generic specification."""
+
+    @abstractmethod
+    def is_satisfied_by(self, obj: T) -> bool:
+        """Determines if the specification is valid."""
+
+
+class CompountResourceSpec[T: ResourceBase](ResourceSpec[T]):
+    """Spec for more then one spec."""
+
+    specs: list[str]
+
+    # Relationships (real objects)
+    spec_objs: list[ResourceSpec[T]] = Field(default_factory=list, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('specs', 'spec_objs', 'many-to-none')
+    ]
+
+
+class AnyResourceSpec[T: ResourceBase](CompountResourceSpec[T]):
+    """Satisifies when any spec is satisfied."""
+
+    @override
+    def is_satisfied_by(self, obj: T) -> bool:
+        """Return True when any of the given specs is true."""
+        return any([spec.is_satisfied_by(obj) for spec in self.spec_objs])
+
+
+class AllResourceSpec[T: ResourceBase](CompountResourceSpec[T]):
+    """Satisifies when all specs are satisfied."""
+
+    @override
+    def is_satisfied_by(self, obj: T) -> bool:
+        """Return True when any of the given specs is true."""
+        return all([spec.is_satisfied_by(obj) for spec in self.spec_objs])
+
+
+ReadingSessionSpec = ResourceSpec[ReadingSession]
+
+register_model('reading_session_any_spec')(AnyResourceSpec[ReadingSession])
+register_model('reading_session_all_spec')(AllResourceSpec[ReadingSession])
+
+
+@register_model('reading_session_is_finished')
+class IsFinishedReadingSessionSpec(ReadingSessionSpec):
+    """Determines if a ReadingSession is finished."""
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the book is finished."""
+        return obj.state == ReadingState.FINISHED
+
+
+@register_model('reading_session_started_after')
+class StartedAfterReadingSessionSpec(ReadingSessionSpec):
+    """Determines if a ReadingSession is start after a specific date."""
+
+    date: date
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the book is finished."""
+        if not obj.startdate:
+            return False
+        return obj.startdate >= self.date
+
+
+@register_model('reading_session_started_before')
+class StartedBeforeReadingSessionSpec(ReadingSessionSpec):
+    """Determines if a ReadingSession is start after a specific date."""
+
+    date: date
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the book is finished."""
+        if not obj.startdate:
+            return False
+        return obj.startdate <= self.date
+
+
+@register_model('reading_session_finished_after')
+class FinishedAfterReadingSessionSpec(ReadingSessionSpec):
+    """Determines if a ReadingSession is finished after a specific date."""
+
+    date: date
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the book is finished."""
+        if not obj.enddate:
+            return False
+        return obj.enddate >= self.date
+
+
+@register_model('reading_session_finished_before')
+class FinishedBeforeReadingSessionSpec(ReadingSessionSpec):
+    """Determines if a ReadingSession is finished before a specific date."""
+
+    date: date
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the book is finished."""
+        if not obj.enddate:
+            return False
+        return obj.enddate <= self.date
+
+
+class ReadingChallengeState(Enum):
+    """Reading challenge states."""
+
+    IN_PROGRESS = 'in_progress'
+    CLOSED = 'closed'
+
+
+class ReadingChallengeResult(Enum):
+    """Reading challenge results."""
+
+    REACHED = 1
+    NOT_REACHED = 2
+    IN_PROGRESS = 3
+
+
+@register_model('reading_challenge')
+class ReadingChallenge(ResourceBase):
+    """Model for a reading challenge."""
+
+    name: str
+    spec: str
+    goal: int
+    state: ReadingChallengeState
+
+    # Relationships (real objects)
+    spec_obj: ReadingSessionSpec | None = Field(default=None, exclude=True)
+
+    resolvable_fields: ClassVar[list[ResolvableField]] = [
+        ResolvableField('spec', 'spec_obj', 'one-to-none')
+    ]
+
+    def get_sessions(
+        self, reading_sessions: dict[str, ReadingSession]
+    ) -> dict[str, ReadingSession]:
+        """Get the sessions in this reading challenge."""
+        if not self.spec_obj:
+            return {}
+        return {
+            obj_id: obj
+            for obj_id, obj in reading_sessions.items()
+            if self.spec_obj.is_satisfied_by(obj)
+        }
+
+    def get_count(self, reading_sessions: dict[str, ReadingSession]) -> int:
+        """Get the number of reading sessions inside this challenge."""
+        if not self.spec_obj:
+            return 0
+
+        return len(self.get_sessions(reading_sessions))
+
+    def get_result(
+        self, reading_sessions: dict[str, ReadingSession]
+    ) -> ReadingChallengeResult:
+        """Retrieve the result of a reading challenge."""
+        reached = self.get_count(reading_sessions) >= self.goal
+
+        if self.state == ReadingChallengeState.IN_PROGRESS and not reached:
+            return ReadingChallengeResult.IN_PROGRESS
+
+        if self.state == ReadingChallengeState.CLOSED and not reached:
+            return ReadingChallengeResult.NOT_REACHED
+
+        return ReadingChallengeResult.REACHED
