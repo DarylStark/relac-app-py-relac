@@ -27,6 +27,7 @@ class RelacTheme:
             'owners',
             'series',
             'reading_sessions',
+            'reading_challenges',
         ],
         str,
     ] = field(default_factory=dict)
@@ -43,6 +44,7 @@ class RelacTheme:
             'owner',
             'series',
             'reading_session',
+            'reading_challenge',
             'literary_analysis',
             'literary_analysis_locations',
             'literary_analysis_characters',

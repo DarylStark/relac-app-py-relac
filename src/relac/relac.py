@@ -18,6 +18,7 @@ from relac.model import (
     LintingFinding,
     Location,
     Owner,
+    ReadingChallenge,
     ReadingList,
     ReadingSession,
     ReadingState,
@@ -140,6 +141,12 @@ class Relac:
         cast(dict[str, object], env.globals)['config'] = (
             self.database.get_relac_config()
         )
+        reading_sessions = {
+            session.id: session
+            for session in self.database.get_all_values(ReadingSession)
+            if session.id is not None
+        }
+        reading_challenges = self.database.get_all_values(ReadingChallenge)
 
         # Copy static folder
         if metadata.static_folder:
@@ -151,6 +158,8 @@ class Relac:
         html = template.render(
             db=self.database,
             models=relac_models,
+            reading_challenges=reading_challenges,
+            reading_sessions=reading_sessions,
             currently_reading=[
                 session
                 for session in self.database.get_all_values(ReadingSession)
@@ -174,6 +183,7 @@ class Relac:
             'collections': BookCollection,
             'lists': ReadingList,
             'reading_sessions': ReadingSession,
+            'reading_challenges': ReadingChallenge,
         }
 
         # Add index pages
@@ -181,7 +191,12 @@ class Relac:
             if index_page in metadata.index_pages:
                 template = env.get_template(metadata.index_pages[index_page])
                 html = template.render(
-                    **{index_page: self.database.get_all_values(obj_type)}
+                    **{index_page: self.database.get_all_values(obj_type)},
+                    **(
+                        {'reading_sessions': reading_sessions}
+                        if index_page == 'reading_challenges'
+                        else {}
+                    ),
                 )
                 out_path = output / f'{index_page.replace("_", "-")}.html'
                 out_path.write_text(html)
@@ -199,6 +214,7 @@ class Relac:
             'collection': BookCollection,
             'list': ReadingList,
             'reading_session': ReadingSession,
+            'reading_challenge': ReadingChallenge,
         }
 
         for detail_page, obj_type in detail_pages.items():
@@ -210,9 +226,21 @@ class Relac:
                     template = env.get_template(
                         metadata.resource_pages[detail_page]
                     )
-                    html = template.render(
-                        **{detail_page: self.database.get_one(resource.id)}
-                    )
+                    render_context: dict[str, object] = {
+                        detail_page: self.database.get_one(resource.id)
+                    }
+                    if isinstance(resource, ReadingChallenge):
+                        render_context.update(
+                            {
+                                'challenge_sessions': list(
+                                    resource.get_sessions(
+                                        reading_sessions
+                                    ).values()
+                                ),
+                                'reading_sessions': reading_sessions,
+                            }
+                        )
+                    html = template.render(**render_context)
                     out_path = output / f'{resource.id}.html'
                     out_path.write_text(html)
 

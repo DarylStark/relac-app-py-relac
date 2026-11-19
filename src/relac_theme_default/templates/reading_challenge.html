@@ -1,0 +1,41 @@
+{% extends "_base.html" %}
+{% set active_page = "reading-challenges" %}
+
+{% from "_breadcrumbs.html" import breadcrumbs %}
+{% from "_reading_session_table.html" import reading_session_table %}
+
+{% block content %}
+<div class="content">
+  {{ breadcrumbs([
+      ("Reading sessions", "reading-sessions.html"),
+      ("Reading challenges", "reading-challenges.html"),
+      (reading_challenge.name, none)
+  ]) }}
+  {% set session_count = challenge_sessions | length %}
+  {% set result = reading_challenge.get_result(reading_sessions) %}
+  <div class="card">
+    <section class="detail-summary" aria-labelledby="detail-title">
+      <div class="detail-summary-header">
+        <div>
+          <p class="detail-kind">Reading challenge</p>
+          <h3 id="detail-title">{{ reading_challenge.name }}</h3>
+        </div>
+        <p class="detail-badge">
+          <span class="availability-badge">{{ result.name | replace('_', '-') | enum_label }}</span>
+        </p>
+      </div>
+      <dl class="detail-metadata">
+        <div class="detail-fact">
+          <dt>Sessions</dt>
+          <dd>{{ session_count }} / {{ reading_challenge.goal }}</dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Challenge state</dt>
+          <dd>{{ reading_challenge.state.value | replace('_', '-') | enum_label }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+  {{ reading_session_table(challenge_sessions, "Reading sessions in this challenge") }}
+</div>
+{% endblock %}

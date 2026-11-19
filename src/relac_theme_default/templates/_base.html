@@ -42,6 +42,8 @@
         {% set page_title = ("Series: " ~ series.name) if series is defined else "Series" %}
     {% elif active_page == "reading-sessions" %}
         {% set page_title = ("Reading session: " ~ reading_session.work_edition_obj.title) if reading_session is defined and reading_session.work_edition_obj else "Reading sessions" %}
+    {% elif active_page == "reading-challenges" %}
+        {% set page_title = ("Reading challenge: " ~ reading_challenge.name) if reading_challenge is defined else "Reading challenges" %}
     {% else %}
         {% set page_title = "Relac library" %}
     {% endif %}
@@ -90,7 +92,12 @@
                     <a href="locations.html" {% if active_page in ["locations", "literary-analysis-locations"] %}class="active" aria-current="page"{% endif %}>Locations</a>
                 </div>
                 {% endif %}
-                <a href="reading-sessions.html" {% if active_page == "reading-sessions" %}class="active" aria-current="page"{% endif %}>Reading sessions</a>
+                <a href="reading-sessions.html" {% if active_page in ["reading-sessions", "reading-challenges"] %}class="active"{% if active_page == "reading-sessions" %} aria-current="page"{% endif %}{% endif %}>Reading sessions</a>
+                {% if active_page in ["reading-sessions", "reading-challenges"] %}
+                <div class="nav-submenu" role="group" aria-label="Reading sessions">
+                    <a href="reading-challenges.html" {% if active_page == "reading-challenges" %}class="active" aria-current="page"{% endif %}>Reading challenges</a>
+                </div>
+                {% endif %}
                 <a href="books.html" {% if active_page in ["books", "owners", "collections"] %}class="active"{% if active_page == "books" %} aria-current="page"{% endif %}{% endif %}>Books</a>
                 {% if active_page in ["books", "owners", "collections"] %}
                 <div class="nav-submenu" role="group" aria-label="Books">

@@ -43,11 +43,8 @@
         </div>
     </div>
 
-    <div class="content">
-        <div class="card small">
-            <h2>Reading challenges</h2>
-            <p>No challenges yet.</p>
-        </div>
+    <div class="content dashboard-content">
+
 
         <div class="card small">
             <h2>Currently reading</h2>
@@ -79,6 +76,35 @@
                 </ul>
             {% else %}
                 <p class="currently-reading-empty">No active reading sessions.</p>
+            {% endif %}
+        </div>
+
+        <div class="card small">
+            <h2>Reading challenges</h2>
+            {% if reading_challenges %}
+                <ul class="reading-challenge-list" aria-label="Reading challenges">
+                    {% for challenge in reading_challenges %}
+                        {% set session_count = challenge.get_count(reading_sessions) %}
+                        {% set result = challenge.get_result(reading_sessions) %}
+                        <li>
+                            <a class="reading-challenge-entry" href="{{ challenge.id }}.html">
+                            <div class="reading-challenge-entry-header">
+                                <h3 class="reading-challenge-title">
+                                    {{ challenge.name }}
+                                </h3>
+                                <span class="reading-challenge-status reading-challenge-status--{{ result.name | lower | replace('_', '-') }}">
+                                    {{ result.name | replace('_', '-') | enum_label }}
+                                </span>
+                            </div>
+                            <p class="reading-challenge-progress">
+                                {{ session_count }} of {{ challenge.goal }} sessions
+                            </p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No challenges yet.</p>
             {% endif %}
         </div>
 

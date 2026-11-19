@@ -30,6 +30,7 @@ relac_theme = RelacTheme(
         'series': 'series_detail.html',
         'owner': 'owner.html',
         'reading_session': 'reading_session.html',
+        'reading_challenge': 'reading_challenge.html',
     },
     index_pages={
         'books': 'books.html',
@@ -43,6 +44,7 @@ relac_theme = RelacTheme(
         'collections': 'collections.html',
         'lists': 'lists.html',
         'reading_sessions': 'reading_sessions.html',
+        'reading_challenges': 'reading_challenges.html',
         'owners': 'owners.html',
     },
     static_folder=base_path / 'static',

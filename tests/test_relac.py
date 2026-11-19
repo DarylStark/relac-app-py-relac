@@ -2,6 +2,7 @@
 
 import json
 import re
+import shutil
 from pathlib import Path
 
 from relac.relac import Relac
@@ -204,3 +205,89 @@ def test_generated_analysis_pages_have_read_status_controls(
     assert 'aria-label="Analysis available"' in chapter_page
     assert 'data-read-group-label="Chapters"' in chapter_page
     assert 'data-read-group-label="Part 1"' in chapter_page
+
+
+def test_generates_reading_challenge_index_and_detail_pages(
+    tmp_path: Path,
+) -> None:
+    """Render a challenge with its matching sessions and calculated status."""
+    repo_path = tmp_path / 'repo'
+    shutil.copytree(Path(__file__).parent / 'simple_project', repo_path)
+    sessions_path = repo_path / 'reading_sessions.yml'
+    sessions = sessions_path.read_text(encoding='utf-8')
+    sessions = sessions.replace(
+        '  state: finished\n  startdate: 2026-09-09\n',
+        '  state: finished\n  startdate: 2026-09-09\n  enddate: 2026-01-01\n',
+    )
+    assert '  enddate: 2026-01-01\n' in sessions
+    sessions_path.write_text(sessions, encoding='utf-8')
+
+    relac = Relac(YamlRepoLoader(repo_path))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    index_page = (output / 'index.html').read_text(encoding='utf-8')
+    assert '<div class="content dashboard-content">' in index_page
+    assert 'class="reading-challenge-list"' in index_page
+    assert (
+        'class="reading-challenge-status reading-challenge-status--in-progress"'
+        in index_page
+    )
+    assert '1 of 10 sessions' in index_page
+    assert re.search(
+        r'<a class="reading-challenge-entry" '
+        r'href="reading_challenge\.challenge_2026\.html">.*?'
+        r'class="reading-challenge-progress".*?</a>',
+        index_page,
+        re.DOTALL,
+    )
+
+    challenges_page = (output / 'reading-challenges.html').read_text(
+        encoding='utf-8'
+    )
+    assert '<a href="reading-sessions.html">Reading sessions</a>' in (
+        challenges_page
+    )
+    assert '<span aria-current="page">Reading challenges</span>' in (
+        challenges_page
+    )
+    assert 'Reading 20 works in 2026' in challenges_page
+    assert (
+        '<a href="reading-sessions.html" class="active">Reading sessions</a>'
+    ) in challenges_page
+    assert (
+        '<a href="reading-challenges.html" class="active" '
+        'aria-current="page">Reading challenges</a>'
+    ) in challenges_page
+    assert re.search(r'<pre>1</pre>\s*/\s*<pre>10</pre>', challenges_page)
+    assert 'In progress' in challenges_page
+    assert 'href="reading_challenge.challenge_2026.html"' in challenges_page
+
+    sessions_page = (output / 'reading-sessions.html').read_text(
+        encoding='utf-8'
+    )
+    assert (
+        '<a href="reading-sessions.html" class="active" '
+        'aria-current="page">Reading sessions</a>'
+    ) in sessions_page
+    assert re.search(
+        r'<a href="reading-challenges\.html"\s*>Reading challenges</a>',
+        sessions_page,
+    )
+
+    challenge_page = (
+        output / 'reading_challenge.challenge_2026.html'
+    ).read_text(encoding='utf-8')
+    assert '<a href="reading-sessions.html">Reading sessions</a>' in (
+        challenge_page
+    )
+    assert '<a href="reading-challenges.html">Reading challenges</a>' in (
+        challenge_page
+    )
+    assert '1 / 10' in challenge_page
+    assert 'Reading sessions in this challenge' in challenge_page
+    assert (
+        'data-href="reading_session.nineteen_eighty_four_no_end_date__finished.html"'
+        in challenge_page
+    )
