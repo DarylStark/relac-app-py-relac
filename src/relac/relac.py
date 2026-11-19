@@ -154,7 +154,7 @@ class Relac:
             currently_reading=[
                 session
                 for session in self.database.get_all_values(ReadingSession)
-                if session.state == ReadingState.READING
+                if session.state in (ReadingState.READING, ReadingState.PAUSED)
             ],
         )
         out_path = output / 'index.html'

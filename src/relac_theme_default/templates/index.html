@@ -1,6 +1,8 @@
 {% extends "_base.html" %}
 {% set active_page = "overview" %}
 
+{% from "_entity_link.html" import entity_link %}
+
 {% block content %}
     <div class="statistics">
         <div class="card">
@@ -48,10 +50,35 @@
 
         <div class="card small">
             <h2>Currently reading</h2>
-            {% for session in currently_reading %}
-                <p>{{ session.work_edition_obj.title }}</p>
-                <p>{{ session.book_obj.title }}</p>
-            {% endfor %}
+            {% if currently_reading %}
+                <ul class="currently-reading-list" aria-label="Currently reading sessions">
+                    {% for session in currently_reading %}
+                        <li class="currently-reading-entry">
+                            <div class="currently-reading-entry-header">
+                                <h3 class="currently-reading-title">{{ entity_link(session.work_edition_obj, session.work_edition_obj.title) }}</h3>
+                                {% if session.state.value == "paused" %}
+                                    <span class="currently-reading-status currently-reading-status--paused">PAUSED</span>
+                                {% else %}
+                                    <span class="currently-reading-status">READING</span>
+                                {% endif %}
+                            </div>
+                            <p class="currently-reading-book">
+                                {{ entity_link(session.book_obj, session.book_obj.title) }}
+                            </p>
+                            {% if session.book_obj.contributor_objs %}
+                                <p class="currently-reading-contributors">
+                                    By
+                                    {% for contributor in session.book_obj.contributor_objs %}
+                                        {% if not loop.first %}, {% endif %}{{ entity_link(contributor, contributor.name) }}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="currently-reading-empty">No active reading sessions.</p>
+            {% endif %}
         </div>
 
         <div class="card">
