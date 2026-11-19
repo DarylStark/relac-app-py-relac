@@ -81,9 +81,10 @@
 
         <div class="card small">
             <h2>Reading challenges</h2>
-            {% if reading_challenges %}
+            {% set active_challenges = reading_challenges | rejectattr("state.value", "equalto", "closed") | list %}
+            {% if active_challenges %}
                 <ul class="reading-challenge-list" aria-label="Reading challenges">
-                    {% for challenge in reading_challenges %}
+                    {% for challenge in active_challenges %}
                         {% set session_count = challenge.get_count(reading_sessions) %}
                         {% set result = challenge.get_result(reading_sessions) %}
                         <li>
@@ -104,7 +105,7 @@
                     {% endfor %}
                 </ul>
             {% else %}
-                <p>No challenges yet.</p>
+                <p>No active challenges.</p>
             {% endif %}
         </div>
 
