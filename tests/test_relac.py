@@ -323,7 +323,10 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         in reading_list_page
     )
     assert re.search(
-        r'<td class="fit-content">\s*English\s*'
+        r'<td class="fit-content" data-filter-values=\'\["English", "Or'
+        r'iginal"\]\' '
+        r'data-filter-groups=\'\{"Edition type": \["Original"\], '
+        r'"Language": \["English"\]\}\'>\s*English\s*'
         r'<span class="table-secondary-text">Original</span>\s*</td>',
         reading_list_page,
     )
@@ -368,7 +371,16 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     assert 'data-filter-groups=' in butchers_crossing_row.group(1)
     assert '"Work": ["Butcher' in butchers_crossing_row.group(1)
     assert '"Work Edition": []' in butchers_crossing_row.group(1)
-    assert '<td class="fit-content"></td>' in butchers_crossing_row.group(1)
+    assert (
+        re.search(
+            r'<td class="fit-content" data-filter-values=\'\[\]\' '
+            r'data-filter-groups=\'\{"Edition '
+            r'type": \[\], "Language": \[\]\}\'>'
+            r'\s*</td>',
+            butchers_crossing_row.group(1),
+        )
+        is not None
+    )
     assert 'class="reading-challenge-list"' in index_page
     assert (
         'class="reading-challenge-status reading-challenge-status--in-progress"'

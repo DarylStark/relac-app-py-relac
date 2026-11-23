@@ -42,6 +42,10 @@
 {% macro work_row(work, order=none, work_edition=none, show_work_edition=false) %}
 {% set work_type = work.work_type.value if work.work_type else 'unspecified' %}
 {% set work_structure = work.work_structure.value if work.work_structure else 'unspecified' %}
+{% set edition_language = work_edition.language | language if work_edition else '' %}
+{% set edition_type = work_edition.edition_type.value | enum_label if work_edition else '' %}
+{% set edition_filter_values = ([edition_language] if edition_language else []) + ([edition_type] if edition_type else []) %}
+{% set edition_filter_groups = {"Language": ([edition_language] if edition_language else []), "Edition type": ([edition_type] if edition_type else [])} %}
 <tr data-href="{{ work.id }}.html">
     {% if order is not none %}
     <td class="center fit-content">
@@ -57,10 +61,10 @@
         {% endif %}
     </td>
     {% if show_work_edition %}
-    <td class="fit-content">
+    <td class="fit-content" data-filter-values='{{ edition_filter_values | tojson }}' data-filter-groups='{{ edition_filter_groups | tojson }}'>
         {% if work_edition %}
-            {{ work_edition.language | language }}
-            <span class="table-secondary-text">{{ work_edition.edition_type.value | enum_label }}</span>
+            {{ edition_language }}
+            <span class="table-secondary-text">{{ edition_type }}</span>
         {% endif %}
     </td>
     {% endif %}
