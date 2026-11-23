@@ -274,6 +274,17 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         'my_reading_list.html">'
         'My reading list</a></h3>'
     ) in index_page
+    dashboard_list = re.search(
+        r'<table id="dashboard-reading-list-1".*?</table>',
+        index_page,
+        re.DOTALL,
+    )
+    assert dashboard_list is not None
+    assert (
+        'work.john_williams__butchers_crossing.html' in dashboard_list.group()
+    )
+    assert 'work.freida_mcfadden__the_witch.html' in dashboard_list.group()
+    assert 'work.john_williams__stoner.html' not in dashboard_list.group()
     assert 'class="reading-challenge-list"' in index_page
     assert (
         'class="reading-challenge-status reading-challenge-status--in-progress"'
