@@ -70,3 +70,10 @@ reading_session.nineteen_eighty_four_finished_2025:
   state: finished
   startdate: 2025-12-20
   enddate: 2025-12-31
+
+reading_session.nineteen_eighty_four_finished_2025_2:
+  work_edition: work_edition.george_orwell__nineteen_eighty_four__original
+  book: book.george_orwell__nineteen_eighty_four__clothbound_classic
+  state: finished
+  startdate: 2025-10-20
+  enddate: 2025-10-31

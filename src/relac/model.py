@@ -2097,6 +2097,7 @@ class ReadingChallenge(ResourceBase):
     spec: str
     goal: int
     state: ReadingChallengeState
+    only_unique_works: bool = True
 
     # Relationships (real objects)
     spec_obj: ReadingSessionSpec | None = Field(default=None, exclude=True)
@@ -2111,11 +2112,23 @@ class ReadingChallenge(ResourceBase):
         """Get the sessions in this reading challenge."""
         if not self.spec_obj:
             return {}
-        return {
-            obj_id: obj
-            for obj_id, obj in reading_sessions.items()
-            if self.spec_obj.is_satisfied_by(obj)
-        }
+        seen_works: list[str] = []
+        rv: dict[str, ReadingSession] = {}
+        for obj_id, obj in reading_sessions.items():
+            if (
+                not self.spec_obj.is_satisfied_by(obj)
+                or obj.work_edition_obj is None
+            ):
+                continue
+
+            if not (
+                self.only_unique_works
+                and obj.work_edition_obj.work in seen_works
+            ):
+                seen_works.append(obj.work_edition_obj.work)
+                rv[obj_id] = obj
+
+        return rv
 
     def get_count(self, reading_sessions: dict[str, ReadingSession]) -> int:
         """Get the number of reading sessions inside this challenge."""
