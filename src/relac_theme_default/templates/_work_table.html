@@ -13,6 +13,7 @@
             <tr>
                 {% if show_order %}<th scope="col" class="center fit-content">#</th>{% endif %}
                 <th scope="col">Title</th>
+                {% if show_work_edition %}<th scope="col" class="fit-content">Language / edition type</th>{% endif %}
                 <th scope="col">Author</th>
                 <th scope="col" class="fit-content">Structure</th>
                 <th scope="col" class="fit-content">Category</th>
@@ -50,11 +51,19 @@
     <td{% if show_work_edition %} data-filter-values='{{ ([work.title] + ([work_edition.title] if work_edition else [])) | tojson }}' data-filter-groups='{{ {"Work": [work.title], "Work Edition": ([work_edition.title] if work_edition else [])} | tojson }}'{% endif %}>
         {% if work_edition %}
             {{ entity_link(work_edition, work_edition.title) }}
-            <br><small>{{ entity_link(work, work.title) }}</small>
+            <span class="table-secondary-text">{{ entity_link(work, work.title) }}</span>
         {% else %}
             {{ entity_link(work, work.title) }}
         {% endif %}
     </td>
+    {% if show_work_edition %}
+    <td class="fit-content">
+        {% if work_edition %}
+            {{ work_edition.language | language }}
+            <span class="table-secondary-text">{{ work_edition.edition_type.value | enum_label }}</span>
+        {% endif %}
+    </td>
+    {% endif %}
     <td data-filter-values='{{ work.author_objs | map(attribute="name") | list | tojson }}'>
         {% for author in work.author_objs %}
             {% if not loop.first %}, {% endif %}{{ entity_link(author, author.name) }}

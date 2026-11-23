@@ -314,8 +314,17 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     ).read_text(encoding='utf-8')
     assert re.search(
         r'<a href="work_edition\.john_williams__stoner__original\.html">'
-        r'Stoner</a>\s*<br><small>\s*'
-        r'<a href="work\.john_williams__stoner\.html">Stoner</a>',
+        r'Stoner</a>\s*<span class="table-secondary-text">'
+        r'<a href="work\.john_williams__stoner\.html">Stoner</a></span>',
+        reading_list_page,
+    )
+    assert (
+        '<th scope="col" class="fit-content">Language / edition type</th>'
+        in reading_list_page
+    )
+    assert re.search(
+        r'<td class="fit-content">\s*English\s*'
+        r'<span class="table-secondary-text">Original</span>\s*</td>',
         reading_list_page,
     )
     assert (
@@ -359,6 +368,7 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     assert 'data-filter-groups=' in butchers_crossing_row.group(1)
     assert '"Work": ["Butcher' in butchers_crossing_row.group(1)
     assert '"Work Edition": []' in butchers_crossing_row.group(1)
+    assert '<td class="fit-content"></td>' in butchers_crossing_row.group(1)
     assert 'class="reading-challenge-list"' in index_page
     assert (
         'class="reading-challenge-status reading-challenge-status--in-progress"'
