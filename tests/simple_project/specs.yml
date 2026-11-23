@@ -29,3 +29,22 @@ reading_challenge.challenge_2026_closed:
   goal: 3
   state: closed
   spec: reading_session_all_spec.challenge_2026
+
+reading_session_finished_after.finished_after_2025_01_01:
+  date: 2025-01-01
+
+reading_session_finished_before.finished_before_2025_12_31:
+  date: 2025-12-31
+
+reading_session_all_spec.challenge_2025:
+  specs:
+    - reading_session_is_finished.is_finished
+    - reading_session_finished_after.finished_after_2025_01_01
+    - reading_session_finished_before.finished_before_2025_12_31
+
+reading_challenge.challenge_2025_double:
+  name: "Closed challenge: finish 3 sessions in 2025"
+  goal: 3
+  state: in_progress
+  only_unique_works: true
+  spec: reading_session_all_spec.challenge_2025
