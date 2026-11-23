@@ -22,7 +22,8 @@ work_edition.author_with_no_books__work1__original:
 #-------------------------------------------------------------------------------
 book.author_with_no_books__book1__no_isbn:
   title: Als het bloedt
-  medium: paperback
+  medium: print
+  format: paperback
   work_editions:
     - work_edition.author_with_no_books__work1__original
 #-------------------------------------------------------------------------------

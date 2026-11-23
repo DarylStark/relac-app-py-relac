@@ -10,7 +10,7 @@
 {% from "_detail_links.html" import detail_links %}
 
 {% set book_medium = book.medium.value %}
-{% set book_binding = book.binding.value %}
+{% set book_format = book.format.value %}
 
 {% block content %}
 <div class="content">
@@ -68,10 +68,10 @@
             </dd>
           </div>
           <div class="detail-fact">
-            <dt>Medium and binding</dt>
+            <dt>Medium and format</dt>
             <dd>
               {{ book_medium | enum_label }}
-              <span class="detail-small">{{ book_binding | enum_label }}</span>
+              <span class="detail-small">{{ book_format | enum_label }}</span>
             </dd>
           </div>
           <div class="detail-fact">

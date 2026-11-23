@@ -164,6 +164,8 @@ def test_book_language_is_shown_in_tables_and_detail_metadata(
         '  edition_type: translation\n'
         'book.multi_language:\n'
         '  title: Multi-language book\n'
+        '  medium: ebook\n'
+        '  format: epub-drm\n'
         '  work_editions:\n'
         '    - work_edition.example.en\n'
         '    - work_edition.example.nl\n',
@@ -175,9 +177,25 @@ def test_book_language_is_shown_in_tables_and_detail_metadata(
     relac.create_static_webpage('relac_theme_default', output)
 
     books_page = (output / 'books.html').read_text(encoding='utf-8')
+    assert '<th scope="col">Medium and format</th>' in books_page
     assert (
         '<th scope="col" class="right fit-content">Language</th>' in books_page
     )
+    medium_format_cell = re.search(
+        r'<td data-sort-value="ebook" data-filter-values=\'([^\']*)\' '
+        r'data-filter-groups=\'([^\']*)\'>',
+        books_page,
+    )
+    assert medium_format_cell is not None
+    assert json.loads(medium_format_cell.group(1)) == [
+        'eBook',
+        'ePub (DRM)',
+    ]
+    assert json.loads(medium_format_cell.group(2)) == {
+        'Format': ['ePub (DRM)'],
+        'Medium': ['eBook'],
+    }
+    assert '<span class="table-secondary-text">ePub (DRM)</span>' in books_page
     language_cell = re.search(
         r"""<td class="right fit-content" """
         r"""data-filter-values='([^']*)'>(.*?)</td>""",
@@ -190,6 +208,9 @@ def test_book_language_is_shown_in_tables_and_detail_metadata(
     book_page = (output / 'book.multi_language.html').read_text(
         encoding='utf-8'
     )
+    assert '<dt>Medium and format</dt>' in book_page
+    assert 'eBook' in book_page
+    assert 'ePub (DRM)' in book_page
     language_fact = re.search(
         r'<dt>Language</dt>\s*<dd>\s*(.*?)\s*</dd>',
         book_page,

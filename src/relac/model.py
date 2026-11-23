@@ -1111,19 +1111,21 @@ class BookMedium(Enum):
     """Mediums for books."""
 
     UNSPECIFIED = 'unspecified'
-    PAPERBACK = 'paperback'
-    HARDCOVER = 'hardcover'
+    PRINT = 'print'
     EBOOK = 'ebook'
     AUDIOBOOK = 'audiobook'
+    WEB = 'web'
 
 
-class BookBinding(Enum):
-    """Mediums for books."""
+class BookFormat(Enum):
+    """Formats for books."""
 
     UNSPECIFIED = 'unspecified'
-    POCKET = 'pocket'
-    NOVELLA = 'novella'
+
+    HARDCOVER = 'hardcover'
+    PAPERBACK = 'paperback'
     LUXE_EDITION = 'luxe-edition'
+    POCKET = 'pocket'
     GRAPHICAL_NOVEL_ADAPTION = 'graphical-novel-adaption'
     EPUB = 'epub'
     EPUB_WATERMARK = 'epub-watermark'
@@ -1131,6 +1133,7 @@ class BookBinding(Enum):
     PDF = 'pdf'
     PDF_WATERMARK = 'pdf-watermark'
     PDF_DRM = 'pdf-drm'
+    WEBPAGE = 'webpage'
 
 
 class BookOwnerLoan(BaseModel):
@@ -1211,7 +1214,7 @@ class Book(LabelledResource):
     publisher: str | None = None
     work_editions: list[str] = Field(default_factory=list)
     medium: BookMedium = BookMedium.UNSPECIFIED
-    binding: BookBinding = BookBinding.UNSPECIFIED
+    format: BookFormat = BookFormat.UNSPECIFIED
     owners: list[BookOwner] = Field(default_factory=list)
 
     @override
@@ -1264,7 +1267,7 @@ class Book(LabelledResource):
             search_detail_for_obj('Imprint', 'imprint', self.publisher_obj),
             transformed_search_detail('ISBN', self.isbn13, _format_isbn),
             search_detail_for_enum('Medium', self.medium),
-            search_detail_for_enum('Binding', self.binding),
+            search_detail_for_enum('Format', self.format),
             search_detail_for_obj_list(
                 'Works', 'title', self.work_edition_objs
             ),
@@ -1352,13 +1355,34 @@ class Book(LabelledResource):
 
         return list(works_by_id.values())
 
+    def _get_work_reading_state(self, work: Work) -> ReadingState:
+        """Get state from the work and this book's abridged editions."""
+        work_reading_state = work.reading_state
+        editions = [
+            edition
+            for edition in self.work_edition_objs
+            if edition.work_obj is work
+        ]
+        for reading_state in (
+            ReadingState.FINISHED,
+            ReadingState.READING,
+            ReadingState.PAUSED,
+            ReadingState.DID_NOT_FINISH,
+        ):
+            if work_reading_state == reading_state or any(
+                edition.reading_state == reading_state for edition in editions
+            ):
+                return reading_state
+
+        return ReadingState.NOT_READ
+
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
     ) -> list[Work]:
         return [
             work
             for work in self._get_unique_works()
-            if work.reading_state == reading_state
+            if self._get_work_reading_state(work) == reading_state
         ]
 
     @property

@@ -185,7 +185,8 @@ book.john_williams__stoner__vintage_classic_red_spine:
   isbn13: 9780099561545
   title: Stoner
   publisher: publisher.penguin_random_house__vintage_classics
-  medium: paperback
+  medium: print
+  format: paperback
   work_editions:
     - work_edition.john_williams__stoner__original
   owners:
@@ -197,7 +198,7 @@ book.john_williams__stoner__epub_drm:
   title: Stoner
   publisher: publisher.penguin_random_house__books
   medium: ebook
-  binding: epub-drm
+  format: epub-drm
   work_editions:
     - work_edition.john_williams__stoner__original
   owners:
