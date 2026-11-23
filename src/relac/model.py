@@ -1640,13 +1640,16 @@ class ReadingListItem(BaseModel):
 
     order: int
     work: str
+    work_edition: str | None = None
 
     # Relationships (real objects)
     work_obj: Work | None = Field(default=None, exclude=True)
+    work_edition_obj: Work | None = Field(default=None, exclude=True)
 
     # Resolve definitions
     resolvable_fields: ClassVar[list[ResolvableField]] = [
         ResolvableField('work', 'work_obj', 'one-to-none'),
+        ResolvableField('work_edition', 'work_edition_obj', 'one-to-none'),
     ]
 
 

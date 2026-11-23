@@ -306,6 +306,33 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     )
     assert 'work.freida_mcfadden__the_witch.html' in dashboard_list.group()
     assert 'work.john_williams__stoner.html' not in dashboard_list.group()
+    assert 'work_edition.john_williams__stoner__original.html' not in (
+        dashboard_list.group()
+    )
+    reading_list_page = (
+        output / 'reading_list.my_reading_list.html'
+    ).read_text(encoding='utf-8')
+    assert re.search(
+        r'<a href="work_edition\.john_williams__stoner__original\.html">'
+        r'Stoner</a>\s*<br><small>\s*'
+        r'<a href="work\.john_williams__stoner\.html">Stoner</a>',
+        reading_list_page,
+    )
+    assert (
+        'data-filter-groups=\'{"Work": ["Stoner"], '
+        '"Work Edition": ["Stoner"]}\''
+    ) in reading_list_page
+    butchers_crossing_row = re.search(
+        r'<tr data-href="work\.john_williams__butchers_crossing\.html">'
+        r'(.*?)</tr>',
+        reading_list_page,
+        re.DOTALL,
+    )
+    assert butchers_crossing_row is not None
+    assert 'work_edition' not in butchers_crossing_row.group(1)
+    assert 'data-filter-groups=' in butchers_crossing_row.group(1)
+    assert '"Work": ["Butcher' in butchers_crossing_row.group(1)
+    assert '"Work Edition": []' in butchers_crossing_row.group(1)
     assert 'class="reading-challenge-list"' in index_page
     assert (
         'class="reading-challenge-status reading-challenge-status--in-progress"'
