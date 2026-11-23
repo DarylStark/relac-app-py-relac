@@ -114,7 +114,7 @@
 
         {% for reading_list in relac.dashboard_lists_objs %}
             {% set dashboard_works = reading_list.combined_works | selectattr("work_obj.reading_state.value", "in", ["not-read", "reading"]) | list %}
-            {{ work_table(dashboard_works, show_order=true, title=reading_list.name, title_link=(reading_list.id ~ ".html") if reading_list.id else none, table_id="dashboard-reading-list-" ~ loop.index) }}
+            {{ work_table(dashboard_works, show_order=true, title=reading_list.name, title_link=(reading_list.id ~ ".html") if reading_list.id else none, table_id="dashboard-reading-list-" ~ loop.index, show_work_edition=true, show_note=true) }}
         {% endfor %}
     </div>
 {% endblock %}

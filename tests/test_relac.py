@@ -306,9 +306,16 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     )
     assert 'work.freida_mcfadden__the_witch.html' in dashboard_list.group()
     assert 'work.john_williams__stoner.html' not in dashboard_list.group()
-    assert 'work_edition.john_williams__stoner__original.html' not in (
-        dashboard_list.group()
+    assert (
+        'work_edition.stephen_king__mr_harrigans_phone__nl.html'
+        in dashboard_list.group()
     )
+    assert 'De telefoon van meneer Harrigan' in dashboard_list.group()
+    assert (
+        '<th scope="col" class="fit-content">Language / edition type</th>'
+        in dashboard_list.group()
+    )
+    assert '<th scope="col">Note</th>' in dashboard_list.group()
     reading_list_page = (
         output / 'reading_list.my_reading_list.html'
     ).read_text(encoding='utf-8')
