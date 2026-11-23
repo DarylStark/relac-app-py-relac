@@ -23,6 +23,7 @@ from relac.model import (
     Label,
     Owner,
     OwnerType,
+    ReadingList,
     RelacConfig,
     ResolvableField,
     ResourceAvailability,
@@ -134,6 +135,23 @@ def test_resolving_fields_one_to_many() -> None:
 
     assert quote.contributor_obj is contributor
     assert contributor.quote_objs == [quote]
+
+
+def test_resolving_inherited_reading_lists() -> None:
+    """Resolve inherited reading-list IDs to list objects."""
+    db = Database()
+    inherited = ReadingList(id='reading_list.inherited', name='Inherited list')
+    inheriting = ReadingList(
+        id='reading_list.inheriting',
+        name='Inheriting list',
+        inherit=['reading_list.inherited'],
+    )
+    db.add_object('reading_list.inherited', inherited)
+    db.add_object('reading_list.inheriting', inheriting)
+
+    db.resolve_all()
+
+    assert inheriting.inherit_objs == [inherited]
 
 
 def test_resolving_nested_work_character_relationships() -> None:

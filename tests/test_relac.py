@@ -319,6 +319,32 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         reading_list_page,
     )
     assert (
+        len(
+            re.findall(
+                r'<tr data-href="work\.john_williams__stoner\.html">',
+                reading_list_page,
+            )
+        )
+        == 1
+    )
+    assert re.search(
+        r'<tr data-href="work\.stephen_king__mr_harrigans_phone\.html">'
+        r'.*?<pre>5</pre>',
+        reading_list_page,
+        re.DOTALL,
+    )
+    assert (
+        'href="work_edition.stephen_king__mr_harrigans_phone__nl.html">'
+        'De telefoon van meneer Harrigan</a>'
+    ) in reading_list_page
+    lists_page = (output / 'lists.html').read_text(encoding='utf-8')
+    assert re.search(
+        r'<tr data-href="reading_list\.my_reading_list\.html">'
+        r'.*?<pre>\s*6\s*</pre>',
+        lists_page,
+        re.DOTALL,
+    )
+    assert (
         'data-filter-groups=\'{"Work": ["Stoner"], '
         '"Work Edition": ["Stoner"]}\''
     ) in reading_list_page

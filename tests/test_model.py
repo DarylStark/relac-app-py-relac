@@ -5,6 +5,8 @@ import pytest
 from relac.exceptions import DoubleModelNameError
 from relac.model import (
     Book,
+    ReadingList,
+    ReadingListItem,
     ReadingSession,
     ReadingState,
     ResourceBase,
@@ -77,6 +79,66 @@ def test_book_does_not_count_abridged_edition_in_another_book() -> None:
     assert work.reading_state == ReadingState.NOT_READ
     assert book.read_count == 0
     assert book.not_read_count == 1
+
+
+def test_reading_list_combines_inherited_work_orders() -> None:
+    """Append inherited lists after local and preceding inherited works."""
+    first_inherited = ReadingList(
+        id='reading_list.first',
+        name='First inherited list',
+        works=[
+            ReadingListItem(order=1, work='work.first'),
+            ReadingListItem(order=2, work='work.second'),
+        ],
+    )
+    second_inherited = ReadingList(
+        id='reading_list.second',
+        name='Second inherited list',
+        works=[ReadingListItem(order=1, work='work.third')],
+    )
+    reading_list = ReadingList(
+        id='reading_list.combined',
+        name='Combined list',
+        works=[
+            ReadingListItem(order=3, work='work.local'),
+            ReadingListItem(work='work.local_without_order'),
+        ],
+        inherit_objs=[first_inherited, second_inherited],
+    )
+
+    assert [item.order for item in reading_list.works] == [3, 4]
+    assert [item.work for item in reading_list.combined_works] == [
+        'work.local',
+        'work.local_without_order',
+        'work.first',
+        'work.second',
+        'work.third',
+    ]
+    assert [item.order for item in reading_list.combined_works] == [
+        3,
+        4,
+        5,
+        6,
+        7,
+    ]
+
+
+def test_reading_list_cycle_is_linted_and_does_not_recurse_forever() -> None:
+    """Ignore a repeated ancestor during expansion and report the cycle."""
+    first = ReadingList(id='reading_list.first', name='First')
+    second = ReadingList(
+        id='reading_list.second',
+        name='Second',
+        works=[ReadingListItem(work='work.second')],
+        inherit_objs=[first],
+    )
+    first.inherit_objs.append(second)
+
+    assert first.combined_works == second.combined_works
+    assert any(
+        finding.id == 'reading-list-inheritance-cycle'
+        for finding in first.linting_findings
+    )
 
 
 def test_book_counts_non_abridged_edition_read_in_another_book() -> None:
