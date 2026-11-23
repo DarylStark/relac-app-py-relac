@@ -238,7 +238,7 @@ def test_generated_analysis_pages_have_read_status_controls(
     assert 'data-read-group-label="Part 1"' in chapter_page
 
 
-def test_generates_reading_challenge_index_and_detail_pages(
+def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     tmp_path: Path,
 ) -> None:
     """Render challenge counts, outcomes, and only matching sessions."""
@@ -249,6 +249,31 @@ def test_generates_reading_challenge_index_and_detail_pages(
 
     index_page = (output / 'index.html').read_text(encoding='utf-8')
     assert '<div class="content dashboard-content">' in index_page
+    assert 'href="contributors.html">contributors</a>' in index_page
+    assert 'href="work-editions.html">editions</a>' in index_page
+    assert 'href="works.html">works</a>' in index_page
+    assert 'href="lists.html">reading lists</a>' in index_page
+    assert 'href="books.html">books</a>' in index_page
+    for href in (
+        'contributors.html',
+        'work-editions.html',
+        'works.html',
+        'lists.html',
+        'books.html',
+    ):
+        assert re.search(rf'<a href="{href}">\d+</a>', index_page)
+    assert '<h2><a href="reading-sessions.html">Currently reading</a></h2>' in (
+        index_page
+    )
+    assert (
+        '<h2><a href="reading-challenges.html">Reading challenges</a></h2>'
+        in index_page
+    )
+    assert (
+        '<h3 class="table-card-title"><a href="reading_list.'
+        'my_reading_list.html">'
+        'My reading list</a></h3>'
+    ) in index_page
     assert 'class="reading-challenge-list"' in index_page
     assert (
         'class="reading-challenge-status reading-challenge-status--in-progress"'
