@@ -8,37 +8,40 @@
     <div class="statistics">
         <div class="card">
             <p>
-                {{ db.get_all_values(models['contributor']) | length }}
+                <a href="contributors.html">{{ db.get_all_values(models['contributor']) | length }}</a>
             </p>
             <p>
-                contributors
-            </p>
-        </div>
-
-        <div class="card">
-            <p>
-                {{ db.get_all_values(models['work_edition']) | length }} / {{ db.get_all_values(models['work']) | length }}
-            </p>
-            <p>
-                editions and works
+                <a href="contributors.html">contributors</a>
             </p>
         </div>
 
         <div class="card">
             <p>
-                {{ db.get_all_values(models['reading_list']) | length }}
+                <a href="work-editions.html">{{ db.get_all_values(models['work_edition']) | length }}</a>
+                /
+                <a href="works.html">{{ db.get_all_values(models['work']) | length }}</a>
             </p>
             <p>
-                reading lists
+                <a href="work-editions.html">editions</a> and
+                <a href="works.html">works</a>
             </p>
         </div>
 
         <div class="card">
             <p>
-                {{ db.get_all_values(models['book']) | length }}
+                <a href="lists.html">{{ db.get_all_values(models['reading_list']) | length }}</a>
             </p>
             <p>
-                books
+                <a href="lists.html">reading lists</a>
+            </p>
+        </div>
+
+        <div class="card">
+            <p>
+                <a href="books.html">{{ db.get_all_values(models['book']) | length }}</a>
+            </p>
+            <p>
+                <a href="books.html">books</a>
             </p>
         </div>
     </div>
@@ -47,7 +50,7 @@
 
 
         <div class="card small">
-            <h2>Currently reading</h2>
+            <h2><a href="reading-sessions.html">Currently reading</a></h2>
             {% if currently_reading %}
                 <ul class="currently-reading-list" aria-label="Currently reading sessions">
                     {% for session in currently_reading %}
@@ -80,7 +83,7 @@
         </div>
 
         <div class="card small">
-            <h2>Reading challenges</h2>
+            <h2><a href="reading-challenges.html">Reading challenges</a></h2>
             {% set active_challenges = reading_challenges | rejectattr("state.value", "equalto", "closed") | list %}
             {% if active_challenges %}
                 <ul class="reading-challenge-list" aria-label="Reading challenges">
@@ -110,7 +113,7 @@
         </div>
 
         {% for reading_list in relac.dashboard_lists_objs %}
-            {{ work_table(reading_list.works, show_order=true, title=reading_list.name, table_id="dashboard-reading-list-" ~ loop.index) }}
+            {{ work_table(reading_list.works, show_order=true, title=reading_list.name, title_link=(reading_list.id ~ ".html") if reading_list.id else none, table_id="dashboard-reading-list-" ~ loop.index) }}
         {% endfor %}
     </div>
 {% endblock %}
