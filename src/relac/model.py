@@ -1355,13 +1355,34 @@ class Book(LabelledResource):
 
         return list(works_by_id.values())
 
+    def _get_work_reading_state(self, work: Work) -> ReadingState:
+        """Get state from the work and this book's abridged editions."""
+        work_reading_state = work.reading_state
+        editions = [
+            edition
+            for edition in self.work_edition_objs
+            if edition.work_obj is work
+        ]
+        for reading_state in (
+            ReadingState.FINISHED,
+            ReadingState.READING,
+            ReadingState.PAUSED,
+            ReadingState.DID_NOT_FINISH,
+        ):
+            if work_reading_state == reading_state or any(
+                edition.reading_state == reading_state for edition in editions
+            ):
+                return reading_state
+
+        return ReadingState.NOT_READ
+
     def _get_works_with_specific_reading_state(
         self, reading_state: ReadingState
     ) -> list[Work]:
         return [
             work
             for work in self._get_unique_works()
-            if work.reading_state == reading_state
+            if self._get_work_reading_state(work) == reading_state
         ]
 
     @property
