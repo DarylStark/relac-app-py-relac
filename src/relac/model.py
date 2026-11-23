@@ -1662,6 +1662,7 @@ class ReadingList(LabelledResource):
     works: list[ReadingListItem] = Field(default_factory=list)
     inherit: list[str] = Field(default_factory=list)
     inherit_objs: list[ReadingList] = Field(default_factory=list, exclude=True)
+    prune_read_items: bool = False
 
     resolvable_children: ClassVar[tuple[str, ...]] = ('works',)
 
@@ -1690,7 +1691,7 @@ class ReadingList(LabelledResource):
 
     @property
     def combined_works(self) -> list[ReadingListItem]:
-        """Get this list's works followed by its inherited works."""
+        """Get this list's works, applying configured read-item pruning."""
         return _get_combined_works(self, set())
 
     @override
@@ -1848,6 +1849,14 @@ def _get_combined_works(
             max_order = max(
                 item.order for item in combined if item.order is not None
             )
+    if reading_list.prune_read_items:
+        combined = [
+            item
+            for item in combined
+            if item.work_obj is None
+            or item.work_obj.reading_state
+            not in (ReadingState.FINISHED, ReadingState.DID_NOT_FINISH)
+        ]
     return combined
 
 

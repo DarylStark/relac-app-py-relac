@@ -123,6 +123,62 @@ def test_reading_list_combines_inherited_work_orders() -> None:
     ]
 
 
+def test_reading_list_prunes_finished_and_did_not_finish_items() -> None:
+    """Prune finished and did-not-finish works from the combined list."""
+
+    def work_with_state(work_id: str, state: ReadingState | None) -> Work:
+        work = Work(id=work_id, title=work_id, authors=[])
+        if state is not None:
+            edition_id = f'{work_id}.edition'
+            edition = WorkEdition(
+                id=edition_id,
+                title=edition_id,
+                work=work_id,
+                work_obj=work,
+                reading_session_objs=[
+                    ReadingSession(
+                        work_edition=edition_id,
+                        book='book.test',
+                        state=state,
+                    )
+                ],
+            )
+            work.edition_objs.append(edition)
+        return work
+
+    finished = work_with_state('work.finished', ReadingState.FINISHED)
+    did_not_finish = work_with_state(
+        'work.did_not_finish', ReadingState.DID_NOT_FINISH
+    )
+    paused = work_with_state('work.paused', ReadingState.PAUSED)
+    not_read = work_with_state('work.not_read', None)
+    inherited = ReadingList(
+        id='reading_list.inherited',
+        name='Inherited',
+        works=[
+            ReadingListItem(work='work.finished', work_obj=finished),
+            ReadingListItem(
+                work='work.did_not_finish', work_obj=did_not_finish
+            ),
+        ],
+    )
+    reading_list = ReadingList(
+        id='reading_list.pruned',
+        name='Pruned',
+        works=[
+            ReadingListItem(work='work.paused', work_obj=paused),
+            ReadingListItem(work='work.not_read', work_obj=not_read),
+        ],
+        inherit_objs=[inherited],
+        prune_read_items=True,
+    )
+
+    assert [item.work for item in reading_list.combined_works] == [
+        'work.paused',
+        'work.not_read',
+    ]
+
+
 def test_reading_list_cycle_is_linted_and_does_not_recurse_forever() -> None:
     """Ignore a repeated ancestor during expansion and report the cycle."""
     first = ReadingList(id='reading_list.first', name='First')
