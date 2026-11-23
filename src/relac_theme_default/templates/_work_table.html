@@ -1,7 +1,7 @@
 {% from "_entity_link.html" import entity_link %}
 {% from "_rating_value.html" import rating_value %}
 
-{% macro work_table(works, show_order=false, title="Works", order_attribute="order", table_id="works-table", title_link=none, show_work_edition=false) %}
+{% macro work_table(works, show_order=false, title="Works", order_attribute="order", table_id="works-table", title_link=none, show_work_edition=false, show_note=false) %}
 <div class="card table-card">
     <header class="table-card-header">
         <h3 class="table-card-title">{% if title_link %}<a href="{{ title_link }}">{{ title }}</a>{% else %}{{ title }}{% endif %}</h3>
@@ -13,6 +13,7 @@
             <tr>
                 {% if show_order %}<th scope="col" class="center fit-content">#</th>{% endif %}
                 <th scope="col">Title</th>
+                {% if show_work_edition %}<th scope="col" class="fit-content">Language / edition type</th>{% endif %}
                 <th scope="col">Author</th>
                 <th scope="col" class="fit-content">Structure</th>
                 <th scope="col" class="fit-content">Category</th>
@@ -22,12 +23,13 @@
                 <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
                 <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Availability</th>
+                {% if show_note %}<th scope="col">Note</th>{% endif %}
             </tr>
         </thead>
         <tbody>
             {% for item in works %}
                 {% if show_order %}
-                    {{ work_row(item.work_obj, item[order_attribute], item.work_edition_obj if show_work_edition else none, show_work_edition) }}
+                    {{ work_row(item.work_obj, item[order_attribute], item.work_edition_obj if show_work_edition else none, show_work_edition, show_note, item.note if show_note else none) }}
                 {% else %}
                     {{ work_row(item) }}
                 {% endif %}
@@ -38,9 +40,13 @@
 </div>
 {% endmacro %}
 
-{% macro work_row(work, order=none, work_edition=none, show_work_edition=false) %}
+{% macro work_row(work, order=none, work_edition=none, show_work_edition=false, show_note=false, note=none) %}
 {% set work_type = work.work_type.value if work.work_type else 'unspecified' %}
 {% set work_structure = work.work_structure.value if work.work_structure else 'unspecified' %}
+{% set edition_language = work_edition.language | language if work_edition else '' %}
+{% set edition_type = work_edition.edition_type.value | enum_label if work_edition else '' %}
+{% set edition_filter_values = ([edition_language] if edition_language else []) + ([edition_type] if edition_type else []) %}
+{% set edition_filter_groups = {"Language": ([edition_language] if edition_language else []), "Edition type": ([edition_type] if edition_type else [])} %}
 <tr data-href="{{ work.id }}.html">
     {% if order is not none %}
     <td class="center fit-content">
@@ -50,11 +56,19 @@
     <td{% if show_work_edition %} data-filter-values='{{ ([work.title] + ([work_edition.title] if work_edition else [])) | tojson }}' data-filter-groups='{{ {"Work": [work.title], "Work Edition": ([work_edition.title] if work_edition else [])} | tojson }}'{% endif %}>
         {% if work_edition %}
             {{ entity_link(work_edition, work_edition.title) }}
-            <br><small>{{ entity_link(work, work.title) }}</small>
+            <span class="table-secondary-text">{{ entity_link(work, work.title) }}</span>
         {% else %}
             {{ entity_link(work, work.title) }}
         {% endif %}
     </td>
+    {% if show_work_edition %}
+    <td class="fit-content" data-filter-values='{{ edition_filter_values | tojson }}' data-filter-groups='{{ edition_filter_groups | tojson }}'>
+        {% if work_edition %}
+            {{ edition_language }}
+            <span class="table-secondary-text">{{ edition_type }}</span>
+        {% endif %}
+    </td>
+    {% endif %}
     <td data-filter-values='{{ work.author_objs | map(attribute="name") | list | tojson }}'>
         {% for author in work.author_objs %}
             {% if not loop.first %}, {% endif %}{{ entity_link(author, author.name) }}
@@ -86,5 +100,8 @@
             {{ work.availability.value | enum_label }}
         </span>
     </td>
+    {% if show_note %}
+    <td>{% if note is not none %}{{ note }}{% endif %}</td>
+    {% endif %}
 </tr>
 {% endmacro %}

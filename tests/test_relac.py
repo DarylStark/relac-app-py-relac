@@ -314,8 +314,30 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     ).read_text(encoding='utf-8')
     assert re.search(
         r'<a href="work_edition\.john_williams__stoner__original\.html">'
-        r'Stoner</a>\s*<br><small>\s*'
-        r'<a href="work\.john_williams__stoner\.html">Stoner</a>',
+        r'Stoner</a>\s*<span class="table-secondary-text">'
+        r'<a href="work\.john_williams__stoner\.html">Stoner</a></span>',
+        reading_list_page,
+    )
+    assert (
+        '<th scope="col" class="fit-content">Language / edition type</th>'
+        in reading_list_page
+    )
+    assert '<th scope="col">Note</th>' in reading_list_page
+    assert reading_list_page.index(
+        '<th scope="col" class="right fit-content">Availability</th>'
+    ) < reading_list_page.index('<th scope="col">Note</th>')
+    assert re.search(
+        r'<tr data-href="work\.john_williams__stoner\.html">'
+        r'.*?<td>Try the original edition first\.</td>\s*</tr>',
+        reading_list_page,
+        re.DOTALL,
+    )
+    assert re.search(
+        r'<td class="fit-content" data-filter-values=\'\["English", "Or'
+        r'iginal"\]\' '
+        r'data-filter-groups=\'\{"Edition type": \["Original"\], '
+        r'"Language": \["English"\]\}\'>\s*English\s*'
+        r'<span class="table-secondary-text">Original</span>\s*</td>',
         reading_list_page,
     )
     assert (
@@ -359,6 +381,17 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     assert 'data-filter-groups=' in butchers_crossing_row.group(1)
     assert '"Work": ["Butcher' in butchers_crossing_row.group(1)
     assert '"Work Edition": []' in butchers_crossing_row.group(1)
+    assert (
+        re.search(
+            r'<td class="fit-content" data-filter-values=\'\[\]\' '
+            r'data-filter-groups=\'\{"Edition '
+            r'type": \[\], "Language": \[\]\}\'>'
+            r'\s*</td>',
+            butchers_crossing_row.group(1),
+        )
+        is not None
+    )
+    assert re.search(r'<td>\s*</td>\s*$', butchers_crossing_row.group(1))
     assert 'class="reading-challenge-list"' in index_page
     assert (
         'class="reading-challenge-status reading-challenge-status--in-progress"'
