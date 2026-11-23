@@ -321,8 +321,7 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     ).read_text(encoding='utf-8')
     assert '<dt>Inherited lists</dt>' in reading_list_page
     assert (
-        '<a href="reading_list.dutch_translations.html">'
-        'Dutch translations</a>'
+        '<a href="reading_list.dutch_translations.html">Dutch translations</a>'
     ) in reading_list_page
     assert '<dt>Prune read items</dt>' in reading_list_page
     assert '<dd>No</dd>' in reading_list_page
