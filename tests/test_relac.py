@@ -322,6 +322,16 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         '<th scope="col" class="fit-content">Language / edition type</th>'
         in reading_list_page
     )
+    assert '<th scope="col">Note</th>' in reading_list_page
+    assert reading_list_page.index(
+        '<th scope="col" class="right fit-content">Availability</th>'
+    ) < reading_list_page.index('<th scope="col">Note</th>')
+    assert re.search(
+        r'<tr data-href="work\.john_williams__stoner\.html">'
+        r'.*?<td>Try the original edition first\.</td>\s*</tr>',
+        reading_list_page,
+        re.DOTALL,
+    )
     assert re.search(
         r'<td class="fit-content" data-filter-values=\'\["English", "Or'
         r'iginal"\]\' '
@@ -381,6 +391,7 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         )
         is not None
     )
+    assert re.search(r'<td>\s*</td>\s*$', butchers_crossing_row.group(1))
     assert 'class="reading-challenge-list"' in index_page
     assert (
         'class="reading-challenge-status reading-challenge-status--in-progress"'

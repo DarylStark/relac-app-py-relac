@@ -1,7 +1,7 @@
 {% from "_entity_link.html" import entity_link %}
 {% from "_rating_value.html" import rating_value %}
 
-{% macro work_table(works, show_order=false, title="Works", order_attribute="order", table_id="works-table", title_link=none, show_work_edition=false) %}
+{% macro work_table(works, show_order=false, title="Works", order_attribute="order", table_id="works-table", title_link=none, show_work_edition=false, show_note=false) %}
 <div class="card table-card">
     <header class="table-card-header">
         <h3 class="table-card-title">{% if title_link %}<a href="{{ title_link }}">{{ title }}</a>{% else %}{{ title }}{% endif %}</h3>
@@ -23,12 +23,13 @@
                 <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
                 <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Availability</th>
+                {% if show_note %}<th scope="col">Note</th>{% endif %}
             </tr>
         </thead>
         <tbody>
             {% for item in works %}
                 {% if show_order %}
-                    {{ work_row(item.work_obj, item[order_attribute], item.work_edition_obj if show_work_edition else none, show_work_edition) }}
+                    {{ work_row(item.work_obj, item[order_attribute], item.work_edition_obj if show_work_edition else none, show_work_edition, show_note, item.note if show_note else none) }}
                 {% else %}
                     {{ work_row(item) }}
                 {% endif %}
@@ -39,7 +40,7 @@
 </div>
 {% endmacro %}
 
-{% macro work_row(work, order=none, work_edition=none, show_work_edition=false) %}
+{% macro work_row(work, order=none, work_edition=none, show_work_edition=false, show_note=false, note=none) %}
 {% set work_type = work.work_type.value if work.work_type else 'unspecified' %}
 {% set work_structure = work.work_structure.value if work.work_structure else 'unspecified' %}
 {% set edition_language = work_edition.language | language if work_edition else '' %}
@@ -99,5 +100,8 @@
             {{ work.availability.value | enum_label }}
         </span>
     </td>
+    {% if show_note %}
+    <td>{% if note is not none %}{{ note }}{% endif %}</td>
+    {% endif %}
 </tr>
 {% endmacro %}

@@ -1641,6 +1641,7 @@ class ReadingListItem(BaseModel):
     order: int | None = None
     work: str
     work_edition: str | None = None
+    note: str | None = None
 
     # Relationships (real objects)
     work_obj: Work | None = Field(default=None, exclude=True)

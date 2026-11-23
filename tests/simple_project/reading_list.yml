@@ -8,6 +8,7 @@ reading_list.my_reading_list:
     - order: 1
       work: work.john_williams__stoner
       work_edition: work_edition.john_williams__stoner__original
+      note: Try the original edition first.
     - order: 2
       work: work.john_williams__butchers_crossing
     - order: 3
