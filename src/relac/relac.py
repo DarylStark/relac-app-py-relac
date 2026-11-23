@@ -263,7 +263,10 @@ class Relac:
                 matching_reading_lists = [
                     reading_list
                     for reading_list in reading_lists
-                    if any(item.work == work.id for item in reading_list.works)
+                    if any(
+                        item.work == work.id
+                        for item in reading_list.combined_works
+                    )
                 ]
                 html = template.render(
                     work=work, reading_lists=matching_reading_lists

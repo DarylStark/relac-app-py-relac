@@ -7,8 +7,30 @@ reading_list.my_reading_list:
   works:
     - order: 1
       work: work.john_williams__stoner
+      work_edition: work_edition.john_williams__stoner__original
     - order: 2
       work: work.john_williams__butchers_crossing
     - order: 3
       work: work.freida_mcfadden__the_witch
+  inherit:
+    - reading_list.dutch_translations
+
+reading_list.dutch_translations:
+  name: Dutch translations
+  works:
+    - order: 1
+      work: work.george_orwell__nineteen_eighty_four
+      work_edition: work_edition.george_orwell__nineteen_eighty_four__translation_nl
+  inherit:
+    - reading_list.stephen_king_dutch_translations
+
+reading_list.stephen_king_dutch_translations:
+  name: Stephen King in Dutch
+  works:
+    - order: 1
+      work: work.stephen_king__mr_harrigans_phone
+      work_edition: work_edition.stephen_king__mr_harrigans_phone__nl
+    - order: 2
+      work: work.stephen_king__the_life_of_chuck
+      work_edition: work_edition.stephen_king__the_life_of_chuck__nl
 #-------------------------------------------------------------------------------

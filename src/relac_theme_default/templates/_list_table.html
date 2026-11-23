@@ -35,10 +35,10 @@
     <td>{{ list.name }}</td>
     <td class="center fit-content">
         <pre>
-            {{ list.works | length }}
+            {{ list.combined_works | length }}
         </pre>
     </td>
-    {{ availability_cell(list.works) }}
+    {{ availability_cell(list.combined_works) }}
     {% set filter_values = [] %}
     {% if list.read_count > 0 %}{% set _ = filter_values.append("Finished") %}{% endif %}
     {% if list.reading_count > 0 %}{% set _ = filter_values.append("Reading") %}{% endif %}

@@ -1638,15 +1638,18 @@ class Label(ResourceBase):
 class ReadingListItem(BaseModel):
     """A item in a reading list."""
 
-    order: int
+    order: int | None = None
     work: str
+    work_edition: str | None = None
 
     # Relationships (real objects)
     work_obj: Work | None = Field(default=None, exclude=True)
+    work_edition_obj: Work | None = Field(default=None, exclude=True)
 
     # Resolve definitions
     resolvable_fields: ClassVar[list[ResolvableField]] = [
         ResolvableField('work', 'work_obj', 'one-to-none'),
+        ResolvableField('work_edition', 'work_edition_obj', 'one-to-none'),
     ]
 
 
@@ -1656,14 +1659,38 @@ class ReadingList(LabelledResource):
 
     name: str
     works: list[ReadingListItem] = Field(default_factory=list)
+    inherit: list[str] = Field(default_factory=list)
+    inherit_objs: list[ReadingList] = Field(default_factory=list, exclude=True)
 
     resolvable_children: ClassVar[tuple[str, ...]] = ('works',)
 
     resolvable_fields: ClassVar[list[ResolvableField]] = [
         ResolvableField(
             'labels', 'label_objs', 'many-to-many', 'reading_list_objs'
-        )
+        ),
+        ResolvableField('inherit', 'inherit_objs', 'many-to-none'),
     ]
+
+    @model_validator(mode='after')
+    def assign_missing_work_orders(self) -> ReadingList:
+        """Assign unspecified work orders after the list's explicit orders."""
+        next_order = (
+            max(
+                (item.order for item in self.works if item.order is not None),
+                default=0,
+            )
+            + 1
+        )
+        for item in self.works:
+            if item.order is None:
+                item.order = next_order
+                next_order += 1
+        return self
+
+    @property
+    def combined_works(self) -> list[ReadingListItem]:
+        """Get this list's works followed by its inherited works."""
+        return _get_combined_works(self, set())
 
     @override
     @property
@@ -1671,7 +1698,7 @@ class ReadingList(LabelledResource):
         """Get linting findings for the model."""
         rv = super().linting_findings
 
-        orders = [work.order for work in self.works]
+        orders = [work.order for work in self.combined_works]
         double = set([order for order in orders if orders.count(order) > 1])
 
         for double_order in double:
@@ -1685,7 +1712,7 @@ class ReadingList(LabelledResource):
 
         all_works = [
             work.work_obj.id or ''
-            for work in self.works
+            for work in self.combined_works
             if work.work_obj is not None
         ]
         double_works: set[str] = set(
@@ -1701,6 +1728,15 @@ class ReadingList(LabelledResource):
                 )
             )
 
+        if _has_inheritance_cycle(self, frozenset()):
+            rv.append(
+                LintingFinding(
+                    id='reading-list-inheritance-cycle',
+                    resource_id=self.id,
+                    error='This reading list has a circular inheritance.',
+                )
+            )
+
         return rv
 
     @override
@@ -1712,7 +1748,9 @@ class ReadingList(LabelledResource):
     def _get_details(self) -> list[str]:
         """Get the details for this object."""
         works = [
-            item.work_obj for item in self.works if item.work_obj is not None
+            item.work_obj
+            for item in self.combined_works
+            if item.work_obj is not None
         ]
         return [search_detail_for_obj_list('Works', 'title', works)]
 
@@ -1721,7 +1759,7 @@ class ReadingList(LabelledResource):
     ) -> list[Work]:
         return [
             work.work_obj
-            for work in self.works
+            for work in self.combined_works
             if work.work_obj is not None
             and work.work_obj.reading_state == reading_state
         ]
@@ -1767,21 +1805,61 @@ class ReadingList(LabelledResource):
     @property
     def read_percentage(self) -> float:
         """Get the percentage of works in this list that are finished."""
-        if not self.works:
+        if not self.combined_works:
             return 0.0
 
-        return self.read_count / len(self.works) * 100
+        return self.read_count / len(self.combined_works) * 100
 
     @property
     def rating(self) -> float | None:
         """Get the average rating for this work."""
         ratings = [
-            rs_obj.work_obj.rating for rs_obj in self.works if rs_obj.work_obj
+            rs_obj.work_obj.rating
+            for rs_obj in self.combined_works
+            if rs_obj.work_obj
         ]
         rated_ratings = [rating for rating in ratings if rating is not None]
         if not rated_ratings:
             return None
         return statistics.mean(rated_ratings)
+
+
+def _get_combined_works(
+    reading_list: ReadingList, ancestors: set[int]
+) -> list[ReadingListItem]:
+    if id(reading_list) in ancestors:
+        return []
+
+    next_ancestors = ancestors | {id(reading_list)}
+    combined = list(reading_list.works)
+    max_order = max(
+        (item.order for item in combined if item.order is not None),
+        default=0,
+    )
+    for inherited_list in reading_list.inherit_objs:
+        inherited_works = _get_combined_works(inherited_list, next_ancestors)
+        for item in inherited_works:
+            item_order = item.order if item.order is not None else 0
+            combined.append(
+                item.model_copy(update={'order': max_order + item_order})
+            )
+        if inherited_works:
+            max_order = max(
+                item.order for item in combined if item.order is not None
+            )
+    return combined
+
+
+def _has_inheritance_cycle(
+    reading_list: ReadingList, ancestors: frozenset[int]
+) -> bool:
+    if id(reading_list) in ancestors:
+        return True
+    next_ancestors = ancestors | {id(reading_list)}
+    return any(
+        _has_inheritance_cycle(inherited_list, next_ancestors)
+        for inherited_list in reading_list.inherit_objs
+    )
 
 
 class OwnerType(Enum):

@@ -46,6 +46,8 @@
         },
         ".venv/bin/python": true,
         ".venv/bin/pytest": true,
-        ".venv/bin/ruff": true
+        ".venv/bin/ruff": true,
+        "../../.venv/bin/python": true,
+        "/workspaces/relac-app-py-relac/.venv/bin/python": true
     }
 }
