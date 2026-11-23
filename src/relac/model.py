@@ -1111,19 +1111,21 @@ class BookMedium(Enum):
     """Mediums for books."""
 
     UNSPECIFIED = 'unspecified'
-    PAPERBACK = 'paperback'
-    HARDCOVER = 'hardcover'
+    PRINT = 'print'
     EBOOK = 'ebook'
     AUDIOBOOK = 'audiobook'
+    WEB = 'web'
 
 
-class BookBinding(Enum):
-    """Mediums for books."""
+class BookFormat(Enum):
+    """Formats for books."""
 
     UNSPECIFIED = 'unspecified'
-    POCKET = 'pocket'
-    NOVELLA = 'novella'
+
+    HARDCOVER = 'hardcover'
+    PAPERBACK = 'paperback'
     LUXE_EDITION = 'luxe-edition'
+    POCKET = 'pocket'
     GRAPHICAL_NOVEL_ADAPTION = 'graphical-novel-adaption'
     EPUB = 'epub'
     EPUB_WATERMARK = 'epub-watermark'
@@ -1131,6 +1133,7 @@ class BookBinding(Enum):
     PDF = 'pdf'
     PDF_WATERMARK = 'pdf-watermark'
     PDF_DRM = 'pdf-drm'
+    WEBPAGE = 'webpage'
 
 
 class BookOwnerLoan(BaseModel):
@@ -1211,7 +1214,7 @@ class Book(LabelledResource):
     publisher: str | None = None
     work_editions: list[str] = Field(default_factory=list)
     medium: BookMedium = BookMedium.UNSPECIFIED
-    binding: BookBinding = BookBinding.UNSPECIFIED
+    format: BookFormat = BookFormat.UNSPECIFIED
     owners: list[BookOwner] = Field(default_factory=list)
 
     @override
@@ -1264,7 +1267,7 @@ class Book(LabelledResource):
             search_detail_for_obj('Imprint', 'imprint', self.publisher_obj),
             transformed_search_detail('ISBN', self.isbn13, _format_isbn),
             search_detail_for_enum('Medium', self.medium),
-            search_detail_for_enum('Binding', self.binding),
+            search_detail_for_enum('Format', self.format),
             search_detail_for_obj_list(
                 'Works', 'title', self.work_edition_objs
             ),

@@ -91,7 +91,7 @@ book.stephen_king__als_het_bloedt:
   isbn13: 9789402315103
   title: Als het bloedt
   medium: ebook
-  binding: epub-watermark
+  format: epub-watermark
   work_editions:
     - work_edition.stephen_king__if_it_bleed__nl
     - work_edition.stephen_king__mr_harrigans_phone__nl
@@ -101,8 +101,8 @@ book.stephen_king__als_het_bloedt:
 book.stephen_king__if_it_bleeds:
   isbn13: 9781982137984
   title: If It Bleeds
-  medium: paperback
-  binding: unspecified
+  medium: print
+  format: paperback
   work_editions:
     - work_edition.stephen_king__if_it_bleed__original
     - work_edition.stephen_king__mr_harrigans_phone__original

@@ -14,7 +14,7 @@
                 <th scope="col">Title</th>
                 <th scope="col">Contributors</th>
                 <th scope="col">Publisher</th>
-                <th scope="col">Medium</th>
+                <th scope="col">Medium and format</th>
                 <th scope="col" class="right fit-content">Language</th>
                 <th scope="col" class="center fit-content">Works</th>
                 <th scope="col" class="right fit-content">ISBN</th>
@@ -37,13 +37,13 @@
 
 {% macro book_row(book) %}
 {% set book_medium = book.medium.value %}
-{% set book_binding = book.binding.value %}
+{% set book_format = book.format.value %}
 {% set book_publisher = book.publisher_obj.name if book.publisher_obj else '' %}
 {% set book_imprint = book.publisher_obj.imprint if book.publisher_obj and book.publisher_obj.imprint else '' %}
 {% set publisher_values = ([book_publisher] if book_publisher else []) + ([book_imprint] if book_imprint else []) %}
 {% set publisher_filter_groups = {"Publisher": ([book_publisher] if book_publisher else []), "Imprint": ([book_imprint] if book_imprint else [])} %}
-{% set medium_values = [book.medium.value | enum_label, book_binding | enum_label] %}
-{% set medium_filter_groups = {"Medium": [book.medium.value | enum_label], "Binding": [book_binding | enum_label]} %}
+{% set medium_values = [book.medium.value | enum_label, book_format | enum_label] %}
+{% set medium_filter_groups = {"Medium": [book.medium.value | enum_label], "Format": [book_format | enum_label]} %}
 {% set language_values = book.languages | map("language") | list %}
 <tr data-href="{{ book.id }}.html">
     <td>{{ book.title }}</td>
@@ -62,7 +62,7 @@
     </td>
     <td data-sort-value="{{ book_medium }}" data-filter-values='{{ medium_values | tojson }}' data-filter-groups='{{ medium_filter_groups | tojson }}'>
         {{ book.medium.value | enum_label }}
-        <span class="table-secondary-text">{{ book_binding | enum_label }}</span>
+        <span class="table-secondary-text">{{ book_format | enum_label }}</span>
     </td>
     <td class="right fit-content" data-filter-values='{{ language_values | tojson }}'>{{ language_values | join(", ") }}</td>
     <td class="center fit-content">
