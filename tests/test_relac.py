@@ -252,13 +252,13 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     assert 'href="contributors.html">contributors</a>' in index_page
     assert 'href="work-editions.html">editions</a>' in index_page
     assert 'href="works.html">works</a>' in index_page
-    assert 'href="lists.html">reading lists</a>' in index_page
+    assert 'href="collections.html">book collections</a>' in index_page
     assert 'href="books.html">books</a>' in index_page
     for href in (
         'contributors.html',
         'work-editions.html',
         'works.html',
-        'lists.html',
+        'collections.html',
         'books.html',
     ):
         assert re.search(rf'<a href="{href}">\d+</a>', index_page)
