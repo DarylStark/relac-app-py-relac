@@ -29,6 +29,20 @@
               {{ list.read_percentage | round | int }}%
             </dd>
           </div>
+          {% if list.inherit_objs %}
+          <div class="detail-fact">
+            <dt>Inherited lists</dt>
+            <dd>
+              {% for inherited_list in list.inherit_objs %}
+              <a href="{{ inherited_list.id }}.html">{{ inherited_list.name }}</a>{% if not loop.last %}, {% endif %}
+              {% endfor %}
+            </dd>
+          </div>
+          {% endif %}
+          <div class="detail-fact">
+            <dt>Prune read items</dt>
+            <dd>{{ "Yes" if list.prune_read_items else "No" }}</dd>
+          </div>
         </dl>
       </section>
       {{ detail_labels(list.label_objs) }}
