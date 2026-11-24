@@ -305,7 +305,7 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         'work.john_williams__butchers_crossing.html' in dashboard_list.group()
     )
     assert 'work.freida_mcfadden__the_witch.html' in dashboard_list.group()
-    assert 'work.john_williams__stoner.html' not in dashboard_list.group()
+    assert 'work.john_williams__stoner.html' in dashboard_list.group()
     assert (
         'work_edition.stephen_king__mr_harrigans_phone__nl.html'
         in dashboard_list.group()
