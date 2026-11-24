@@ -1313,6 +1313,8 @@ div.card p.table-count {
 }
 
 table.resources {
+    --character-note-toggle-size: 24px;
+    --character-note-toggle-gap: 8px;
     width: 100%;
     min-width: 480px;
     border-collapse: collapse;
@@ -2557,6 +2559,49 @@ table.resources tbody tr:hover {
 
 table.resources tbody tr[hidden] {
     display: none;
+}
+
+table.resources tbody tr.character-with-note.character-note-expanded td {
+    border-bottom: 0;
+}
+
+table.resources .character-note-toggle {
+    display: inline-grid;
+    width: var(--character-note-toggle-size);
+    height: var(--character-note-toggle-size);
+    margin-right: var(--character-note-toggle-gap);
+    padding: 0;
+    place-items: center;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+}
+
+table.resources .character-note-toggle-spacer {
+    display: inline-block;
+    width: var(--character-note-toggle-size);
+    height: var(--character-note-toggle-size);
+    margin-right: var(--character-note-toggle-gap);
+    vertical-align: middle;
+}
+
+table.resources .character-note-toggle:hover {
+    background: var(--hover-surface);
+}
+
+table.resources .character-note-toggle:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 2px;
+}
+
+table.resources tbody tr.literary-analysis-character-note td {
+    padding-top: 0;
+    padding-left: calc(12px + var(--character-note-toggle-size) + var(--character-note-toggle-gap));
+    color: var(--muted);
 }
 
 table.resources tbody tr[data-href] {
