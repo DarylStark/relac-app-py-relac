@@ -828,6 +828,23 @@ nav.tab-nav
     background: var(--hover-surface);
 }
 
+@media (max-height: 500px) and (orientation: landscape)
+{
+    nav.tab-nav
+    {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    nav.tab-nav::-webkit-scrollbar
+    {
+        display: none;
+    }
+}
+
 nav.tab-nav a,
 .nav-submenu a
 {
