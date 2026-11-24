@@ -503,6 +503,7 @@ class Character(ResourceBase):
     """A character in a story."""
 
     name: str
+    nicknames: list[str] = Field(default_factory=list)
     birthdate: date | None = None
     birthplace: str | None = None
     birthcountry: str | None = None
@@ -517,6 +518,7 @@ class Character(ResourceBase):
     def _get_details(self) -> list[str]:
         """Get the details for this object."""
         return [
+            search_detail_for_str_list('Nicknames', self.nicknames),
             search_detail('Birthplace', self.birthplace),
             search_detail('Birth country', self.birthcountry),
             search_detail_for_obj_list('Works', 'title', self.work_objs),

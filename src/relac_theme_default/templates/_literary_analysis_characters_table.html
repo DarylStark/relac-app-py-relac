@@ -9,6 +9,7 @@
       <thead>
         <tr>
           <th scope="col">Character</th>
+          <th scope="col">Nicknames</th>
           <th scope="col">Roles</th>
           <th scope="col">Story arc</th>
           <th scope="col" data-sort-type="date" data-filter-type="date">Birth date</th>
@@ -16,15 +17,30 @@
           <th scope="col" class="right fit-content" data-sort-type="number">Age</th>
           <th scope="col">Birthplace</th>
           <th scope="col">Country</th>
-          <th scope="col">Note</th>
         </tr>
       </thead>
       <tbody>
         {% for work_character in characters %}
         {% set character = work_character.character_obj %}
         {% set character_age = character.birthdate | age(character.deceased_date) if character.birthdate and character.deceased_date else none %}
-        <tr>
-          <td><a href="{{ character.id }}.html">{{ character.name | e }}</a></td>
+        {% set row_group = "character-" ~ loop.index %}
+        <tr data-row-group="{{ row_group }}"{% if work_character.note %} class="character-with-note"{% endif %}>
+          <td>
+            {% if work_character.note %}
+            <button class="character-note-toggle" type="button" data-row-detail-toggle
+              data-character-name="{{ character.name | e }}"
+              aria-expanded="false"
+              aria-controls="character-note-{{ loop.index }}"
+              aria-label="Expand note for {{ character.name | e }}"
+              title="Expand note for {{ character.name | e }}">
+              <span class="character-note-toggle-icon" aria-hidden="true">+</span>
+            </button>
+            {% else %}
+            <span class="character-note-toggle-spacer" aria-hidden="true"></span>
+            {% endif %}
+            <a href="{{ character.id }}.html">{{ character.name | e }}</a>
+          </td>
+          <td data-filter-values='{{ character.nicknames | tojson }}'>{{ character.nicknames | map("e") | join(", ") }}</td>
           <td>
             {% for role in work_character.roles %}
               {% if not loop.first %}, {% endif %}{{ role.value | enum_label }}
@@ -42,10 +58,14 @@
             {% endif %}
           </td>
           <td class="right fit-content character-age" data-sort-value="{{ character_age if character_age is not none else '' }}">{% if character_age is not none %}<pre>{{ character_age }}</pre>{% endif %}</td>
-          <td>{{ character.birthplace | e }}</td>
+          <td>{{ character.birthplace | default('', true) | e }}</td>
           <td>{{ character.birthcountry | country }}</td>
-          <td>{{ work_character.note | e if work_character.note else '' }}</td>
         </tr>
+        {% if work_character.note %}
+        <tr id="character-note-{{ loop.index }}" class="literary-analysis-character-note" data-row-detail-for="{{ row_group }}" hidden>
+          <td colspan="9">{{ work_character.note | markdown }}</td>
+        </tr>
+        {% endif %}
         {% endfor %}
       </tbody>
     </table>

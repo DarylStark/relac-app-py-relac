@@ -214,7 +214,48 @@
         }
 
         const headers = Array.from(table.tHead.rows[0].cells);
-        const rows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
+        const tableRows = Array.from(table.tBodies).flatMap((body) => Array.from(body.rows));
+        const rows = tableRows.filter((row) => !row.hasAttribute("data-row-detail-for"));
+        const rowDetails = new Map(rows.map((row) => [row, []]));
+        const rowsByGroup = new Map(
+            rows
+                .filter((row) => row.dataset.rowGroup !== undefined)
+                .map((row) => [row.dataset.rowGroup, row])
+        );
+        tableRows
+            .filter((row) => row.dataset.rowDetailFor !== undefined)
+            .forEach((detailRow) => {
+                const row = rowsByGroup.get(detailRow.dataset.rowDetailFor);
+                if (row) {
+                    rowDetails.get(row).push(detailRow);
+                }
+            });
+        rows.forEach((row) => {
+            const toggle = row.querySelector("[data-row-detail-toggle]");
+            if (!toggle) {
+                return;
+            }
+
+            toggle.addEventListener("click", () => {
+                const isExpanded = toggle.getAttribute("aria-expanded") !== "true";
+                const action = isExpanded ? "Collapse" : "Expand";
+                const characterName = toggle.dataset.characterName;
+                const label = characterName
+                    ? `${action} note for ${characterName}`
+                    : `${action} note`;
+                toggle.setAttribute("aria-expanded", String(isExpanded));
+                toggle.setAttribute("aria-label", label);
+                toggle.title = label;
+                row.classList.toggle("character-note-expanded", isExpanded);
+                const icon = toggle.querySelector(".character-note-toggle-icon");
+                if (icon) {
+                    icon.textContent = isExpanded ? "-" : "+";
+                }
+                rowDetails.get(row).forEach((detailRow) => {
+                    detailRow.hidden = row.hidden || !isExpanded;
+                });
+            });
+        });
         const rowCells = new Map(rows.map((row) => [row, Array.from(row.cells)]));
         const emptyStateBody = table.tBodies[table.tBodies.length - 1];
         const emptyStateRow = emptyStateBody.insertRow();
@@ -444,6 +485,14 @@
                     visibleColumnCount += 1;
                 }
             });
+            rowDetails.forEach((detailRows) => {
+                detailRows.forEach((row) => {
+                    const cell = row.cells[0];
+                    if (cell) {
+                        cell.colSpan = Math.max(1, visibleColumnCount);
+                    }
+                });
+            });
             emptyStateCell.colSpan = Math.max(1, visibleColumnCount);
             visibilityToggles.forEach(({ checkbox, key }) => {
                 checkbox.checked = !hiddenColumnKeys.has(key);
@@ -503,7 +552,9 @@
         const updateRows = () => {
             let visibleCount = 0;
             rows.forEach((row) => {
-                row.hidden = Array.from(selectedValuesByColumn).some(([columnIndex, selectedValues]) => {
+                const toggle = row.querySelector("[data-row-detail-toggle]");
+                const isExpanded = toggle?.getAttribute("aria-expanded") === "true";
+                const isHidden = Array.from(selectedValuesByColumn).some(([columnIndex, selectedValues]) => {
                     if (selectedValues.size === 0) {
                         return false;
                     }
@@ -532,7 +583,11 @@
                         );
                     });
                 });
-                if (!row.hidden) {
+                row.hidden = isHidden;
+                rowDetails.get(row).forEach((detailRow) => {
+                    detailRow.hidden = isHidden || !isExpanded;
+                });
+                if (!isHidden) {
                     visibleCount += 1;
                 }
             });
@@ -1019,9 +1074,7 @@
             sortAction.addEventListener("click", () => {
                 const direction = header.getAttribute("aria-sort") === "ascending" ? -1 : 1;
                 const sortType = header.dataset.sortType ?? "auto";
-                const values = Array.from(table.tBodies).flatMap((body) => {
-                    return Array.from(body.rows, (row) => getCellValue(rowCells.get(row)?.[columnIndex]));
-                });
+                const values = rows.map((row) => getCellValue(rowCells.get(row)?.[columnIndex]));
                 const nonEmptyValues = values.filter((value) => value !== "");
                 const numericColumn = sortType === "number" || (
                     sortType === "auto" &&
@@ -1050,7 +1103,7 @@
 
                 Array.from(table.tBodies).forEach((body) => {
                     const rows = Array.from(body.rows)
-                        .filter((row) => row !== emptyStateRow)
+                        .filter((row) => row !== emptyStateRow && !row.hasAttribute("data-row-detail-for"))
                         .map((row, originalIndex) => ({
                             row,
                             originalIndex,
@@ -1070,7 +1123,12 @@
                             : comparison;
                     });
 
-                    rows.forEach(({ row }) => body.append(row));
+                    rows.forEach(({ row }) => {
+                        body.append(row);
+                        rowDetails.get(row).forEach((detailRow) => {
+                            body.append(detailRow);
+                        });
+                    });
                 });
                 emptyStateBody.append(emptyStateRow);
             });

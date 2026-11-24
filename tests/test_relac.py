@@ -134,6 +134,146 @@ def test_character_and_location_detail_breadcrumbs(tmp_path: Path) -> None:
     )
 
 
+def test_character_nicknames_are_rendered_on_work_character_page(
+    tmp_path: Path,
+) -> None:
+    """Render character nicknames in the work's character table."""
+    relac = Relac(YamlRepoLoader(Path(__file__).parent / 'simple_project'))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    character_page = (output / 'character.william_stoner.html').read_text(
+        encoding='utf-8'
+    )
+    assert '<dt>Nicknames</dt>' in character_page
+    assert 'Will, Bill, Stoner' in character_page
+
+    work_characters_page = (
+        output / 'literary_analysis_characters.work.john_williams__stoner.html'
+    ).read_text(encoding='utf-8')
+    assert '<th scope="col">Nicknames</th>' in work_characters_page
+    assert 'Will, Bill, Stoner' in work_characters_page
+
+
+def test_character_nicknames_are_rendered(tmp_path: Path) -> None:
+    """Render character nicknames on detail and index pages."""
+    repo_path = tmp_path / 'repo'
+    repo_path.mkdir()
+    (repo_path / 'main.yml').write_text(
+        'relac:\n'
+        '  title: Test Library\n'
+        '  owner: owner.test\n'
+        'owner.test:\n'
+        '  name: Test Owner\n'
+        'character.with_nicknames:\n'
+        '  name: Example Character\n'
+        '  nicknames:\n'
+        '    - Ace\n'
+        '    - "A & B"\n'
+        'character.without_nicknames:\n'
+        '  name: Another Character\n',
+        encoding='utf-8',
+    )
+
+    relac = Relac(YamlRepoLoader(repo_path))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    character_page = (output / 'character.with_nicknames.html').read_text(
+        encoding='utf-8'
+    )
+    assert '<dt>Nicknames</dt>' in character_page
+    assert 'Ace, A &amp; B' in character_page
+
+    characters_page = (output / 'characters.html').read_text(encoding='utf-8')
+    assert '<th scope="col">Nicknames</th>' in characters_page
+    assert 'Ace, A &amp; B' in characters_page
+    assert 'character.without_nicknames.html' in characters_page
+
+
+def test_work_character_notes_render_below_the_row(tmp_path: Path) -> None:
+    """Render character notes as full-width rows below their characters."""
+    repo_path = tmp_path / 'repo'
+    repo_path.mkdir()
+    (repo_path / 'main.yml').write_text(
+        'relac:\n'
+        '  title: Test Library\n'
+        '  owner: owner.test\n'
+        'owner.test:\n'
+        '  name: Test Owner\n'
+        'character.first:\n'
+        '  name: First Character\n'
+        'character.second:\n'
+        '  name: Second Character\n'
+        'character.third:\n'
+        '  name: Third Character\n'
+        'work.example:\n'
+        '  title: Example Work\n'
+        '  authors: []\n'
+        '  characters:\n'
+        '    - character: character.first\n'
+        '      note: "A lengthy **bold** note & its details."\n'
+        '    - character: character.second\n'
+        '      note: Another note.\n'
+        '    - character: character.third\n',
+        encoding='utf-8',
+    )
+
+    relac = Relac(YamlRepoLoader(repo_path))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    page = (
+        output / 'literary_analysis_characters.work.example.html'
+    ).read_text(encoding='utf-8')
+    assert '<th scope="col">Note</th>' not in page
+    assert re.search(
+        r'<button class="character-note-toggle".*?'
+        r'data-row-detail-toggle.*?aria-expanded="false".*?'
+        r'aria-controls="character-note-1".*?'
+        r'aria-label="Expand note for First Character".*?</button>',
+        page,
+        re.DOTALL,
+    )
+    assert (
+        '<tr id="character-note-1" '
+        'class="literary-analysis-character-note" '
+        'data-row-detail-for="character-1" hidden>'
+    ) in page
+    assert re.search(
+        r'<span class="character-note-toggle-spacer" aria-hidden="true">'
+        r'</span>\s*<a href="character.third.html">Third Character</a>',
+        page,
+    )
+    third_row = re.search(
+        r'<tr data-row-group="character-3">(.*?)</tr>',
+        page,
+        re.DOTALL,
+    )
+    assert third_row is not None
+    third_cells = re.findall(
+        r'<td(?:\s[^>]*)?>(.*?)</td>',
+        third_row.group(1),
+        re.DOTALL,
+    )
+    assert len(third_cells) == 9
+    assert not third_cells[7].strip()
+    assert re.search(
+        r'<tr data-row-group="character-1" class="character-with-note">'
+        r'.*?</tr>\s*'
+        r'<tr id="character-note-1" '
+        r'class="literary-analysis-character-note" '
+        r'data-row-detail-for="character-1" hidden>\s*'
+        r'<td colspan="9">\s*<p>A lengthy <strong>bold</strong> note '
+        r'&amp; its details\.</p>\s*</td>\s*</tr>',
+        page,
+        re.DOTALL,
+    )
+
+
 def test_book_language_is_shown_in_tables_and_detail_metadata(
     tmp_path: Path,
 ) -> None:
