@@ -12,8 +12,10 @@ from relac.model import (
     IsFinishedReadingSessionSpec,
     ReadingSession,
     ReadingState,
+    SpecificLanguageReadingSessionSpec,
     StartedAfterReadingSessionSpec,
     StartedBeforeReadingSessionSpec,
+    WorkEdition,
 )
 
 
@@ -195,6 +197,32 @@ def test_invalid_finished_after_spec_none() -> None:
     )
     assert not FinishedAfterReadingSessionSpec(
         date=date(2026, 12, 31)
+    ).is_satisfied_by(session)
+
+
+def test_valid_specific_language_spec() -> None:
+    """Test if we get True for the correct language."""
+    session = ReadingSession(
+        work_edition='work_edition.test',
+        book='book.test',
+        state=ReadingState.FINISHED,
+        work_edition_obj=WorkEdition(title='test', work='work', language='nl'),
+    )
+    assert SpecificLanguageReadingSessionSpec(language='nl').is_satisfied_by(
+        session
+    )
+
+
+def test_invalid_specific_language_spec() -> None:
+    """Test if we get False for the wrong language."""
+    session = ReadingSession(
+        work_edition='work_edition.test',
+        book='book.test',
+        state=ReadingState.FINISHED,
+        work_edition_obj=WorkEdition(title='test', work='work', language='nl'),
+    )
+    assert not SpecificLanguageReadingSessionSpec(
+        language='en'
     ).is_satisfied_by(session)
 
 

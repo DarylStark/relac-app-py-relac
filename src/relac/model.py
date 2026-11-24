@@ -2188,6 +2188,50 @@ class FinishedBeforeReadingSessionSpec(ReadingSessionSpec):
         return obj.enddate <= self.date
 
 
+@register_model('reading_session_edition_language')
+class SpecificLanguageReadingSessionSpec(ReadingSessionSpec):
+    """Determines if a ReadingSession has a edition of a specific language."""
+
+    language: str
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the work edition has the correct language."""
+        if not obj.work_edition_obj:
+            return False
+        return obj.work_edition_obj.language == self.language
+
+
+@register_model('reading_session_edition_type')
+class SpecificTypeReadingSessionSpec(ReadingSessionSpec):
+    """Determines if a ReadingSession has a edition of a specific type."""
+
+    edition_type: WorkEditionType
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the work edition has the correct type."""
+        if not obj.work_edition_obj:
+            return False
+        return obj.work_edition_obj.edition_type == self.edition_type
+
+
+@register_model('reading_session_work_category')
+class SpecificWorkCategoryReadingSessionSpec(ReadingSessionSpec):
+    """Determines if a ReadingSession has a work of a specific category."""
+
+    category: WorkType
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the work has the correct type."""
+        if not obj.work_edition_obj:
+            return False
+        if not obj.work_edition_obj.work_obj:
+            return False
+        return obj.work_edition_obj.work_obj.work_type == self.category
+
+
 class ReadingChallengeState(Enum):
     """Reading challenge states."""
 
