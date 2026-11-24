@@ -11,21 +11,39 @@
           <th scope="col">Work</th>
           <th scope="col">Roles</th>
           <th scope="col">Story arc</th>
-          <th scope="col">Note</th>
         </tr>
       </thead>
       <tbody>
         {% for work_character in work_characters %}
-        <tr data-href="{{ work_character.work_obj.id }}.html">
-          <td><a href="{{ work_character.work_obj.id }}.html">{{ work_character.work_obj.title | e }}</a></td>
+        {% set row_group = "character-work-" ~ loop.index %}
+        <tr data-href="{{ work_character.work_obj.id }}.html" data-row-group="{{ row_group }}"{% if work_character.note %} class="character-with-note"{% endif %}>
+          <td data-sort-value="{{ work_character.work_obj.title | e }}" data-filter-values='{{ [work_character.work_obj.title] | tojson }}'>
+            {% if work_character.note %}
+            <button class="character-note-toggle" type="button" data-row-detail-toggle
+              data-character-name="{{ work_character.work_obj.title | e }}"
+              aria-expanded="false"
+              aria-controls="character-work-note-{{ loop.index }}"
+              aria-label="Expand note for {{ work_character.work_obj.title | e }}"
+              title="Expand note for {{ work_character.work_obj.title | e }}">
+              <span class="character-note-toggle-icon" aria-hidden="true">+</span>
+            </button>
+            {% else %}
+            <span class="character-note-toggle-spacer" aria-hidden="true"></span>
+            {% endif %}
+            <a href="{{ work_character.work_obj.id }}.html">{{ work_character.work_obj.title | e }}</a>
+          </td>
           <td>
             {% for role in work_character.roles %}
               {% if not loop.first %}, {% endif %}{{ role.value | enum_label }}
             {% endfor %}
           </td>
           <td>{{ work_character.story_arc.value | enum_label if work_character.story_arc else '' }}</td>
-          <td>{{ work_character.note | e if work_character.note else '' }}</td>
         </tr>
+        {% if work_character.note %}
+        <tr id="character-work-note-{{ loop.index }}" class="literary-analysis-character-note" data-row-detail-for="{{ row_group }}" hidden>
+          <td colspan="3">{{ work_character.note | markdown }}</td>
+        </tr>
+        {% endif %}
         {% endfor %}
       </tbody>
     </table>

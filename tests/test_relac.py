@@ -273,6 +273,31 @@ def test_work_character_notes_render_below_the_row(tmp_path: Path) -> None:
         re.DOTALL,
     )
 
+    character_page = (output / 'character.first.html').read_text(
+        encoding='utf-8'
+    )
+    assert '<table id="character-works-table"' in character_page
+    assert '<th scope="col">Note</th>' not in character_page
+    assert (
+        'data-sort-value="Example Work" data-filter-values=\'["Example Work"]\''
+    ) in character_page
+    assert re.search(
+        r'<button class="character-note-toggle".*?'
+        r'aria-controls="character-work-note-1".*?'
+        r'aria-label="Expand note for Example Work".*?</button>',
+        character_page,
+        re.DOTALL,
+    )
+    assert re.search(
+        r'<tr id="character-work-note-1" '
+        r'class="literary-analysis-character-note" '
+        r'data-row-detail-for="character-work-1" hidden>\s*'
+        r'<td colspan="3">\s*<p>A lengthy <strong>bold</strong> note '
+        r'&amp; its details\.</p>\s*</td>\s*</tr>',
+        character_page,
+        re.DOTALL,
+    )
+
 
 def test_book_language_is_shown_in_tables_and_detail_metadata(
     tmp_path: Path,

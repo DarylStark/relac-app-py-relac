@@ -25,7 +25,7 @@
         {% set character_age = character.birthdate | age(character.deceased_date) if character.birthdate and character.deceased_date else none %}
         {% set row_group = "character-" ~ loop.index %}
         <tr data-row-group="{{ row_group }}"{% if work_character.note %} class="character-with-note"{% endif %}>
-          <td>
+          <td data-sort-value="{{ character.name | e }}" data-filter-values='{{ [character.name] | tojson }}'>
             {% if work_character.note %}
             <button class="character-note-toggle" type="button" data-row-detail-toggle
               data-character-name="{{ character.name | e }}"
