@@ -39,6 +39,10 @@ character.william_stoner:
   birthplace: Missouri
   birthcountry: US
   description: "[file:william_stoner.md]"
+  nicknames:
+    - "Will"
+    - "Bill"
+    - "Stoner"
 
 character.edith_elaine_bostwick:
   name: Edith Elaine Bostwick

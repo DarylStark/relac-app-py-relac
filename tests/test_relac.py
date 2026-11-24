@@ -134,6 +134,65 @@ def test_character_and_location_detail_breadcrumbs(tmp_path: Path) -> None:
     )
 
 
+def test_character_nicknames_are_rendered_on_work_character_page(
+    tmp_path: Path,
+) -> None:
+    """Render character nicknames in the work's character table."""
+    relac = Relac(YamlRepoLoader(Path(__file__).parent / 'simple_project'))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    character_page = (output / 'character.william_stoner.html').read_text(
+        encoding='utf-8'
+    )
+    assert '<dt>Nicknames</dt>' in character_page
+    assert 'Will, Bill, Stoner' in character_page
+
+    work_characters_page = (
+        output / 'literary_analysis_characters.work.john_williams__stoner.html'
+    ).read_text(encoding='utf-8')
+    assert '<th scope="col">Nicknames</th>' in work_characters_page
+    assert 'Will, Bill, Stoner' in work_characters_page
+
+
+def test_character_nicknames_are_rendered(tmp_path: Path) -> None:
+    """Render character nicknames on detail and index pages."""
+    repo_path = tmp_path / 'repo'
+    repo_path.mkdir()
+    (repo_path / 'main.yml').write_text(
+        'relac:\n'
+        '  title: Test Library\n'
+        '  owner: owner.test\n'
+        'owner.test:\n'
+        '  name: Test Owner\n'
+        'character.with_nicknames:\n'
+        '  name: Example Character\n'
+        '  nicknames:\n'
+        '    - Ace\n'
+        '    - "A & B"\n'
+        'character.without_nicknames:\n'
+        '  name: Another Character\n',
+        encoding='utf-8',
+    )
+
+    relac = Relac(YamlRepoLoader(repo_path))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    character_page = (output / 'character.with_nicknames.html').read_text(
+        encoding='utf-8'
+    )
+    assert '<dt>Nicknames</dt>' in character_page
+    assert 'Ace, A &amp; B' in character_page
+
+    characters_page = (output / 'characters.html').read_text(encoding='utf-8')
+    assert '<th scope="col">Nicknames</th>' in characters_page
+    assert 'Ace, A &amp; B' in characters_page
+    assert 'character.without_nicknames.html' in characters_page
+
+
 def test_book_language_is_shown_in_tables_and_detail_metadata(
     tmp_path: Path,
 ) -> None:

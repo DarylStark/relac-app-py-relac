@@ -9,6 +9,7 @@
       <thead>
         <tr>
           <th scope="col">Name</th>
+          <th scope="col">Nicknames</th>
           <th scope="col">Birthplace</th>
           <th scope="col">Country</th>
           <th scope="col">Works</th>
@@ -26,6 +27,7 @@
         {% endfor %}
         <tr data-href="{{ character.id }}.html">
           <td><a href="{{ character.id }}.html">{{ character.name | e }}</a></td>
+          <td data-filter-values='{{ character.nicknames | tojson }}'>{{ character.nicknames | map("e") | join(", ") }}</td>
           <td>{{ character.birthplace | default('', true) | e }}</td>
           <td>{{ character.birthcountry | country }}</td>
           <td data-filter-values='{{ works | map(attribute="title") | list | tojson }}'>

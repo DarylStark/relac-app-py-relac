@@ -22,6 +22,12 @@
         </div>
       </div>
       <dl class="detail-metadata">
+        {% if character.nicknames %}
+        <div class="detail-fact">
+          <dt>Nicknames</dt>
+          <dd>{{ character.nicknames | map("e") | join(", ") }}</dd>
+        </div>
+        {% endif %}
         {% if character.birthdate %}
         <div class="detail-fact">
           <dt>Birth date</dt>

@@ -5,6 +5,7 @@ import pytest
 from relac.exceptions import DoubleModelNameError
 from relac.model import (
     Book,
+    Character,
     ReadingList,
     ReadingListItem,
     ReadingSession,
@@ -15,6 +16,13 @@ from relac.model import (
     WorkEditionType,
     register_model,
 )
+
+
+def test_character_nicknames_default_to_empty_list() -> None:
+    """Characters without nicknames have an empty nickname list."""
+    character = Character(id='character.test', name='Test Character')
+
+    assert character.nicknames == []
 
 
 def test_book_counts_read_abridged_work_edition() -> None:
