@@ -335,6 +335,14 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         '<th scope="col" class="fit-content">Language / edition type</th>'
         in reading_list_page
     )
+    assert reading_list_page.index('<th scope="col">Series</th>') < (
+        reading_list_page.index(
+            '<th scope="col" class="fit-content">Language / edition type</th>'
+        )
+    )
+    assert '<th scope="col" class="center fit-content">Editions</th>' not in (
+        reading_list_page
+    )
     assert '<th scope="col">Note</th>' in reading_list_page
     assert reading_list_page.index(
         '<th scope="col" class="right fit-content">Availability</th>'
