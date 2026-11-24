@@ -617,3 +617,49 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         'class="availability-badge reading-challenge-state '
         'reading-challenge-state--closed">Closed</span>'
     ) in closed_challenge_page
+
+
+def test_language_edition_filter_example_has_distinct_combinations(
+    tmp_path: Path,
+) -> None:
+    """Provide original and translated editions for filter examples."""
+    relac = Relac(YamlRepoLoader(Path(__file__).parent / 'simple_project'))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    filter_example_page = (
+        output / 'reading_list.language_edition_filter_example.html'
+    ).read_text(encoding='utf-8')
+    lists_page = (output / 'lists.html').read_text(encoding='utf-8')
+    assert re.search(
+        r'<tr data-href="reading_list\.language_edition_filter_example\.html">'
+        r'\s*<td>Language and edition type filter example</td>',
+        lists_page,
+    )
+
+    rows = re.findall(
+        r'<tr data-href="[^"]+">(.*?)</tr>',
+        filter_example_page,
+        re.DOTALL,
+    )
+    assert len(rows) == 3
+
+    combinations = set()
+    for row in rows:
+        group_data = next(
+            value
+            for value in re.findall(
+                r"data-filter-groups='([^']+)'",
+                row,
+            )
+            if '"Language"' in value
+        )
+        groups = json.loads(group_data)
+        combinations.add((groups['Language'][0], groups['Edition type'][0]))
+
+    assert combinations == {
+        ('English', 'Original'),
+        ('English', 'Translation'),
+        ('Spanish', 'Original'),
+    }

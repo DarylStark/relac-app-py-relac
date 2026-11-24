@@ -1,0 +1,44 @@
+contributor.filter_example_author:
+  name: Filter Example Author
+  state: alive
+
+work.filter_example_spanish_work:
+  title: Sample Spanish Work
+  authors:
+    - contributor.filter_example_author
+
+work_edition.filter_example_spanish_work__original:
+  title: Sample Spanish Work
+  work: work.filter_example_spanish_work
+  edition_type: original
+  language: es
+
+work_edition.filter_example_spanish_work__english_translation:
+  title: Sample Spanish Work
+  work: work.filter_example_spanish_work
+  edition_type: translation
+  language: en
+
+work.filter_example_english_work:
+  title: Sample English Work
+  authors:
+    - contributor.filter_example_author
+
+work_edition.filter_example_english_work__original:
+  title: Sample English Work
+  work: work.filter_example_english_work
+  edition_type: original
+  language: en
+
+reading_list.language_edition_filter_example:
+  name: Language and edition type filter example
+  works:
+    - order: 1
+      work: work.filter_example_spanish_work
+      work_edition: work_edition.filter_example_spanish_work__original
+    - order: 2
+      work: work.filter_example_spanish_work
+      work_edition: work_edition.filter_example_spanish_work__english_translation
+    - order: 3
+      work: work.filter_example_english_work
+      work_edition: work_edition.filter_example_english_work__original
