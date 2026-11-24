@@ -223,6 +223,7 @@
         const emptyStateCell = emptyStateRow.insertCell();
         emptyStateCell.colSpan = headers.length;
         const selectedValuesByColumn = new Map();
+        const filterValuesByGroupByColumn = new Map();
         const sortActionsByColumn = new Map();
         const tableKey = table.id || "table";
         const itemName = table.id
@@ -503,10 +504,33 @@
             let visibleCount = 0;
             rows.forEach((row) => {
                 row.hidden = Array.from(selectedValuesByColumn).some(([columnIndex, selectedValues]) => {
+                    if (selectedValues.size === 0) {
+                        return false;
+                    }
+
                     const cell = rowCells.get(row)[columnIndex];
                     const isDateFilter = headers[columnIndex].dataset.filterType === "date";
-                    return selectedValues.size > 0 && !getColumnFilterValues(cell, isDateFilter)
-                        .some((value) => selectedValues.has(value));
+                    if (isDateFilter) {
+                        return !getColumnFilterValues(cell, true)
+                            .some((value) => selectedValues.has(value));
+                    }
+
+                    const selectedGroups = Array.from(
+                        filterValuesByGroupByColumn.get(columnIndex) ?? [],
+                    ).flatMap(([groupLabel, groupValues]) => {
+                        const selectedGroupValues = Array.from(groupValues)
+                            .filter((value) => selectedValues.has(value));
+                        return selectedGroupValues.length > 0
+                            ? [[groupLabel, new Set(selectedGroupValues)]]
+                            : [];
+                    });
+                    const cellGroups = getFilterGroups(cell);
+                    return !selectedGroups.every(([groupLabel, groupValues]) => {
+                        const values = cellGroups[groupLabel];
+                        return Array.isArray(values) && values.some(
+                            (value) => groupValues.has(String(value)),
+                        );
+                    });
                 });
                 if (!row.hidden) {
                     visibleCount += 1;
@@ -736,6 +760,8 @@
                     getColumnFilterValues(cell, isDateFilter).forEach((value) => valuesByGroup.get("").add(value));
                 }
             });
+
+            filterValuesByGroupByColumn.set(columnIndex, valuesByGroup);
 
             const sortFilterValues = (values) => Array.from(values).sort((left, right) => {
                 if (left === "") {
