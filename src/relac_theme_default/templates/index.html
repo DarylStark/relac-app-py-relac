@@ -89,6 +89,7 @@
                 <ul class="reading-challenge-list" aria-label="Reading challenges">
                     {% for challenge in active_challenges %}
                         {% set session_count = challenge.get_count(reading_sessions) %}
+                        {% set session_percentage = ('%.1f' % (session_count / challenge.goal * 100)) if challenge.goal > 0 else none %}
                         {% set result = challenge.get_result(reading_sessions) %}
                         <li>
                             <a class="reading-challenge-entry" href="{{ challenge.id }}.html">
@@ -101,8 +102,14 @@
                                 </span>
                             </div>
                             <p class="reading-challenge-progress">
+                                <pre>{% if session_percentage is not none %}{{ session_percentage }}%{% else %}N/A{% endif %}</pre>
                                 {{ session_count }} of {{ challenge.goal }} sessions
                             </p>
+                            {% if challenge.goal > 0 %}
+                            <div class="reading-challenge-meter" role="progressbar" aria-label="{{ challenge.name }} progress" aria-valuemin="0" aria-valuemax="{{ challenge.goal }}" aria-valuenow="{{ [session_count, challenge.goal] | min }}">
+                                <span class="reading-challenge-meter-fill" style="width: {{ [session_count / challenge.goal * 100, 100] | min }}%;"></span>
+                            </div>
+                            {% endif %}
                             </a>
                         </li>
                     {% endfor %}

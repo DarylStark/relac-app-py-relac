@@ -13,13 +13,12 @@
             <tr>
                 {% if show_order %}<th scope="col" class="center fit-content">#</th>{% endif %}
                 <th scope="col">Title</th>
-                {% if show_work_edition %}<th scope="col" class="fit-content">Language / edition type</th>{% endif %}
                 <th scope="col">Author</th>
                 <th scope="col" class="fit-content">Structure</th>
                 <th scope="col" class="fit-content">Category</th>
                 <th scope="col" class="fit-content">Primary genre</th>
                 <th scope="col">Series</th>
-                <th scope="col" class="center fit-content">Editions</th>
+                {% if show_work_edition %}<th scope="col" class="fit-content">Language / edition type</th>{% endif %}
                 <th scope="col" class="right fit-content" data-sort-type="number">Rating</th>
                 <th scope="col" class="right fit-content">Reading state</th>
                 <th scope="col" class="right fit-content">Availability</th>
@@ -61,14 +60,6 @@
             {{ entity_link(work, work.title) }}
         {% endif %}
     </td>
-    {% if show_work_edition %}
-    <td class="fit-content" data-filter-values='{{ edition_filter_values | tojson }}' data-filter-groups='{{ edition_filter_groups | tojson }}'>
-        {% if work_edition %}
-            {{ edition_language }}
-            <span class="table-secondary-text">{{ edition_type }}</span>
-        {% endif %}
-    </td>
-    {% endif %}
     <td data-filter-values='{{ work.author_objs | map(attribute="name") | list | tojson }}'>
         {% for author in work.author_objs %}
             {% if not loop.first %}, {% endif %}{{ entity_link(author, author.name) }}
@@ -82,11 +73,14 @@
             {% if not loop.first %}, {% endif %}<a href="{{ series.id }}.html">{{ series.name }}</a>
         {% endfor %}
     </td>
-    <td class="center fit-content">
-        <pre>
-            {{ work.edition_objs | length }}
-        </pre>
+    {% if show_work_edition %}
+    <td class="fit-content" data-filter-values='{{ edition_filter_values | tojson }}' data-filter-groups='{{ edition_filter_groups | tojson }}'>
+        {% if work_edition %}
+            {{ edition_language }}
+            <span class="table-secondary-text">{{ edition_type }}</span>
+        {% endif %}
     </td>
+    {% endif %}
     <td class="right fit-content" data-sort-value="{{ work.rating if work.rating is not none else '' }}" data-filter-values='{{ ([work.rating] if work.rating is not none else ["Unrated"]) | tojson }}'>
         {{ rating_value(work.rating) }}
     </td>

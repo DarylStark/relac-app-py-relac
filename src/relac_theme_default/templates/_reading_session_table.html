@@ -14,7 +14,12 @@
                     <th scope="col" data-sort-type="date" data-filter-type="date">Start date</th>
                     <th scope="col" data-sort-type="date" data-filter-type="date">End date</th>
                     <th scope="col">Work edition</th>
+                    <th scope="col" class="fit-content">Primary genre</th>
+                    <th scope="col">Series</th>
                     <th scope="col">Book</th>
+                    <th scope="col" class="fit-content">Work structure</th>
+                    <th scope="col" class="fit-content">Work category</th>
+                    <th scope="col" class="fit-content">Language / edition type</th>
                     <th scope="col">Authors</th>
                     <th scope="col" class="center fit-content">Reading days</th>
                     <th scope="col" class="right fit-content">State</th>
@@ -26,6 +31,15 @@
             </thead>
             <tbody>
                 {% for reading_session in reading_sessions %}
+                    {% set work_edition = reading_session.work_edition_obj %}
+                    {% set work = work_edition.work_obj if work_edition else none %}
+                    {% set edition_language = work_edition.language | language if work_edition else '' %}
+                    {% set edition_type = work_edition.edition_type.value | enum_label if work_edition else '' %}
+                    {% set edition_filter_values = ([edition_language] if edition_language else []) + ([edition_type] if edition_type else []) %}
+                    {% set edition_filter_groups = {"Language": ([edition_language] if edition_language else []), "Edition type": ([edition_type] if edition_type else [])} %}
+                    {% set work_structure = work.work_structure.value.replace('-', ' ').capitalize() if work and work.work_structure else 'Unspecified' %}
+                    {% set work_category = work.work_type.value.replace('-', ' ').capitalize() if work and work.work_type else 'Unspecified' %}
+                    {% set primary_genre = work.genre.primary.value.replace('_', '-') | enum_label if work and work.genre else '' %}
                     <tr data-href="{{ reading_session.id }}.html">
                         <td data-sort-value="{{ reading_session.startdate.isoformat() if reading_session.startdate else '' }}" data-filter-values='{{ ([reading_session.startdate.isoformat()] if reading_session.startdate else [""]) | tojson }}'>
                             {% if reading_session.startdate %}
@@ -46,11 +60,27 @@
                                 Unspecified
                             {% endif %}
                         </td>
+                        <td class="fit-content" data-filter-values='{{ ([primary_genre] if primary_genre else []) | tojson }}'>{{ primary_genre }}</td>
+                        <td data-filter-values='{{ work.series_objs | map(attribute="name") | list | tojson if work else [] }}'>
+                            {% if work %}
+                                {% for series in work.series_objs %}
+                                    {% if not loop.first %}, {% endif %}<a href="{{ series.id }}.html">{{ series.name }}</a>
+                                {% endfor %}
+                            {% endif %}
+                        </td>
                         <td>
                             {% if reading_session.book_obj %}
                                 {{ entity_link(reading_session.book_obj, reading_session.book_obj.title) }}
                             {% else %}
                                 Unspecified
+                            {% endif %}
+                        </td>
+                        <td class="fit-content" data-filter-values='{{ [work_structure] | tojson }}'>{{ work_structure }}</td>
+                        <td class="fit-content" data-filter-values='{{ [work_category] | tojson }}'>{{ work_category }}</td>
+                        <td class="fit-content" data-filter-values='{{ edition_filter_values | tojson }}' data-filter-groups='{{ edition_filter_groups | tojson }}'>
+                            {% if work_edition %}
+                                {{ edition_language }}
+                                <span class="table-secondary-text">{{ edition_type }}</span>
                             {% endif %}
                         </td>
                         <td data-filter-values='{{ (reading_session.work_edition_obj.authors if reading_session.work_edition_obj else []) | map(attribute="name") | list | tojson }}'>

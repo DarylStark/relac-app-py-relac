@@ -828,6 +828,23 @@ nav.tab-nav
     background: var(--hover-surface);
 }
 
+@media (max-height: 500px) and (orientation: landscape)
+{
+    nav.tab-nav
+    {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    nav.tab-nav::-webkit-scrollbar
+    {
+        display: none;
+    }
+}
+
 nav.tab-nav a,
 .nav-submenu a
 {
@@ -1048,6 +1065,23 @@ h3.reading-challenge-title
     color: var(--muted);
     font-size: 13px;
     line-height: 1.4;
+}
+
+.reading-challenge-meter
+{
+    height: 5px;
+    margin-top: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--line);
+}
+
+.reading-challenge-meter-fill
+{
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--accent-text);
 }
 
 .currently-reading-entry > .currently-reading-book

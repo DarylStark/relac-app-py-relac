@@ -335,6 +335,14 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         '<th scope="col" class="fit-content">Language / edition type</th>'
         in reading_list_page
     )
+    assert reading_list_page.index('<th scope="col">Series</th>') < (
+        reading_list_page.index(
+            '<th scope="col" class="fit-content">Language / edition type</th>'
+        )
+    )
+    assert '<th scope="col" class="center fit-content">Editions</th>' not in (
+        reading_list_page
+    )
     assert '<th scope="col">Note</th>' in reading_list_page
     assert reading_list_page.index(
         '<th scope="col" class="right fit-content">Availability</th>'
@@ -411,6 +419,15 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         in index_page
     )
     assert '2 of 2 sessions' in index_page
+    assert re.search(r'<pre>100\.0%</pre>\s*2 of 2 sessions', index_page)
+    assert re.search(
+        r'<div class="reading-challenge-meter" role="progressbar" '
+        r'aria-label="Finish 2 sessions in 2026 progress" aria-valuemin="0" '
+        r'aria-valuemax="2" aria-valuenow="2">\s*'
+        r'<span class="reading-challenge-meter-fill" '
+        r'style="width: 100(?:\.0)?%;"></span>\s*</div>',
+        index_page,
+    )
     assert 'Finish 3 sessions in 2026' in index_page
     assert 'Closed challenge: finish 3 sessions in 2026' not in index_page
     assert re.search(
@@ -463,6 +480,91 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         r'<a href="reading-challenges\.html"\s*>Reading challenges</a>',
         sessions_page,
     )
+    assert (
+        '<th scope="col" class="fit-content">Language / edition type</th>'
+        in (sessions_page)
+    )
+    assert '<th scope="col" class="fit-content">Work structure</th>' in (
+        sessions_page
+    )
+    assert '<th scope="col" class="fit-content">Work category</th>' in (
+        sessions_page
+    )
+    assert '<th scope="col" class="fit-content">Primary genre</th>' in (
+        sessions_page
+    )
+    assert '<th scope="col">Series</th>' in sessions_page
+    assert sessions_page.index('<th scope="col">Book</th>') < (
+        sessions_page.index(
+            '<th scope="col" class="fit-content">Work structure</th>'
+        )
+    )
+    assert sessions_page.index(
+        '<th scope="col" class="fit-content">Work structure</th>'
+    ) < sessions_page.index(
+        '<th scope="col" class="fit-content">Work category</th>'
+    )
+    assert sessions_page.index(
+        '<th scope="col" class="fit-content">Work category</th>'
+    ) < sessions_page.index(
+        '<th scope="col" class="fit-content">Language / edition type</th>'
+    )
+    assert re.search(
+        r'<td class="fit-content" '
+        r'data-filter-values=\'\["English", "Original"\]'
+        r'\' data-filter-groups=\'\{"Edition type": \["Original"\], '
+        r'"Language": \["English"\]\}\'>\s*English\s*'
+        r'<span class="table-secondary-text">Original</span>\s*</td>',
+        sessions_page,
+    )
+    assert (
+        '<td class="fit-content" data-filter-values=\'["Novel"]\'>Novel</td>'
+        in (sessions_page)
+    )
+    stoner_session_row = re.search(
+        r'<tr data-href="reading_session\.stoner_finished_2026\.html">'
+        r'(.*?)</tr>',
+        sessions_page,
+        re.DOTALL,
+    )
+    assert stoner_session_row is not None
+    stoner_row = stoner_session_row.group(1)
+    assert stoner_row.index(
+        'book.john_williams__stoner__vintage_classic_red_spine.html'
+    ) < (
+        stoner_row.index(
+            '<td class="fit-content" data-filter-values=\'["Novel"]\'>'
+        )
+    )
+    assert stoner_row.index(
+        '<td class="fit-content" data-filter-values=\'["Novel"]\'>'
+    ) < (
+        stoner_row.rindex(
+            '<td class="fit-content"'
+            ' data-filter-values=\'["Literary fiction"]\'>'
+        )
+    )
+    assert stoner_row.rindex(
+        '<td class="fit-content" data-filter-values=\'["Literary fiction"]\'>'
+    ) < stoner_row.index(
+        '<td class="fit-content" data-filter-values=\'["English", "Original"]\''
+    )
+    assert (
+        stoner_row.count(
+            '<td class="fit-content"'
+            ' data-filter-values=\'["Literary fiction"]\'>'
+            'Literary fiction</td>'
+        )
+        == 2
+    )
+    assert re.search(
+        r"<td data-filter-values='\[\]'>\s*</td>",
+        stoner_row,
+    )
+    assert (
+        '<td class="fit-content" data-filter-values=\'["Literary fiction"]\'>'
+        'Literary fiction</td>'
+    ) in sessions_page
 
     challenge_page = (
         output / 'reading_challenge.challenge_2026.html'
