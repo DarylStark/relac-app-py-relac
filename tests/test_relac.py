@@ -419,6 +419,15 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         in index_page
     )
     assert '2 of 2 sessions' in index_page
+    assert re.search(r'<pre>100\.0%</pre>\s*2 of 2 sessions', index_page)
+    assert re.search(
+        r'<div class="reading-challenge-meter" role="progressbar" '
+        r'aria-label="Finish 2 sessions in 2026 progress" aria-valuemin="0" '
+        r'aria-valuemax="2" aria-valuenow="2">\s*'
+        r'<span class="reading-challenge-meter-fill" '
+        r'style="width: 100(?:\.0)?%;"></span>\s*</div>',
+        index_page,
+    )
     assert 'Finish 3 sessions in 2026' in index_page
     assert 'Closed challenge: finish 3 sessions in 2026' not in index_page
     assert re.search(

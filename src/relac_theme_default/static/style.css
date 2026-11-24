@@ -1050,6 +1050,23 @@ h3.reading-challenge-title
     line-height: 1.4;
 }
 
+.reading-challenge-meter
+{
+    height: 5px;
+    margin-top: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--line);
+}
+
+.reading-challenge-meter-fill
+{
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--accent-text);
+}
+
 .currently-reading-entry > .currently-reading-book
 {
     margin: 0;
