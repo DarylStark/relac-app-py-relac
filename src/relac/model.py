@@ -1053,6 +1053,7 @@ class BookCollection(LabelledResource):
 
     name: str
     books: list[str] = Field(default_factory=list)
+    description: str | None = None
 
     # Relations (real objects)
     book_objs: list[Book] = Field(default_factory=list, exclude=True)
