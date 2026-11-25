@@ -4,6 +4,9 @@
 #-------------------------------------------------------------------------------
 collection.penguin_clothbound_classics:
   name: Penguin Clothbound Classics
+  links:
+    - title: Testlink
+      url: https://google.com
   books:
     - book.george_orwell__nineteen_eighty_four__clothbound_classic
 #-------------------------------------------------------------------------------
