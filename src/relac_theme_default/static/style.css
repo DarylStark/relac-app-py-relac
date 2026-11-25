@@ -234,6 +234,127 @@ h1
     box-shadow: 0 20px 60px var(--menu-shadow);
 }
 
+.isbn-popup-trigger
+{
+    padding: 0;
+    border: 0;
+    color: inherit;
+    background: transparent;
+    font: inherit;
+    cursor: pointer;
+}
+
+.isbn-popup-trigger code
+{
+    padding: 5px 8px;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    color: var(--text);
+    background: var(--code-bg);
+    font-family: "Google Sans Code", monospace;
+    font-size: 12px;
+}
+
+.isbn-popup-trigger:hover code
+{
+    background: var(--hover-surface);
+}
+
+.isbn-popup-trigger:focus-visible
+{
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+}
+
+.isbn-dialog
+{
+    width: min(480px, calc(100vw - 28px));
+}
+
+.isbn-popup-content
+{
+    padding: 16px 18px 20px;
+}
+
+.isbn-popup-title-row
+{
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.isbn-language-badge
+{
+    max-width: 42%;
+    flex: none;
+    padding: 5px 9px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--muted);
+    background: var(--code-bg);
+    font-size: 11px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.isbn-popup-book-title
+{
+    min-width: 0;
+    margin: 0;
+    color: var(--text-strong);
+    font-size: 17px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+}
+
+.isbn-popup-credit
+{
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0 0 20px;
+    color: var(--text);
+    font-size: 14px;
+    overflow-wrap: anywhere;
+}
+
+.isbn-popup-credit span:first-child,
+.isbn-popup-identifiers dt
+{
+    color: var(--muted);
+    font-family: "Google Sans Code", monospace;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+}
+
+.isbn-popup-identifiers
+{
+    display: grid;
+    gap: 14px;
+    margin: 0;
+}
+
+.isbn-popup-identifiers > div
+{
+    min-width: 0;
+}
+
+.isbn-popup-identifiers dd
+{
+    margin: 4px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.isbn-popup-identifiers code
+{
+    font-family: "Google Sans Code", monospace;
+    font-size: 13px;
+}
+
 .library-search-dialog::backdrop
 {
     background: rgb(0 0 0 / 0.58);
@@ -1591,6 +1712,12 @@ table.resources tbody tr.table-empty-state td {
     font-size: 14px;
     line-height: 1.4;
     overflow-wrap: anywhere;
+}
+
+.detail-fact--isbn .isbn-popup-trigger
+{
+    align-self: flex-start;
+    text-align: left;
 }
 
 .reading-challenge-sessions

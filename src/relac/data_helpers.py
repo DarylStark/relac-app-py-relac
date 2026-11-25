@@ -2,7 +2,7 @@
 
 from datetime import date
 
-from isbnlib import mask
+from isbnlib import mask, to_isbn10
 from markdown_it import MarkdownIt
 from markupsafe import Markup
 from pycountry import countries, languages
@@ -10,9 +10,18 @@ from pycountry import countries, languages
 _MARKDOWN = MarkdownIt('commonmark', {'html': False})
 
 
-def _format_isbn(value: int | None) -> str:
+def _format_isbn(value: int | str | None) -> str:
     """Format an ISBN for display, leaving missing values blank."""
     return mask(str(value)) if value is not None else ''
+
+
+def _isbn10(value: int | None) -> str | None:
+    """Convert an ISBN-13 to ISBN-10 when an equivalent exists."""
+    if value is None:
+        return None
+
+    converted = to_isbn10(str(value))
+    return converted or None
 
 
 def _render_markdown(text: str) -> Markup:
