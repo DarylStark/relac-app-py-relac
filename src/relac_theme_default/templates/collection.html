@@ -29,6 +29,11 @@
           </div>
         </dl>
       </section>
+      {% if collection.description %}
+      <section class="detail-premise" aria-label="Description">
+        {{ collection.description | markdown }}
+      </section>
+      {% endif %}
       {{ detail_labels(collection.label_objs) }}
   </div>
 
