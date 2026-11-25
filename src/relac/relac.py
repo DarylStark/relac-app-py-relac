@@ -36,6 +36,7 @@ from .data_helpers import (
     _code_to_language,
     _format_enum_label,
     _format_isbn,
+    _isbn10,
     _render_markdown,
 )
 from .data_importer import DataImporter
@@ -133,6 +134,7 @@ class Relac:
 
         env = Environment(loader=FileSystemLoader(metadata.source_dir))
         env.filters['isbn'] = _format_isbn
+        env.filters['isbn10'] = _isbn10
         env.filters['markdown'] = _render_markdown
         env.filters['enum_label'] = _format_enum_label
         env.filters['age'] = _calculate_age

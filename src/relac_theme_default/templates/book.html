@@ -85,9 +85,13 @@
             </dd>
           </div>
           {% if book.isbn13 is not none %}
-          <div class="detail-fact">
+          <div class="detail-fact detail-fact--isbn">
             <dt>ISBN</dt>
-            <dd><code>{{ book.isbn13 | isbn }}</code></dd>
+            <dd>
+              <button class="isbn-popup-trigger" type="button" aria-haspopup="dialog" aria-controls="isbn-details-dialog">
+                <code>{{ book.isbn13 | isbn }}</code>
+              </button>
+            </dd>
           </div>
           {% endif %}
           <div class="detail-fact">
@@ -102,6 +106,82 @@
       </section>
       {{ detail_labels(book.label_objs) }}
   </div>
+
+  {% if book.isbn13 is not none %}
+    {% set author_names = [] %}
+    {% set translator_names = [] %}
+    {% set illustrator_names = [] %}
+    {% for work_edition in book.work_edition_objs %}
+      {% if work_edition.work_obj %}
+        {% for author in work_edition.work_obj.author_objs %}
+          {% if author.name not in author_names %}
+            {% set _ = author_names.append(author.name) %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% for translator in work_edition.translator_objs %}
+        {% if translator.name not in translator_names %}
+          {% set _ = translator_names.append(translator.name) %}
+        {% endif %}
+      {% endfor %}
+      {% for illustrator in work_edition.illustrator_objs %}
+        {% if illustrator.name not in illustrator_names %}
+          {% set _ = illustrator_names.append(illustrator.name) %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+    {% set isbn10_value = book.isbn13 | isbn10 %}
+    <dialog id="isbn-details-dialog" class="library-search-dialog isbn-dialog" aria-labelledby="isbn-details-title">
+      <section class="library-search-panel">
+        <header class="library-search-header">
+          <h2 id="isbn-details-title">Book details</h2>
+          <button class="library-search-close isbn-popup-close" type="button" aria-label="Close book details">&times;</button>
+        </header>
+        <div class="isbn-popup-content">
+          <div class="isbn-popup-title-row">
+            <h3 class="isbn-popup-book-title">{{ book.title | e }}</h3>
+            <span class="isbn-language-badge">
+              {{ book.languages | sort | map('language') | join(", ") if book.languages else "Unspecified" }}
+            </span>
+          </div>
+          <p class="isbn-popup-credit isbn-popup-authors">
+            <span>Author(s)</span>
+            <span>{{ author_names | join(", ") | e if author_names else "Unspecified" }}</span>
+          </p>
+          {% if translator_names %}
+            <p class="isbn-popup-credit isbn-popup-translators">
+              <span>Translator(s)</span>
+              <span>{{ translator_names | join(", ") | e }}</span>
+            </p>
+          {% endif %}
+          {% if illustrator_names %}
+            <p class="isbn-popup-credit isbn-popup-illustrators">
+              <span>Illustrator(s)</span>
+              <span>{{ illustrator_names | join(", ") | e }}</span>
+            </p>
+          {% endif %}
+          <dl class="isbn-popup-identifiers">
+            <div>
+              <dt>ISBN-13 with dashes</dt>
+              <dd><code>{{ book.isbn13 | isbn }}</code></dd>
+            </div>
+            <div>
+              <dt>ISBN-13 without dashes</dt>
+              <dd><code>{{ book.isbn13 }}</code></dd>
+            </div>
+            <div>
+              <dt>ISBN-10 with dashes</dt>
+              <dd><code>{{ isbn10_value | isbn if isbn10_value else "Not available" }}</code></dd>
+            </div>
+            <div>
+              <dt>ISBN-10 without dashes</dt>
+              <dd><code>{{ isbn10_value if isbn10_value else "Not available" }}</code></dd>
+            </div>
+          </dl>
+        </div>
+      </section>
+    </dialog>
+  {% endif %}
 
   {% if book.reading_session_objs %}
     {{ reading_session_table(book.reading_session_objs) }}

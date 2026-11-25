@@ -102,6 +102,124 @@ def test_generates_book_owner_detail_page(tmp_path: Path) -> None:
     assert not cells[-1].strip()
 
 
+def test_book_page_includes_isbn_details_popup(tmp_path: Path) -> None:
+    """Include the book's authors and ISBN-13/ISBN-10 formats in its popup."""
+    relac = Relac(YamlRepoLoader(Path(__file__).parent / 'simple_project'))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    book_page = (
+        output / 'book.john_williams__stoner__vintage_classic_red_spine.html'
+    ).read_text(encoding='utf-8')
+
+    assert 'class="isbn-popup-trigger"' in book_page
+    assert 'class="detail-fact detail-fact--isbn"' in book_page
+    assert 'aria-labelledby="isbn-details-title"' in book_page
+    assert 'Stoner' in book_page
+    assert 'John Willams' in book_page
+    assert 'isbn-popup-translators' not in book_page
+    assert 'isbn-popup-illustrators' not in book_page
+    assert '978-0-09-956154-5' in book_page
+    assert '9780099561545' in book_page
+    assert '0-09-956154-9' in book_page
+    assert '0099561549' in book_page
+
+
+def test_isbn_details_popup_includes_translators_illustrators_and_language(
+    tmp_path: Path,
+) -> None:
+    """Include optional edition contributors and the language badge."""
+    repo_path = tmp_path / 'repo'
+    repo_path.mkdir()
+    (repo_path / 'main.yml').write_text(
+        'relac:\n  title: Test Library\n',
+        encoding='utf-8',
+    )
+    (repo_path / 'contributors.yml').write_text(
+        'contributor.author:\n'
+        '  name: Book Author\n'
+        'contributor.translator:\n'
+        '  name: Book Translator\n'
+        'contributor.illustrator:\n'
+        '  name: Book Illustrator\n',
+        encoding='utf-8',
+    )
+    (repo_path / 'works.yml').write_text(
+        'work.example:\n'
+        '  title: Example Work\n'
+        '  authors:\n'
+        '    - contributor.author\n',
+        encoding='utf-8',
+    )
+    (repo_path / 'work_editions.yml').write_text(
+        'work_edition.example:\n'
+        '  title: Example Edition\n'
+        '  work: work.example\n'
+        '  language: en\n'
+        '  translators:\n'
+        '    - contributor.translator\n'
+        '  illustrators:\n'
+        '    - contributor.illustrator\n',
+        encoding='utf-8',
+    )
+    (repo_path / 'books.yml').write_text(
+        'book.example:\n'
+        '  title: Example Book\n'
+        '  isbn13: 9780306406157\n'
+        '  work_editions:\n'
+        '    - work_edition.example\n',
+        encoding='utf-8',
+    )
+
+    relac = Relac(YamlRepoLoader(repo_path))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    book_page = (output / 'book.example.html').read_text(encoding='utf-8')
+
+    assert 'Book Author' in book_page
+    assert 'Book Translator' in book_page
+    assert 'Book Illustrator' in book_page
+    assert 'isbn-popup-translators' in book_page
+    assert 'isbn-popup-illustrators' in book_page
+    assert 'isbn-language-badge' in book_page
+    assert re.search(
+        r'<div class="isbn-popup-title-row">\s*'
+        r'<h3 class="isbn-popup-book-title">Example Book</h3>\s*'
+        r'<span class="isbn-language-badge">\s*English\s*</span>\s*</div>',
+        book_page,
+    )
+
+
+def test_isbn_details_popup_handles_isbn13_without_isbn10(
+    tmp_path: Path,
+) -> None:
+    """Show unavailable ISBN-10 values for an ISBN-13 that has no equivalent."""
+    repo_path = tmp_path / 'repo'
+    repo_path.mkdir()
+    (repo_path / 'main.yml').write_text(
+        'relac:\n  title: Test Library\n',
+        encoding='utf-8',
+    )
+    (repo_path / 'books.yml').write_text(
+        'book.example:\n  title: Example Book\n  isbn13: 9791090636071\n',
+        encoding='utf-8',
+    )
+
+    relac = Relac(YamlRepoLoader(repo_path))
+    relac.import_data()
+    output = tmp_path / 'output'
+    relac.create_static_webpage('relac_theme_default', output)
+
+    book_page = (output / 'book.example.html').read_text(encoding='utf-8')
+
+    assert '979-10-90636-07-1' in book_page
+    assert '9791090636071' in book_page
+    assert book_page.count('Not available') == 2
+
+
 def test_character_and_location_detail_breadcrumbs(tmp_path: Path) -> None:
     """Include the character or location index in detail breadcrumbs."""
     relac = Relac(YamlRepoLoader(Path(__file__).parent / 'simple_project'))
