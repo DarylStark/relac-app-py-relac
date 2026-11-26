@@ -2203,6 +2203,26 @@ class SpecificLanguageReadingSessionSpec(ReadingSessionSpec):
         return obj.work_edition_obj.language == self.language
 
 
+@register_model('reading_session_no_start_date')
+class NoStartDateReadingSessionSpec(ReadingSessionSpec):
+    """Check if the work edition has no startdate."""
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the work edition has the correct language."""
+        return obj.startdate is None
+
+
+@register_model('reading_session_no_end_date')
+class NoEndDateReadingSessionSpec(ReadingSessionSpec):
+    """Determines if a ReadingSession has a no enddate."""
+
+    @override
+    def is_satisfied_by(self, obj: ReadingSession) -> bool:
+        """Check if the work edition has no enddate."""
+        return obj.enddate is None
+
+
 @register_model('reading_session_edition_type')
 class SpecificTypeReadingSessionSpec(ReadingSessionSpec):
     """Determines if a ReadingSession has a edition of a specific type."""

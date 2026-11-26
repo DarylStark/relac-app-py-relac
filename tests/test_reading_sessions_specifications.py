@@ -10,6 +10,8 @@ from relac.model import (
     FinishedAfterReadingSessionSpec,
     FinishedBeforeReadingSessionSpec,
     IsFinishedReadingSessionSpec,
+    NoEndDateReadingSessionSpec,
+    NoStartDateReadingSessionSpec,
     ReadingSession,
     ReadingState,
     SpecificLanguageReadingSessionSpec,
@@ -211,6 +213,52 @@ def test_valid_specific_language_spec() -> None:
     assert SpecificLanguageReadingSessionSpec(language='nl').is_satisfied_by(
         session
     )
+
+
+def test_valid_no_start_date_spec() -> None:
+    """Test if we get True for a session without startdate."""
+    session = ReadingSession(
+        work_edition='work_edition.test',
+        book='book.test',
+        state=ReadingState.FINISHED,
+        work_edition_obj=WorkEdition(title='test', work='work', language='nl'),
+    )
+    assert NoStartDateReadingSessionSpec().is_satisfied_by(session)
+
+
+def test_invalid_no_start_date_spec() -> None:
+    """Test if we get False for a session with startdate."""
+    session = ReadingSession(
+        work_edition='work_edition.test',
+        book='book.test',
+        state=ReadingState.FINISHED,
+        startdate=date(1986, 10, 26),
+        work_edition_obj=WorkEdition(title='test', work='work', language='nl'),
+    )
+    assert not NoStartDateReadingSessionSpec().is_satisfied_by(session)
+
+
+def test_valid_no_end_date_spec() -> None:
+    """Test if we get True for a session without enddate."""
+    session = ReadingSession(
+        work_edition='work_edition.test',
+        book='book.test',
+        state=ReadingState.FINISHED,
+        work_edition_obj=WorkEdition(title='test', work='work', language='nl'),
+    )
+    assert NoEndDateReadingSessionSpec().is_satisfied_by(session)
+
+
+def test_invalid_no_end_date_spec() -> None:
+    """Test if we get False for a session with enddate."""
+    session = ReadingSession(
+        work_edition='work_edition.test',
+        book='book.test',
+        state=ReadingState.FINISHED,
+        enddate=date(1986, 10, 26),
+        work_edition_obj=WorkEdition(title='test', work='work', language='nl'),
+    )
+    assert not NoEndDateReadingSessionSpec().is_satisfied_by(session)
 
 
 def test_invalid_specific_language_spec() -> None:
