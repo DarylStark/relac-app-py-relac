@@ -2289,7 +2289,7 @@ class ReadingChallenge(ResourceBase):
 
         dates = [
             (session.startdate, session.enddate)
-            for session in reading_sessions.values()
+            for session in self.get_sessions(reading_sessions).values()
             if session.startdate
             and session.enddate
             and session.state == ReadingState.FINISHED

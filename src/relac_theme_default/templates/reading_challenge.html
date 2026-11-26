@@ -14,6 +14,7 @@
   {% set session_count = challenge_sessions | length %}
   {% set session_percentage = (session_count / reading_challenge.goal * 100) | round | int if reading_challenge.goal > 0 else none %}
   {% set result = reading_challenge.get_result(reading_sessions) %}
+  {% set estimated_finish_time = reading_challenge.get_estimate_finish_time(reading_sessions) %}
   <div class="card">
     <section class="detail-summary" aria-labelledby="detail-title">
       <div class="detail-summary-header">
@@ -36,6 +37,16 @@
           <dt>Challenge state</dt>
           <dd>
             <span class="availability-badge reading-challenge-state reading-challenge-state--{{ reading_challenge.state.value | replace('_', '-') }}">{{ reading_challenge.state.value | replace('_', '-') | enum_label }}</span>
+          </dd>
+        </div>
+        <div class="detail-fact">
+          <dt>Estimated finish</dt>
+          <dd>
+            {% if estimated_finish_time %}
+              <time datetime="{{ estimated_finish_time.isoformat() }}" data-local-date>{{ estimated_finish_time }}</time>
+            {% else %}
+              Not calculated
+            {% endif %}
           </dd>
         </div>
       </dl>

@@ -889,9 +889,19 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
     )
     assert 'reading_session.nineteen_eighty_four.html' not in challenge_page
 
+    in_progress_challenge_page = (
+        output / 'reading_challenge.challenge_2026_in_progress.html'
+    ).read_text(encoding='utf-8')
+    assert re.search(
+        r'<dt>Estimated finish</dt>\s*<dd>\s*'
+        r'<time datetime="2026-10-12" data-local-date>2026-10-12</time>',
+        in_progress_challenge_page,
+    )
+
     closed_challenge_page = (
         output / 'reading_challenge.challenge_2026_closed.html'
     ).read_text(encoding='utf-8')
+    assert 'Not calculated' in closed_challenge_page
     assert re.search(
         r'<pre>2</pre>\s*/\s*<pre>3</pre>\s*\(\s*<pre>67%</pre>\s*\)',
         closed_challenge_page,

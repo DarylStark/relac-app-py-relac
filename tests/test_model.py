@@ -1,16 +1,22 @@
 """Tests for the Relac Model."""
 
+from datetime import date
+
 import pytest
 
 from relac.exceptions import DoubleModelNameError
 from relac.model import (
     Book,
     Character,
+    IsFinishedReadingSessionSpec,
+    ReadingChallenge,
+    ReadingChallengeState,
     ReadingList,
     ReadingListItem,
     ReadingSession,
     ReadingState,
     ResourceBase,
+    StartedAfterReadingSessionSpec,
     Work,
     WorkEdition,
     WorkEditionType,
@@ -238,6 +244,126 @@ def test_book_counts_non_abridged_edition_read_in_another_book() -> None:
 
     assert work.reading_state == ReadingState.FINISHED
     assert book.read_count == 1
+
+
+def test_reading_challenge_estimates_finish_from_matching_sessions() -> None:
+    """Estimate using only dated finished sessions matching the challenge."""
+    challenge = ReadingChallenge(
+        name='Test challenge',
+        spec='reading_session_started_after.test',
+        goal=4,
+        state=ReadingChallengeState.IN_PROGRESS,
+        spec_obj=StartedAfterReadingSessionSpec(date=date(2026, 1, 1)),
+    )
+    reading_sessions = {
+        'session.first': ReadingSession(
+            work_edition='edition.first',
+            book='book.test',
+            state=ReadingState.FINISHED,
+            startdate=date(2026, 1, 1),
+            enddate=date(2026, 1, 3),
+            work_edition_obj=WorkEdition(
+                id='edition.first', title='First', work='work.first'
+            ),
+        ),
+        'session.second': ReadingSession(
+            work_edition='edition.second',
+            book='book.test',
+            state=ReadingState.FINISHED,
+            startdate=date(2026, 1, 9),
+            enddate=date(2026, 1, 11),
+            work_edition_obj=WorkEdition(
+                id='edition.second', title='Second', work='work.second'
+            ),
+        ),
+        'session.outside_challenge': ReadingSession(
+            work_edition='edition.outside',
+            book='book.test',
+            state=ReadingState.FINISHED,
+            startdate=date(2025, 12, 1),
+            enddate=date(2025, 12, 2),
+            work_edition_obj=WorkEdition(
+                id='edition.outside', title='Outside', work='work.outside'
+            ),
+        ),
+    }
+
+    assert challenge.get_estimate_finish_time(reading_sessions) == date(
+        2026, 1, 21
+    )
+
+
+def test_reading_challenge_estimate_requires_two_dated_finished_sessions() -> (
+    None
+):
+    """Ignore unfinished or undated sessions when checking estimate data."""
+    challenge = ReadingChallenge(
+        name='Test challenge',
+        spec='reading_session_is_finished.test',
+        goal=3,
+        state=ReadingChallengeState.IN_PROGRESS,
+        spec_obj=IsFinishedReadingSessionSpec(),
+    )
+    reading_sessions = {
+        'session.dated': ReadingSession(
+            work_edition='edition.dated',
+            book='book.test',
+            state=ReadingState.FINISHED,
+            startdate=date(2026, 1, 1),
+            enddate=date(2026, 1, 2),
+            work_edition_obj=WorkEdition(
+                id='edition.dated', title='Dated', work='work.dated'
+            ),
+        ),
+        'session.undated': ReadingSession(
+            work_edition='edition.undated',
+            book='book.test',
+            state=ReadingState.FINISHED,
+            work_edition_obj=WorkEdition(
+                id='edition.undated', title='Undated', work='work.undated'
+            ),
+        ),
+    }
+
+    assert challenge.get_estimate_finish_time(reading_sessions) is None
+
+
+def test_reading_challenge_estimate_is_unavailable_when_closed_or_reached() -> (
+    None
+):
+    """Do not estimate challenges that are closed or already reached."""
+    sessions = {
+        f'session.{index}': ReadingSession(
+            work_edition=f'edition.{index}',
+            book='book.test',
+            state=ReadingState.FINISHED,
+            startdate=date(2026, 1, index),
+            enddate=date(2026, 1, index + 1),
+            work_edition_obj=WorkEdition(
+                id=f'edition.{index}',
+                title=f'Work {index}',
+                work=f'work.{index}',
+            ),
+        )
+        for index in (1, 3)
+    }
+    closed_challenge = ReadingChallenge(
+        name='Closed challenge',
+        spec='reading_session_is_finished.test',
+        goal=3,
+        state=ReadingChallengeState.CLOSED,
+        spec_obj=IsFinishedReadingSessionSpec(),
+    )
+    reached_challenge = ReadingChallenge(
+        name='Reached challenge',
+        spec='reading_session_is_finished.test',
+        goal=2,
+        state=ReadingChallengeState.IN_PROGRESS,
+        spec_obj=IsFinishedReadingSessionSpec(),
+    )
+
+    assert closed_challenge.get_estimate_finish_time(sessions) is None
+    assert reached_challenge.get_estimate_finish_time(sessions) is None
 
 
 def test_register_model_with_double_model() -> None:
