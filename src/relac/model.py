@@ -2265,6 +2265,45 @@ class ReadingChallenge(ResourceBase):
         ResolvableField('spec', 'spec_obj', 'one-to-none')
     ]
 
+    def get_estimate_finish_time(
+        self, reading_sessions: dict[str, ReadingSession]
+    ) -> date | None:
+        """Get the estimated finish time for the challenge.
+
+        Uses the startdate of the first session in the challenge and the enddate
+        of the last session. It then calculates how many days there are in
+        between and uses that to calculate the average days of reading time per
+        work. It uses that to calculate how long it would take to get to the
+        goal.
+
+        It can only do this when there is enough information; if there aren't
+        enough sessions with dates to do this, or when the challenge is closed
+        or already made, it returns None.
+        """
+        result = self.get_result(reading_sessions)
+        if (
+            result == ReadingChallengeResult.REACHED
+            or self.state == ReadingChallengeState.CLOSED
+        ):
+            return None
+
+        dates = [
+            (session.startdate, session.enddate)
+            for session in self.get_sessions(reading_sessions).values()
+            if session.startdate
+            and session.enddate
+            and session.state == ReadingState.FINISHED
+        ]
+        if len(dates) < 2:
+            return None
+
+        first_date = min([session_date[0] for session_date in dates])
+        last_date = max([session_date[1] for session_date in dates])
+        diff = last_date - first_date
+        avg_per_session = diff / len(dates)
+
+        return first_date + (avg_per_session * self.goal)
+
     def get_sessions(
         self, reading_sessions: dict[str, ReadingSession]
     ) -> dict[str, ReadingSession]:
