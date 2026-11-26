@@ -2281,6 +2281,7 @@ class ReadingChallenge(ResourceBase):
         or already made, it returns None.
         """
         result = self.get_result(reading_sessions)
+        sessions = self.get_sessions(reading_sessions).values()
         if (
             result == ReadingChallengeResult.REACHED
             or self.state == ReadingChallengeState.CLOSED
@@ -2289,7 +2290,7 @@ class ReadingChallenge(ResourceBase):
 
         dates = [
             (session.startdate, session.enddate)
-            for session in self.get_sessions(reading_sessions).values()
+            for session in sessions
             if session.startdate
             and session.enddate
             and session.state == ReadingState.FINISHED
@@ -2302,7 +2303,7 @@ class ReadingChallenge(ResourceBase):
         diff = last_date - first_date
         avg_per_session = diff / len(dates)
 
-        return first_date + (avg_per_session * self.goal)
+        return last_date + (avg_per_session * (self.goal - len(sessions)))
 
     def get_sessions(
         self, reading_sessions: dict[str, ReadingSession]
