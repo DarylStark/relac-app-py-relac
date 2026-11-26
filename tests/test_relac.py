@@ -764,6 +764,10 @@ def test_generates_reading_challenge_index_and_detail_pages(  # noqa: PLR0915
         sessions_page,
     )
     assert (
+        '<th scope="col" data-sort-type="date" data-filter-type="date" '
+        'data-sort-empty="first">Start date</th>'
+    ) in sessions_page
+    assert (
         '<th scope="col" class="fit-content">Language / edition type</th>'
         in (sessions_page)
     )

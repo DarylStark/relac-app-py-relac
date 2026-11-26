@@ -182,13 +182,23 @@
         return value !== "" && Number.isFinite(Number(value.replace(/,/g, "")));
     };
 
-    const compareValues = (leftValue, rightValue, sortType, direction) => {
+    const compareValues = (
+        leftValue,
+        rightValue,
+        sortType,
+        direction,
+        emptyValuesFirst = false
+    ) => {
         if (leftValue === "") {
-            return rightValue === "" ? 0 : 1;
+            if (rightValue === "") {
+                return 0;
+            }
+
+            return emptyValuesFirst ? -direction : 1;
         }
 
         if (rightValue === "") {
-            return -1;
+            return emptyValuesFirst ? direction : -1;
         }
 
         let comparison;
@@ -1115,7 +1125,8 @@
                             left.value,
                             right.value,
                             effectiveSortType,
-                            direction
+                            direction,
+                            header.dataset.sortEmpty === "first"
                         );
 
                         return comparison === 0
